@@ -1,0 +1,58 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Background styling moved to GuestLayout for auth pages only */
+
+/* Overlay to ensure content readability */
+.bg-gradient-to-br {
+    position: relative;
+    background: linear-gradient(to bottom right, rgba(219, 234, 254, 0.3), rgba(255, 255, 255, 0.2), rgba(254, 215, 170, 0.3));
+}
+
+/* Form container transparency */
+.bg-white\/80 {
+    background-color: rgba(255, 255, 255, 0.6) !important;
+    backdrop-filter: blur(8px);
+}
+
+/* SVG decoration transparency */
+.opacity-20 {
+    opacity: 0.30 !important;
+}
+
+.opacity-25 {
+    opacity: 0.20 !important;
+}
+
+.opacity-15 {
+    opacity: 0.20 !important;
+}
+
+/* Industrial animations */
+@keyframes spin-slow {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.animate-spin-slow {
+    animation: spin-slow 20s linear infinite;
+}
+
+/* 3D transform utilities */
+@keyframes float {
+    0%, 100% {
+        transform: translateY(0px) rotate(0deg);
+    }
+    50% {
+        transform: translateY(-10px) rotate(5deg);
+    }
+}
+
+.animate-float {
+    animation: float 6s ease-in-out infinite;
+}
