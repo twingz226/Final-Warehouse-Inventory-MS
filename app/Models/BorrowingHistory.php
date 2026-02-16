@@ -47,6 +47,9 @@ class BorrowingHistory extends Model
             'updated' => 'Updated',
             'deleted' => 'Deleted',
             'status_changed' => 'Status Changed',
+            'system_update' => 'System Update',
+            'notification_sent' => 'Notification Sent',
+            'reminder_sent' => 'Reminder Sent',
         ];
     }
 
@@ -60,6 +63,9 @@ class BorrowingHistory extends Model
             'updated' => 'blue',
             'deleted' => 'red',
             'status_changed' => 'yellow',
+            'system_update' => 'orange',
+            'notification_sent' => 'purple',
+            'reminder_sent' => 'indigo',
             default => 'gray',
         };
     }

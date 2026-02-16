@@ -7,6 +7,8 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Config;
 
 class Borrowing extends Model
 {
@@ -33,6 +35,24 @@ class Borrowing extends Model
         'actual_return_date' => 'datetime',
         'quantity' => 'integer',
     ];
+
+    /**
+     * Boot the model.
+     */
+    protected static function boot()
+    {
+        parent::boot();
+
+        // Check and update overdue status when retrieving borrowed items
+        static::retrieved(function ($borrowing) {
+            if (config('borrowing.auto_update_overdue.enabled', true) && 
+                config('borrowing.auto_update_overdue.check_on_retrieve', true)) {
+                if ($borrowing->status === 'borrowed' && $borrowing->isActuallyOverdue()) {
+                    $borrowing->updateOverdueStatus();
+                }
+            }
+        });
+    }
 
     /**
      * The validation rules for the model.
@@ -77,6 +97,67 @@ class Borrowing extends Model
     public function isOverdue(): bool
     {
         return $this->status === 'borrowed' && $this->expected_return_date->isPast();
+    }
+
+    /**
+     * Check if the borrowing is actually overdue considering grace period.
+     */
+    public function isActuallyOverdue(): bool
+    {
+        if ($this->status !== 'borrowed') {
+            return false;
+        }
+
+        $gracePeriod = config('borrowing.grace_period', 0);
+        $effectiveDueTime = $this->expected_return_date->addMinutes($gracePeriod);
+        
+        return $effectiveDueTime->isPast();
+    }
+
+    /**
+     * Get the effective due time considering grace period.
+     */
+    public function getEffectiveDueTime()
+    {
+        $gracePeriod = config('borrowing.grace_period', 0);
+        return $this->expected_return_date->addMinutes($gracePeriod);
+    }
+
+    /**
+     * Update status to overdue if past due date (for real-time updates).
+     */
+    public function updateOverdueStatus(): bool
+    {
+        if ($this->isActuallyOverdue()) {
+            $oldValues = $this->toArray();
+            $this->update(['status' => 'overdue']);
+
+            // Log the automatic status change
+            BorrowingHistory::create([
+                'borrowing_id' => $this->id,
+                'user_id' => 1, // System user ID
+                'action' => 'system_update',
+                'old_values' => $oldValues,
+                'new_values' => $this->toArray(),
+                'description' => 'System automatically marked item as overdue (expected return: ' . $this->expected_return_date->format('M j, Y g:i A') . ')',
+            ]);
+
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * Scope to get overdue items.
+     */
+    public function scopeOverdue($query)
+    {
+        return $query->where('status', 'overdue')
+            ->orWhere(function($q) {
+                $q->where('status', 'borrowed')
+                  ->where('expected_return_date', '<', now());
+            });
     }
 
     /**

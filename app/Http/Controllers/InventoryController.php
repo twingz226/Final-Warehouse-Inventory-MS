@@ -18,7 +18,10 @@ class InventoryController extends Controller
         // Apply search filter
         if ($request->filled('search')) {
             $search = $request->get('search');
-            $query->where('name', 'like', "%{$search}%");
+            $query->where(function($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                  ->orWhere('description', 'like', "%{$search}%");
+            });
         }
         
         // Apply category filter
@@ -27,6 +30,47 @@ class InventoryController extends Controller
             if ($category !== 'all') {
                 $query->where('category', $category);
             }
+        }
+        
+        // Apply stock level filter
+        if ($request->filled('stock_level')) {
+            $stockLevel = $request->get('stock_level');
+            $query->where('quantity', '>=', 0); // Base condition
+            
+            switch ($stockLevel) {
+                case 'out_of_stock':
+                    $query->where('quantity', '=', 0);
+                    break;
+                case 'low_stock':
+                    $query->where('quantity', '>', 0)->where('quantity', '<=', 10);
+                    break;
+                case 'normal_stock':
+                    $query->where('quantity', '>', 5)->where('quantity', '<=', 50);
+                    break;
+                case 'high_stock':
+                    $query->where('quantity', '>', 50);
+                    break;
+            }
+        }
+        
+        // Apply date range filter
+        if ($request->filled('date_from')) {
+            $query->whereDate('date_time', '>=', $request->get('date_from'));
+        }
+        
+        if ($request->filled('date_to')) {
+            $query->whereDate('date_time', '<=', $request->get('date_to'));
+        }
+        
+        // Apply sorting
+        $sortBy = $request->get('sort_by', 'name');
+        $sortOrder = $request->get('sort_order', 'asc');
+        
+        $validSortFields = ['name', 'category', 'quantity', 'date_time', 'created_at'];
+        if (in_array($sortBy, $validSortFields)) {
+            $query->orderBy($sortBy, $sortOrder);
+        } else {
+            $query->orderBy('name', 'asc');
         }
         
         $items = $query->get()->map(function ($item) {
@@ -64,6 +108,11 @@ class InventoryController extends Controller
             'filters' => [
                 'search' => $request->get('search', ''),
                 'category' => $request->get('category', 'all'),
+                'stock_level' => $request->get('stock_level', 'all'),
+                'date_from' => $request->get('date_from', ''),
+                'date_to' => $request->get('date_to', ''),
+                'sort_by' => $request->get('sort_by', 'name'),
+                'sort_order' => $request->get('sort_order', 'asc'),
             ],
         ]);
     }

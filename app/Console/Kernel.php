@@ -14,6 +14,8 @@ class Kernel extends ConsoleKernel
      */
     protected $commands = [
         Commands\UpdateDailyStock::class,
+        Commands\UpdateOverdueStatus::class,
+        Commands\SendOverdueNotifications::class,
     ];
 
     /**
@@ -25,6 +27,13 @@ class Kernel extends ConsoleKernel
     protected function schedule(Schedule $schedule)
     {
         $schedule->command('stock:update-daily')->daily();
+        
+        // Use configurable frequency for overdue status updates
+        $frequency = config('borrowing.auto_update_overdue.schedule_frequency', 'hourly');
+        $schedule->command('overdue:update-status')->$frequency();
+        
+        // Send notifications twice daily
+        $schedule->command('overdue:send-notifications')->twiceDaily(9, 17);
     }
 
     /**
