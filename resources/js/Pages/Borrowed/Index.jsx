@@ -1,13 +1,18 @@
 import { Head, Link, router } from '@inertiajs/react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { useState } from 'react';
-import { PlusIcon, EyeIcon, PencilIcon, TrashIcon, MagnifyingGlassIcon } from '@heroicons/react/24/outline';
+import { PlusIcon, EyeIcon, PencilIcon, TrashIcon, MagnifyingGlassIcon, CheckIcon } from '@heroicons/react/24/outline';
+import Modal from '@/Components/Modal';
+import PrimaryButton from '@/Components/PrimaryButton';
+import SecondaryButton from '@/Components/SecondaryButton';
 
 export default function Index({ auth, borrowings, status, statusOptions }) {
     const [search, setSearch] = useState('');
     const [selectedStatus, setSelectedStatus] = useState('');
     const [searchTimeout, setSearchTimeout] = useState(null);
     const [tooltip, setTooltip] = useState({ show: false, text: '', x: 0, y: 0 });
+    const [confirmingReturn, setConfirmingReturn] = useState(false);
+    const [selectedItem, setSelectedItem] = useState({ id: null, name: '' });
 
     const handleSearch = (value) => {
         setSearch(value);
@@ -55,6 +60,24 @@ export default function Index({ auth, borrowings, status, statusOptions }) {
         if (confirm('Are you sure you want to delete this borrowing record?')) {
             router.delete(route('borrowings.destroy', id));
         }
+    };
+
+    const returnItem = (id, itemName) => {
+        setSelectedItem({ id, name: itemName });
+        setConfirmingReturn(true);
+    };
+
+    const confirmReturn = () => {
+        router.post(route('borrowings.return', selectedItem.id), {}, {
+            preserveScroll: true,
+            preserveState: true,
+            onSuccess: () => closeModal(),
+        });
+    };
+
+    const closeModal = () => {
+        setConfirmingReturn(false);
+        setSelectedItem({ id: null, name: '' });
     };
 
     const getStatusBadgeColor = (status) => {
@@ -193,14 +216,16 @@ export default function Index({ auth, borrowings, status, statusOptions }) {
                                                     >
                                                         <PencilIcon className="w-4 h-4" />
                                                     </Link>
-                                                    <button
-                                                        onClick={() => deleteBorrowing(borrowing.id)}
-                                                        className="inline-flex items-center p-2 border border-red-300 dark:border-red-600 shadow-sm rounded-md text-red-700 dark:text-red-400 bg-white dark:bg-gray-700 hover:bg-red-50 dark:hover:bg-red-900 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
-                                                        onMouseEnter={(e) => { const rect = e.currentTarget.getBoundingClientRect(); setTooltip({ show: true, text: 'Delete', x: rect.left + rect.width / 2, y: rect.top - 30 }); }}
-                                                        onMouseLeave={() => setTooltip({ show: false, text: '', x: 0, y: 0 })}
-                                                    >
-                                                        <TrashIcon className="w-4 h-4" />
-                                                    </button>
+                                                    {borrowing.status === 'borrowed' && (
+                                                        <button
+                                                            onClick={() => returnItem(borrowing.id, borrowing.item_name)}
+                                                            className="inline-flex items-center p-2 border border-green-300 dark:border-green-600 shadow-sm rounded-md text-green-700 dark:text-green-400 bg-white dark:bg-gray-700 hover:bg-green-50 dark:hover:bg-green-900 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
+                                                            onMouseEnter={(e) => { const rect = e.currentTarget.getBoundingClientRect(); setTooltip({ show: true, text: 'Return Item', x: rect.left + rect.width / 2, y: rect.top - 30 }); }}
+                                                            onMouseLeave={() => setTooltip({ show: false, text: '', x: 0, y: 0 })}
+                                                        >
+                                                            <CheckIcon className="w-4 h-4" />
+                                                        </button>
+                                                    )}
                                                 </div>
                                             </div>
                                         </div>
@@ -268,6 +293,29 @@ export default function Index({ auth, borrowings, status, statusOptions }) {
                     {tooltip.text}
                 </div>
             )}
+
+            {/* Return Confirmation Modal */}
+            <Modal show={confirmingReturn} onClose={closeModal}>
+                <div className="p-6 bg-white dark:bg-gray-800">
+                    <h2 className="text-lg font-medium text-gray-900 dark:text-gray-100">
+                        Are you sure you want to mark "{selectedItem.name}" as returned?
+                    </h2>
+
+                    <p className="mt-2 text-sm text-gray-600 dark:text-gray-300">
+                        This action will update the borrowing record to mark the item as returned. This action cannot be undone.
+                    </p>
+
+                    <div className="mt-6 flex justify-end">
+                        <SecondaryButton onClick={closeModal}>
+                            Cancel
+                        </SecondaryButton>
+
+                        <PrimaryButton className="ms-3" onClick={confirmReturn}>
+                            Mark as Returned
+                        </PrimaryButton>
+                    </div>
+                </div>
+            </Modal>
         </AuthenticatedLayout>
     );
 }

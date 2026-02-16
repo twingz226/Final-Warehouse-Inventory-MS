@@ -6,20 +6,20 @@ import { PencilIcon, ArrowLeftIcon } from '@heroicons/react/24/outline';
 export default function Show({ auth, borrowing }) {
     const getStatusColor = (status) => {
         switch (status) {
-            case 'borrowed': return 'bg-blue-100 text-blue-800';
-            case 'returned': return 'bg-green-100 text-green-800';
-            case 'overdue': return 'bg-red-100 text-red-800';
-            default: return 'bg-gray-100 text-gray-800';
+            case 'borrowed': return 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200';
+            case 'returned': return 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200';
+            case 'overdue': return 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200';
+            default: return 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200';
         }
     };
 
     const getActionColor = (action) => {
         switch (action) {
-            case 'created': return 'bg-green-100 text-green-800';
-            case 'updated': return 'bg-blue-100 text-blue-800';
-            case 'deleted': return 'bg-red-100 text-red-800';
-            case 'status_changed': return 'bg-yellow-100 text-yellow-800';
-            default: return 'bg-gray-100 text-gray-800';
+            case 'created': return 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200';
+            case 'updated': return 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200';
+            case 'deleted': return 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200';
+            case 'status_changed': return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200';
+            default: return 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200';
         }
     };
 
@@ -27,7 +27,7 @@ export default function Show({ auth, borrowing }) {
         <AuthenticatedLayout
             header={
                 <div className="flex justify-between items-center">
-                    <h2 className="font-semibold text-xl text-gray-800 leading-tight">
+                    <h2 className="font-semibold text-xl text-gray-800 dark:text-gray-100 leading-tight">
                         Borrowing Record Details
                     </h2>
                     <div className="flex space-x-3">
@@ -50,7 +50,7 @@ export default function Show({ auth, borrowing }) {
                     <div className="mb-6">
                         <Link
                             href={route('borrowings.index')}
-                            className="inline-flex items-center text-gray-600 hover:text-gray-900"
+                            className="inline-flex items-center text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100"
                         >
                             <ArrowLeftIcon className="h-4 w-4 mr-2" />
                             Back to Borrowing Records
@@ -58,12 +58,12 @@ export default function Show({ auth, borrowing }) {
                     </div>
 
                     {/* Borrowing Details Card */}
-                    <div className="bg-white overflow-hidden shadow-sm sm:rounded-lg mb-6">
+                    <div className="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg mb-6">
                         <div className="p-6">
                             <div className="flex justify-between items-start mb-6">
                                 <div>
-                                    <h3 className="text-2xl font-bold text-gray-900">{borrowing.item_name}</h3>
-                                    <p className="text-gray-600 mt-1">Borrowing Record #{borrowing.id}</p>
+                                    <h3 className="text-2xl font-bold text-gray-900 dark:text-gray-100">{borrowing.item_name}</h3>
+                                    <p className="text-gray-600 dark:text-gray-300 mt-1">Borrowing Record #{borrowing.id}</p>
                                 </div>
                                 <span className={`inline-flex px-3 py-1 text-sm font-semibold rounded-full ${getStatusColor(borrowing.status)}`}>
                                     {borrowing.status.charAt(0).toUpperCase() + borrowing.status.slice(1)}
@@ -73,22 +73,22 @@ export default function Show({ auth, borrowing }) {
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 {/* Borrower Information */}
                                 <div>
-                                    <h4 className="text-lg font-medium text-gray-900 mb-4">Borrower Information</h4>
+                                    <h4 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-4">Borrower Information</h4>
                                     <dl className="space-y-2">
                                         <div>
-                                            <dt className="text-sm font-medium text-gray-500">Name</dt>
-                                            <dd className="text-sm text-gray-900">{borrowing.borrower_name}</dd>
+                                            <dt className="text-sm font-medium text-gray-500 dark:text-gray-400">Name</dt>
+                                            <dd className="text-sm text-gray-900 dark:text-gray-100">{borrowing.borrower_name}</dd>
                                         </div>
                                         {borrowing.borrower_email && (
                                             <div>
-                                                <dt className="text-sm font-medium text-gray-500">Email</dt>
-                                                <dd className="text-sm text-gray-900">{borrowing.borrower_email}</dd>
+                                                <dt className="text-sm font-medium text-gray-500 dark:text-gray-400">Email</dt>
+                                                <dd className="text-sm text-gray-900 dark:text-gray-100">{borrowing.borrower_email}</dd>
                                             </div>
                                         )}
                                         {borrowing.borrower_phone && (
                                             <div>
-                                                <dt className="text-sm font-medium text-gray-500">Phone</dt>
-                                                <dd className="text-sm text-gray-900">{borrowing.borrower_phone}</dd>
+                                                <dt className="text-sm font-medium text-gray-500 dark:text-gray-400">Phone</dt>
+                                                <dd className="text-sm text-gray-900 dark:text-gray-100">{borrowing.borrower_phone}</dd>
                                             </div>
                                         )}
                                     </dl>
@@ -96,20 +96,20 @@ export default function Show({ auth, borrowing }) {
 
                                 {/* Item Information */}
                                 <div>
-                                    <h4 className="text-lg font-medium text-gray-900 mb-4">Item Information</h4>
+                                    <h4 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-4">Item Information</h4>
                                     <dl className="space-y-2">
                                         <div>
-                                            <dt className="text-sm font-medium text-gray-500">Item Name</dt>
-                                            <dd className="text-sm text-gray-900">{borrowing.item_name}</dd>
+                                            <dt className="text-sm font-medium text-gray-500 dark:text-gray-400">Item Name</dt>
+                                            <dd className="text-sm text-gray-900 dark:text-gray-100">{borrowing.item_name}</dd>
                                         </div>
                                         <div>
-                                            <dt className="text-sm font-medium text-gray-500">Quantity</dt>
-                                            <dd className="text-sm text-gray-900">{borrowing.quantity}</dd>
+                                            <dt className="text-sm font-medium text-gray-500 dark:text-gray-400">Quantity</dt>
+                                            <dd className="text-sm text-gray-900 dark:text-gray-100">{borrowing.quantity}</dd>
                                         </div>
                                         {borrowing.description && (
                                             <div>
-                                                <dt className="text-sm font-medium text-gray-500">Description</dt>
-                                                <dd className="text-sm text-gray-900">{borrowing.description}</dd>
+                                                <dt className="text-sm font-medium text-gray-500 dark:text-gray-400">Description</dt>
+                                                <dd className="text-sm text-gray-900 dark:text-gray-100">{borrowing.description}</dd>
                                             </div>
                                         )}
                                     </dl>
@@ -117,20 +117,20 @@ export default function Show({ auth, borrowing }) {
 
                                 {/* Dates Information */}
                                 <div>
-                                    <h4 className="text-lg font-medium text-gray-900 mb-4">Dates</h4>
+                                    <h4 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-4">Dates</h4>
                                     <dl className="space-y-2">
                                         <div>
-                                            <dt className="text-sm font-medium text-gray-500">Borrow Date</dt>
-                                            <dd className="text-sm text-gray-900">{borrowing.borrow_date}</dd>
+                                            <dt className="text-sm font-medium text-gray-500 dark:text-gray-400">Borrow Date</dt>
+                                            <dd className="text-sm text-gray-900 dark:text-gray-100">{borrowing.borrow_date}</dd>
                                         </div>
                                         <div>
-                                            <dt className="text-sm font-medium text-gray-500">Expected Return Date</dt>
-                                            <dd className="text-sm text-gray-900">{borrowing.expected_return_date}</dd>
+                                            <dt className="text-sm font-medium text-gray-500 dark:text-gray-400">Expected Return Date</dt>
+                                            <dd className="text-sm text-gray-900 dark:text-gray-100">{borrowing.expected_return_date}</dd>
                                         </div>
                                         {borrowing.actual_return_date && (
                                             <div>
-                                                <dt className="text-sm font-medium text-gray-500">Actual Return Date</dt>
-                                                <dd className="text-sm text-gray-900">{borrowing.actual_return_date}</dd>
+                                                <dt className="text-sm font-medium text-gray-500 dark:text-gray-400">Actual Return Date</dt>
+                                                <dd className="text-sm text-gray-900 dark:text-gray-100">{borrowing.actual_return_date}</dd>
                                             </div>
                                         )}
                                     </dl>
@@ -139,18 +139,18 @@ export default function Show({ auth, borrowing }) {
                                 {/* Project Information */}
                                 {(borrowing.project_type || borrowing.project_name) && (
                                     <div>
-                                        <h4 className="text-lg font-medium text-gray-900 mb-4">Project Information</h4>
+                                        <h4 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-4">Project Information</h4>
                                         <dl className="space-y-2">
                                             {borrowing.project_type && (
                                                 <div>
-                                                    <dt className="text-sm font-medium text-gray-500">Project Type</dt>
-                                                    <dd className="text-sm text-gray-900">{borrowing.project_type}</dd>
+                                                    <dt className="text-sm font-medium text-gray-500 dark:text-gray-400">Project Type</dt>
+                                                    <dd className="text-sm text-gray-900 dark:text-gray-100">{borrowing.project_type}</dd>
                                                 </div>
                                             )}
                                             {borrowing.project_name && (
                                                 <div>
-                                                    <dt className="text-sm font-medium text-gray-500">Project Name</dt>
-                                                    <dd className="text-sm text-gray-900">{borrowing.project_name}</dd>
+                                                    <dt className="text-sm font-medium text-gray-500 dark:text-gray-400">Project Name</dt>
+                                                    <dd className="text-sm text-gray-900 dark:text-gray-100">{borrowing.project_name}</dd>
                                                 </div>
                                             )}
                                         </dl>
@@ -161,14 +161,14 @@ export default function Show({ auth, borrowing }) {
                             {/* Notes */}
                             {borrowing.notes && (
                                 <div className="mt-6">
-                                    <h4 className="text-lg font-medium text-gray-900 mb-2">Notes</h4>
-                                    <p className="text-sm text-gray-600 bg-gray-50 p-3 rounded-md">{borrowing.notes}</p>
+                                    <h4 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">Notes</h4>
+                                    <p className="text-sm text-gray-600 dark:text-gray-300 bg-gray-50 dark:bg-gray-700 p-3 rounded-md">{borrowing.notes}</p>
                                 </div>
                             )}
 
                             {/* Created By */}
-                            <div className="mt-6 pt-6 border-t border-gray-200">
-                                <div className="flex justify-between text-sm text-gray-500">
+                            <div className="mt-6 pt-6 border-t border-gray-200 dark:border-gray-600">
+                                <div className="flex justify-between text-sm text-gray-500 dark:text-gray-400">
                                     <span>Created by: {borrowing.creator?.name || 'Unknown'}</span>
                                     <span>Created: {new Date(borrowing.created_at).toLocaleString()}</span>
                                 </div>
@@ -178,9 +178,9 @@ export default function Show({ auth, borrowing }) {
 
                     {/* History Section */}
                     {borrowing.histories && borrowing.histories.length > 0 && (
-                        <div className="bg-white overflow-hidden shadow-sm sm:rounded-lg">
+                        <div className="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
                             <div className="p-6">
-                                <h4 className="text-lg font-medium text-gray-900 mb-4">Activity History</h4>
+                                <h4 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-4">Activity History</h4>
                                 <div className="space-y-4">
                                     {borrowing.histories.map((history) => (
                                         <div key={history.id} className="flex items-start space-x-3">
@@ -190,8 +190,8 @@ export default function Show({ auth, borrowing }) {
                                                 </span>
                                             </div>
                                             <div className="min-w-0 flex-1">
-                                                <p className="text-sm text-gray-900">{history.description}</p>
-                                                <p className="text-xs text-gray-500">
+                                                <p className="text-sm text-gray-900 dark:text-gray-100">{history.description}</p>
+                                                <p className="text-xs text-gray-500 dark:text-gray-400">
                                                     {history.user?.name || 'Unknown user'} • {new Date(history.created_at).toLocaleString()}
                                                 </p>
                                             </div>

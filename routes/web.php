@@ -49,6 +49,9 @@ Route::middleware('auth')->group(function () {
         'index', 'create', 'store', 'show', 'edit', 'update', 'destroy'
     ]);
     
+    // Return item route
+    Route::post('borrowings/{borrowing}/return', [\App\Http\Controllers\BorrowingController::class, 'returnItem'])->name('borrowings.return');
+    
     // Purchase routes  
     Route::resource('purchases', \App\Http\Controllers\PurchaseController::class)->only([
         'index', 'create', 'store', 'show', 'edit', 'update', 'destroy'

@@ -6,21 +6,21 @@ import { PencilIcon, ArrowLeftIcon } from '@heroicons/react/24/outline';
 export default function Show({ auth, purchase }) {
     const getStatusColor = (status) => {
         switch (status) {
-            case 'pending': return 'bg-yellow-100 text-yellow-800';
-            case 'ordered': return 'bg-blue-100 text-blue-800';
-            case 'received': return 'bg-green-100 text-green-800';
-            case 'cancelled': return 'bg-red-100 text-red-800';
-            default: return 'bg-gray-100 text-gray-800';
+            case 'pending': return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200';
+            case 'ordered': return 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200';
+            case 'received': return 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200';
+            case 'cancelled': return 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200';
+            default: return 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200';
         }
     };
 
     const getActionColor = (action) => {
         switch (action) {
-            case 'created': return 'bg-green-100 text-green-800';
-            case 'updated': return 'bg-blue-100 text-blue-800';
-            case 'deleted': return 'bg-red-100 text-red-800';
-            case 'status_changed': return 'bg-yellow-100 text-yellow-800';
-            default: return 'bg-gray-100 text-gray-800';
+            case 'created': return 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200';
+            case 'updated': return 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200';
+            case 'deleted': return 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200';
+            case 'status_changed': return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200';
+            default: return 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200';
         }
     };
 
@@ -29,7 +29,7 @@ export default function Show({ auth, purchase }) {
             user={auth.user}
             header={
                 <div className="flex justify-between items-center">
-                    <h2 className="font-semibold text-xl text-gray-800 leading-tight">
+                    <h2 className="font-semibold text-xl text-gray-800 dark:text-gray-100 leading-tight">
                         Distribution Order Details
                     </h2>
                     <div className="flex space-x-3">
@@ -52,7 +52,7 @@ export default function Show({ auth, purchase }) {
                     <div className="mb-6">
                         <Link
                             href={route('purchases.index')}
-                            className="inline-flex items-center text-gray-600 hover:text-gray-900"
+                            className="inline-flex items-center text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100"
                         >
                             <ArrowLeftIcon className="h-4 w-4 mr-2" />
                             Back to Distribution Orders
@@ -60,12 +60,12 @@ export default function Show({ auth, purchase }) {
                     </div>
 
                     {/* Purchase Details Card */}
-                    <div className="bg-white overflow-hidden shadow-sm sm:rounded-lg mb-6">
+                    <div className="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg mb-6">
                         <div className="p-6">
                             <div className="flex justify-between items-start mb-6">
                                 <div>
-                                    <h3 className="text-2xl font-bold text-gray-900">{purchase.item_name}</h3>
-                                    <p className="text-gray-600 mt-1">Distribution Order #{purchase.id}</p>
+                                    <h3 className="text-2xl font-bold text-gray-900 dark:text-gray-100">{purchase.item_name}</h3>
+                                    <p className="text-gray-600 dark:text-gray-300 mt-1">Distribution Order #{purchase.id}</p>
                                 </div>
                                 <span className={`inline-flex px-3 py-1 text-sm font-semibold rounded-full ${getStatusColor(purchase.status)}`}>
                                     {purchase.status.charAt(0).toUpperCase() + purchase.status.slice(1)}
@@ -75,22 +75,22 @@ export default function Show({ auth, purchase }) {
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 {/* Destination Information */}
                                 <div>
-                                    <h4 className="text-lg font-medium text-gray-900 mb-4">Destination Information</h4>
+                                    <h4 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-4">Destination Information</h4>
                                     <dl className="space-y-2">
                                         <div>
-                                            <dt className="text-sm font-medium text-gray-500">Name</dt>
-                                            <dd className="text-sm text-gray-900">{purchase.supplier_name}</dd>
+                                            <dt className="text-sm font-medium text-gray-500 dark:text-gray-400">Name</dt>
+                                            <dd className="text-sm text-gray-900 dark:text-gray-100">{purchase.supplier_name}</dd>
                                         </div>
                                         {purchase.supplier_email && (
                                             <div>
-                                                <dt className="text-sm font-medium text-gray-500">Email</dt>
-                                                <dd className="text-sm text-gray-900">{purchase.supplier_email}</dd>
+                                                <dt className="text-sm font-medium text-gray-500 dark:text-gray-400">Email</dt>
+                                                <dd className="text-sm text-gray-900 dark:text-gray-100">{purchase.supplier_email}</dd>
                                             </div>
                                         )}
                                         {purchase.supplier_phone && (
                                             <div>
-                                                <dt className="text-sm font-medium text-gray-500">Phone</dt>
-                                                <dd className="text-sm text-gray-900">{purchase.supplier_phone}</dd>
+                                                <dt className="text-sm font-medium text-gray-500 dark:text-gray-400">Phone</dt>
+                                                <dd className="text-sm text-gray-900 dark:text-gray-100">{purchase.supplier_phone}</dd>
                                             </div>
                                         )}
                                     </dl>
@@ -98,21 +98,21 @@ export default function Show({ auth, purchase }) {
 
                                 {/* Item Information */}
                                 <div>
-                                    <h4 className="text-lg font-medium text-gray-900 mb-4">Item Information</h4>
+                                    <h4 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-4">Item Information</h4>
                                     <dl className="space-y-2">
                                         <div>
-                                            <dt className="text-sm font-medium text-gray-500">Item Name</dt>
-                                            <dd className="text-sm text-gray-900">{purchase.item_name}</dd>
+                                            <dt className="text-sm font-medium text-gray-500 dark:text-gray-400">Item Name</dt>
+                                            <dd className="text-sm text-gray-900 dark:text-gray-100">{purchase.item_name}</dd>
                                         </div>
                                         {purchase.description && (
                                             <div>
-                                                <dt className="text-sm font-medium text-gray-500">Description</dt>
-                                                <dd className="text-sm text-gray-900">{purchase.description}</dd>
+                                                <dt className="text-sm font-medium text-gray-500 dark:text-gray-400">Description</dt>
+                                                <dd className="text-sm text-gray-900 dark:text-gray-100">{purchase.description}</dd>
                                             </div>
                                         )}
                                         <div>
-                                            <dt className="text-sm font-medium text-gray-500">Quantity</dt>
-                                            <dd className="text-sm text-gray-900">{purchase.quantity}</dd>
+                                            <dt className="text-sm font-medium text-gray-500 dark:text-gray-400">Quantity</dt>
+                                            <dd className="text-sm text-gray-900 dark:text-gray-100">{purchase.quantity}</dd>
                                         </div>
                                     </dl>
                                 </div>
@@ -120,18 +120,18 @@ export default function Show({ auth, purchase }) {
                                 {/* Project Information */}
                                 {(purchase.project_name || purchase.project_type) && (
                                     <div>
-                                        <h4 className="text-lg font-medium text-gray-900 mb-4">Project Information</h4>
+                                        <h4 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-4">Project Information</h4>
                                         <dl className="space-y-2">
                                             {purchase.project_name && (
                                                 <div>
-                                                    <dt className="text-sm font-medium text-gray-500">Name of the Project</dt>
-                                                    <dd className="text-sm text-gray-900">{purchase.project_name}</dd>
+                                                    <dt className="text-sm font-medium text-gray-500 dark:text-gray-400">Name of the Project</dt>
+                                                    <dd className="text-sm text-gray-900 dark:text-gray-100">{purchase.project_name}</dd>
                                                 </div>
                                             )}
                                             {purchase.project_type && (
                                                 <div>
-                                                    <dt className="text-sm font-medium text-gray-500">Type of the Project</dt>
-                                                    <dd className="text-sm text-gray-900">{purchase.project_type}</dd>
+                                                    <dt className="text-sm font-medium text-gray-500 dark:text-gray-400">Type of the Project</dt>
+                                                    <dd className="text-sm text-gray-900 dark:text-gray-100">{purchase.project_type}</dd>
                                                 </div>
                                             )}
                                         </dl>
@@ -140,34 +140,34 @@ export default function Show({ auth, purchase }) {
 
                                 {/* Distribution Details */}
                                 <div>
-                                    <h4 className="text-lg font-medium text-gray-900 mb-4">Distribution Details</h4>
+                                    <h4 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-4">Distribution Details</h4>
                                     <dl className="space-y-2">
                                         <div>
-                                            <dt className="text-sm font-medium text-gray-500">Distribution Date</dt>
-                                            <dd className="text-sm text-gray-900">{new Date(purchase.purchase_date).toLocaleDateString()}</dd>
+                                            <dt className="text-sm font-medium text-gray-500 dark:text-gray-400">Distribution Date</dt>
+                                            <dd className="text-sm text-gray-900 dark:text-gray-100">{new Date(purchase.purchase_date).toLocaleDateString()}</dd>
                                         </div>
                                         <div>
-                                            <dt className="text-sm font-medium text-gray-500">Status</dt>
-                                            <dd className="text-sm text-gray-900">{purchase.status.charAt(0).toUpperCase() + purchase.status.slice(1)}</dd>
+                                            <dt className="text-sm font-medium text-gray-500 dark:text-gray-400">Status</dt>
+                                            <dd className="text-sm text-gray-900 dark:text-gray-100">{purchase.status.charAt(0).toUpperCase() + purchase.status.slice(1)}</dd>
                                         </div>
                                         <div>
-                                            <dt className="text-sm font-medium text-gray-500">Created By</dt>
-                                            <dd className="text-sm text-gray-900">{purchase.creator?.name || 'Unknown'}</dd>
+                                            <dt className="text-sm font-medium text-gray-500 dark:text-gray-400">Created By</dt>
+                                            <dd className="text-sm text-gray-900 dark:text-gray-100">{purchase.creator?.name || 'Unknown'}</dd>
                                         </div>
                                         <div>
-                                            <dt className="text-sm font-medium text-gray-500">Created At</dt>
-                                            <dd className="text-sm text-gray-900">{new Date(purchase.created_at).toLocaleString()}</dd>
+                                            <dt className="text-sm font-medium text-gray-500 dark:text-gray-400">Created At</dt>
+                                            <dd className="text-sm text-gray-900 dark:text-gray-100">{new Date(purchase.created_at).toLocaleString()}</dd>
                                         </div>
                                     </dl>
                                 </div>
 
                                 {/* Notes */}
                                 <div>
-                                    <h4 className="text-lg font-medium text-gray-900 mb-4">Additional Notes</h4>
+                                    <h4 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-4">Additional Notes</h4>
                                     {purchase.notes ? (
-                                        <p className="text-sm text-gray-900 bg-gray-50 p-3 rounded-md">{purchase.notes}</p>
+                                        <p className="text-sm text-gray-900 dark:text-gray-100 bg-gray-50 dark:bg-gray-700 p-3 rounded-md">{purchase.notes}</p>
                                     ) : (
-                                        <p className="text-sm text-gray-500 italic">No notes provided</p>
+                                        <p className="text-sm text-gray-500 dark:text-gray-400 italic">No notes provided</p>
                                     )}
                                 </div>
                             </div>
@@ -176,9 +176,9 @@ export default function Show({ auth, purchase }) {
 
                     {/* History Section */}
                     {purchase.histories && purchase.histories.length > 0 && (
-                        <div className="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-                            <div className="px-6 py-4 border-b border-gray-200">
-                                <h3 className="text-lg font-medium text-gray-900">Activity History</h3>
+                        <div className="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
+                            <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-600">
+                                <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100">Activity History</h3>
                             </div>
                             <div className="p-6">
                                 <div className="space-y-4">
@@ -190,13 +190,13 @@ export default function Show({ auth, purchase }) {
                                                 </span>
                                             </div>
                                             <div className="flex-1">
-                                                <div className="text-sm text-gray-900">
+                                                <div className="text-sm text-gray-900 dark:text-gray-100">
                                                     <span className="font-medium">{history.user?.name || 'Unknown user'}</span>
                                                     {history.description && (
                                                         <span className="ml-2">{history.description}</span>
                                                     )}
                                                 </div>
-                                                <div className="text-xs text-gray-500 mt-1">
+                                                <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">
                                                     {new Date(history.created_at).toLocaleString()}
                                                 </div>
                                             </div>

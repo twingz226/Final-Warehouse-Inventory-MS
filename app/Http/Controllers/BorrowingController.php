@@ -177,6 +177,33 @@ class BorrowingController extends Controller
     }
 
     /**
+     * Return a borrowed item.
+     */
+    public function returnItem(Borrowing $borrowing)
+    {
+        if ($borrowing->status !== 'borrowed') {
+            return redirect()
+                ->route('borrowings.index')
+                ->with('error', 'Only borrowed items can be returned.');
+        }
+
+        $oldValues = $borrowing->toArray();
+        $oldStatus = $borrowing->status;
+
+        $borrowing->update([
+            'status' => 'returned',
+            'actual_return_date' => now(),
+        ]);
+
+        $newValues = $borrowing->toArray();
+        $this->logHistory($borrowing, 'status_changed', $oldValues, $newValues, "Status changed from {$oldStatus} to returned");
+
+        return redirect()
+            ->route('borrowings.index')
+            ->with('status', 'Item returned successfully.');
+    }
+
+    /**
      * Remove the specified resource from storage.
      */
     public function destroy(Borrowing $borrowing)
