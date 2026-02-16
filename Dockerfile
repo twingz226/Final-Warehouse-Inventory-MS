@@ -1,86 +1,46 @@
-# Stage 1: Build stage with all dependencies
+# Stage 1: Build React assets
 FROM node:20-alpine AS node-build
 WORKDIR /app
-
-# Copy package files
 COPY package*.json ./
 RUN npm ci
-
-# Copy source files and build assets
 COPY . .
 RUN npm run build
 
-# Stage 2: PHP application stage
+# Stage 2: PHP & Nginx Application stage
 FROM php:8.2-fpm-alpine AS app
 
-# Install system dependencies
+# Install system dependencies & Nginx
 RUN apk add --no-cache \
+    nginx \
     libzip-dev \
     zip \
     unzip \
-    curl-dev \
-    sqlite \
-    sqlite-dev \
-    git \
-    supervisor \
     oniguruma-dev \
-    libxml2-dev
+    libxml2-dev \
+    libpng-dev \
+    libjpeg-turbo-dev \
+    freetype-dev
 
-# Install PHP extensions
-RUN docker-php-ext-install \
-    pdo_sqlite \
-    pdo_mysql \
-    mbstring \
-    xml \
-    bcmath \
-    curl \
-    zip \
-    opcache
+# Install PHP extensions for MySQL and Graphics
+RUN docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd
 
 # Install Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
-# Set working directory
 WORKDIR /var/www/html
-
-# Copy application code
 COPY . .
 
-# Make artisan executable
-RUN chmod +x artisan
+# Install PHP dependencies
+RUN composer install --optimize-autoloader --no-dev --no-interaction
 
-# Copy composer files and install PHP dependencies
-COPY composer.json composer.lock ./
-RUN composer install --optimize-autoloader --no-interaction
-
-# Copy built assets from node-build stage
+# Copy built React assets from Stage 1
 COPY --from=node-build /app/public/build public/build
 
-# Create .env file if it doesn't exist
-RUN if [ ! -f .env ]; then cp .env.example .env; fi
+# Set permissions for Laravel
+RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
 
-# Generate application key
-RUN php artisan key:generate
+# Expose port 80 (Standard for Nginx)
+EXPOSE 80
 
-# Set proper permissions
-RUN chown -R www-data:www-data /var/www/html \
-    && chmod -R 755 /var/www/html/storage \
-    && chmod -R 755 /var/www/html/bootstrap/cache
-
-# Create SQLite database if needed
-RUN touch database/database.sqlite && chown www-data:www-data database/database.sqlite
-
-# Copy PHP configuration
-RUN echo "memory_limit=256M" > /usr/local/etc/php/conf.d/memory-limit.ini \
-    && echo "upload_max_filesize=64M" > /usr/local/etc/php/conf.d/upload-limit.ini \
-    && echo "post_max_size=64M" >> /usr/local/etc/php/conf.d/upload-limit.ini
-
-# Expose port
-EXPOSE 9000
-
-# Health check
-HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
-    CMD php -v || exit 1
-
-# Start PHP-FPM
-CMD ["php-fpm"]
+# Start PHP-FPM in the background and Nginx in the foreground
+CMD php-fpm -D && nginx -g "daemon off;"
