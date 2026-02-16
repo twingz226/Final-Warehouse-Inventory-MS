@@ -5,12 +5,13 @@ export default function GuestLayout({ children }) {
     return (
         <div className="flex min-h-screen flex-col items-center pt-6 sm:justify-center sm:pt-0 relative overflow-hidden"
              style={{
-                 backgroundImage: 'linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)), url("/images/warehouse.jpg")',
+                 backgroundImage: 'linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4))',
                  backgroundSize: 'cover',
                  backgroundPosition: 'center',
                  backgroundRepeat: 'no-repeat',
                  backgroundAttachment: 'fixed'
              }}>
+            <div className="absolute inset-0" style={{backgroundImage: 'url("/images/warehouse.jpg")', backgroundSize: 'cover', backgroundPosition: 'center', backgroundRepeat: 'no-repeat', backgroundAttachment: 'fixed', filter: 'blur(10px)'}}></div>
             <div className="absolute inset-0 bg-gradient-to-br from-blue-100/30 via-white/30 to-orange-100/30"></div>
             {/* Industrial decorative elements */}
             {/* Gear shapes */}

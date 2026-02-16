@@ -31,7 +31,6 @@ class InventoryController extends Controller
         
         $items = $query->get()->map(function ($item) {
             $totalDistributed = Purchase::where('item_name', $item->name)
-                ->where('status', 'received')
                 ->sum('quantity');
             
             return (object) [
@@ -40,6 +39,7 @@ class InventoryController extends Controller
                 'description' => $item->description,
                 'category' => $item->category,
                 'total_stock' => $item->quantity,
+                'unit' => $item->unit,
                 'total_distributed' => $totalDistributed,
                 'available_stock' => $item->quantity - $totalDistributed,
                 'date_time' => $item->date_time,

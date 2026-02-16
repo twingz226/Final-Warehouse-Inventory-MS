@@ -3,6 +3,7 @@ import Dropdown from '@/Components/Dropdown';
 import NavLink from '@/Components/NavLink';
 import SidebarNavLink from '@/Components/SidebarNavLink';
 import ResponsiveNavLink from '@/Components/ResponsiveNavLink';
+import ThemeToggle from '@/Components/ThemeToggle';
 import { Link, usePage, router } from '@inertiajs/react';
 import { useState } from 'react';
 
@@ -14,10 +15,10 @@ export default function AuthenticatedLayout({ header, children }) {
     const [showLogoutDialog, setShowLogoutDialog] = useState(false);
 
     return (
-        <div className="min-h-screen bg-gray-100 flex">
+        <div className="min-h-screen bg-gray-100 dark:bg-gray-900 flex">
             {/* Sidebar - Hidden on mobile, visible on desktop */}
             <div className="hidden md:flex md:w-64 md:flex-col md:fixed md:inset-y-0">
-                <div className="flex flex-col flex-grow pt-5 bg-gradient-to-b from-indigo-600 via-purple-600 to-pink-600 overflow-y-auto shadow-2xl">
+                <div className="flex flex-col flex-grow pt-5 bg-gradient-to-b from-indigo-600 via-purple-600 to-pink-600 dark:from-indigo-800 dark:via-purple-800 dark:to-pink-800 overflow-y-auto shadow-2xl">
                     <div className="flex items-center justify-center flex-shrink-0 px-4 border-b border-white/20 pb-4">
                         <Link href="/">
                             <ApplicationLogo className="block h-12 w-auto filter drop-shadow-lg" />
@@ -87,10 +88,10 @@ export default function AuthenticatedLayout({ header, children }) {
                                         </svg>
                                     </div>
                                 </Dropdown.Link>
-                                <Dropdown.Link href={route('purchase.index')} className="group flex items-center px-4 py-3 text-sm font-medium text-gray-700 hover:bg-gradient-to-r hover:from-purple-50 hover:to-pink-50 hover:text-purple-700 transition-all duration-200 border-l-2 border-transparent hover:border-purple-400">
+                                <Dropdown.Link href={route('purchase.index')} className="group flex items-center px-4 py-3 text-sm font-medium text-gray-700 hover:bg-gradient-to-r hover:from-indigo-50 hover:to-purple-50 hover:text-indigo-700 transition-all duration-200 border-l-2 border-transparent hover:border-indigo-400">
                                     <div className="flex items-center w-full">
-                                        <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-gradient-to-br from-purple-100 to-pink-100 group-hover:from-purple-200 group-hover:to-pink-200 transition-all duration-200 mr-3">
-                                            <svg className="h-4 w-4 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-gradient-to-br from-indigo-100 to-purple-100 group-hover:from-indigo-200 group-hover:to-purple-200 transition-all duration-200 mr-3">
+                                            <svg className="h-4 w-4 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
                                             </svg>
                                         </div>
@@ -98,7 +99,23 @@ export default function AuthenticatedLayout({ header, children }) {
                                             <div className="font-medium">Distribution</div>
                                             <div className="text-xs text-gray-500">Manage distribution orders</div>
                                         </div>
-                                        <svg className="h-4 w-4 text-gray-400 group-hover:text-purple-500 transition-colors duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <svg className="h-4 w-4 text-gray-400 group-hover:text-indigo-500 transition-colors duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
+                                        </svg>
+                                    </div>
+                                </Dropdown.Link>
+                                <Dropdown.Link href={route('borrowings.index')} className="group flex items-center px-4 py-3 text-sm font-medium text-gray-700 hover:bg-gradient-to-r hover:from-indigo-50 hover:to-purple-50 hover:text-indigo-700 transition-all duration-200 border-l-2 border-transparent hover:border-indigo-400">
+                                    <div className="flex items-center w-full">
+                                        <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-gradient-to-br from-indigo-100 to-purple-100 group-hover:from-indigo-200 group-hover:to-purple-200 transition-all duration-200 mr-3">
+                                            <svg className="h-4 w-4 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
+                                            </svg>
+                                        </div>
+                                        <div className="flex-1">
+                                            <div className="font-medium">Borrowed Tools & Materials</div>
+                                            <div className="text-xs text-gray-500">Track borrowed items</div>
+                                        </div>
+                                        <svg className="h-4 w-4 text-gray-400 group-hover:text-indigo-500 transition-colors duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
                                         </svg>
                                     </div>
@@ -154,7 +171,7 @@ export default function AuthenticatedLayout({ header, children }) {
             {/* Main content */}
             <div className="md:pl-64 flex flex-col flex-1">
                 {/* Mobile menu button */}
-                <div className="md:hidden bg-white border-b border-gray-200 px-4 py-3">
+                <div className="md:hidden bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-4 py-3">
                     <button
                         onClick={() =>
                             setShowingNavigationDropdown(
@@ -198,8 +215,8 @@ export default function AuthenticatedLayout({ header, children }) {
                 {/* Mobile navigation overlay */}
                 {showingNavigationDropdown && (
                     <div className="md:hidden fixed inset-0 z-40 flex">
-                        <div className="fixed inset-0 bg-black opacity-25" onClick={() => setShowingNavigationDropdown(false)}></div>
-                        <div className="relative flex-1 flex flex-col max-w-xs w-full bg-white">
+                        <div className="fixed inset-0 bg-black opacity-25 dark:opacity-50" onClick={() => setShowingNavigationDropdown(false)}></div>
+                        <div className="relative flex-1 flex flex-col max-w-xs w-full bg-white dark:bg-gray-800">
                             <div className="absolute top-0 right-0 -mr-12 pt-2">
                                 <button
                                     onClick={() => setShowingNavigationDropdown(false)}
@@ -259,10 +276,10 @@ export default function AuthenticatedLayout({ header, children }) {
                                                 </svg>
                                             </div>
                                         </Dropdown.Link>
-                                        <Dropdown.Link href={route('purchase.index')} className="group flex items-center px-4 py-3 text-sm font-medium text-gray-700 hover:bg-gradient-to-r hover:from-purple-50 hover:to-pink-50 hover:text-purple-700 transition-all duration-200 border-l-2 border-transparent hover:border-purple-400">
+                                        <Dropdown.Link href={route('purchase.index')} className="group flex items-center px-4 py-3 text-sm font-medium text-gray-700 hover:bg-gradient-to-r hover:from-indigo-50 hover:to-purple-50 hover:text-indigo-700 transition-all duration-200 border-l-2 border-transparent hover:border-indigo-400">
                                             <div className="flex items-center w-full">
-                                                <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-gradient-to-br from-purple-100 to-pink-100 group-hover:from-purple-200 group-hover:to-pink-200 transition-all duration-200 mr-3">
-                                                    <svg className="h-4 w-4 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-gradient-to-br from-indigo-100 to-purple-100 group-hover:from-indigo-200 group-hover:to-purple-200 transition-all duration-200 mr-3">
+                                                    <svg className="h-4 w-4 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
                                                     </svg>
                                                 </div>
@@ -270,7 +287,23 @@ export default function AuthenticatedLayout({ header, children }) {
                                                     <div className="font-medium">Distribution</div>
                                                     <div className="text-xs text-gray-500">Manage distribution orders</div>
                                                 </div>
-                                                <svg className="h-4 w-4 text-gray-400 group-hover:text-purple-500 transition-colors duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <svg className="h-4 w-4 text-gray-400 group-hover:text-indigo-500 transition-colors duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
+                                                </svg>
+                                            </div>
+                                        </Dropdown.Link>
+                                        <Dropdown.Link href={route('borrowings.index')} className="group flex items-center px-4 py-3 text-sm font-medium text-gray-700 hover:bg-gradient-to-r hover:from-indigo-50 hover:to-purple-50 hover:text-indigo-700 transition-all duration-200 border-l-2 border-transparent hover:border-indigo-400">
+                                            <div className="flex items-center w-full">
+                                                <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-gradient-to-br from-indigo-100 to-purple-100 group-hover:from-indigo-200 group-hover:to-purple-200 transition-all duration-200 mr-3">
+                                                    <svg className="h-4 w-4 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
+                                                    </svg>
+                                                </div>
+                                                <div className="flex-1">
+                                                    <div className="font-medium">Borrowed Tools & Materials</div>
+                                                    <div className="text-xs text-gray-500">Track borrowed items</div>
+                                                </div>
+                                                <svg className="h-4 w-4 text-gray-400 group-hover:text-indigo-500 transition-colors duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
                                                 </svg>
                                             </div>
@@ -324,9 +357,16 @@ export default function AuthenticatedLayout({ header, children }) {
                 )}
 
                 {header && (
-                    <header className="bg-orange-500 shadow">
+                    <header className="bg-orange-500 dark:bg-orange-600 shadow">
                         <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
-                            {header}
+                            <div className="flex items-center justify-between">
+                                <div className="flex-1">
+                                    {header}
+                                </div>
+                                <div className="ml-4">
+                                    <ThemeToggle />
+                                </div>
+                            </div>
                         </div>
                     </header>
                 )}
@@ -339,45 +379,45 @@ export default function AuthenticatedLayout({ header, children }) {
                 <div className="fixed inset-0 z-50 overflow-y-auto">
                     <div className="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
                         <div 
-                            className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity"
+                            className="fixed inset-0 bg-gray-500 bg-opacity-75 dark:bg-gray-900 dark:bg-opacity-75 transition-opacity"
                             onClick={() => setShowLogoutDialog(false)}
                         ></div>
                         <span className="hidden sm:inline-block sm:align-middle sm:h-screen">&#8203;</span>
-                        <div className="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
-                            <div className="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                        <div className="inline-block align-bottom bg-white dark:bg-gray-800 rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
+                            <div className="bg-white dark:bg-gray-800 px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
                                 <div className="sm:flex sm:items-start">
-                                    <div className="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-red-100 sm:mx-0 sm:h-10 sm:w-10">
-                                        <svg className="h-6 w-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <div className="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-red-100 dark:bg-red-900 sm:mx-0 sm:h-10 sm:w-10">
+                                        <svg className="h-6 w-6 text-red-600 dark:text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
                                         </svg>
                                     </div>
                                     <div className="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
-                                        <h3 className="text-lg leading-6 font-medium text-gray-900">
+                                        <h3 className="text-lg leading-6 font-medium text-gray-900 dark:text-gray-100">
                                             Confirm Logout
                                         </h3>
                                         <div className="mt-2">
-                                            <p className="text-sm text-gray-500">
+                                            <p className="text-sm text-gray-500 dark:text-gray-400">
                                                 Are you sure you want to log out? You will need to sign in again to access your account.
                                             </p>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                            <div className="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+                            <div className="bg-gray-50 dark:bg-gray-700 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
                                 <button
                                     type="button"
                                     onClick={() => {
                                         router.post(route('logout'));
                                         setShowLogoutDialog(false);
                                     }}
-                                    className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-red-600 text-base font-medium text-white hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 sm:ml-3 sm:w-auto sm:text-sm"
+                                    className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-red-600 dark:bg-red-700 text-base font-medium text-white hover:bg-red-700 dark:hover:bg-red-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 dark:focus:ring-red-600 sm:ml-3 sm:w-auto sm:text-sm"
                                 >
                                     Log Out
                                 </button>
                                 <button
                                     type="button"
                                     onClick={() => setShowLogoutDialog(false)}
-                                    className="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm"
+                                    className="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 dark:border-gray-600 shadow-sm px-4 py-2 bg-white dark:bg-gray-600 text-base font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm"
                                 >
                                     Cancel
                                 </button>

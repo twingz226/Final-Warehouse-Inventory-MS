@@ -2,66 +2,35 @@
 import { Head, Link, router } from '@inertiajs/react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { useState, useEffect } from 'react';
-import { PlusIcon, EyeIcon, TrashIcon, MagnifyingGlassIcon, XMarkIcon } from '@heroicons/react/24/outline';
-import DatePicker from 'react-datepicker';
-import 'react-datepicker/dist/react-datepicker.css';
+import { PlusIcon, EyeIcon, TrashIcon, MagnifyingGlassIcon } from '@heroicons/react/24/outline';
 
 export default function Index({ auth, items, status }) {
     const [confirmingItemDeletion, setConfirmingItemDeletion] = useState(false);
     const [itemToDelete, setItemToDelete] = useState(null);
     const [search, setSearch] = useState('');
     const [searchTimeout, setSearchTimeout] = useState(null);
-    const [date, setDate] = useState(null);
+    const [tooltip, setTooltip] = useState({ show: false, text: '', x: 0, y: 0 });
 
     useEffect(() => {
         const urlParams = new URLSearchParams(window.location.search);
         const initialSearch = urlParams.get('search') || '';
-        const initialDate = urlParams.get('date') || null;
-        
         setSearch(initialSearch);
-        if (initialDate) {
-            // Parse the date as UTC to match how we send it
-            const date = new Date(initialDate + 'T00:00:00Z');
-            setDate(date);
-        }
     }, []);
 
     const handleSearch = (value) => {
         setSearch(value);
-        performSearch(value, date);
-    };
-
-    const handleDateFilter = (selectedDate) => {
-        setDate(selectedDate);
-        performSearch(search, selectedDate);
-    };
-
-    const performSearch = (searchValue, selectedDate) => {
+        
         if (searchTimeout) {
             clearTimeout(searchTimeout);
         }
         
         const timeout = setTimeout(() => {
             const params = new URLSearchParams(window.location.search);
-            
-            if (searchValue) {
-                params.set('search', searchValue);
+            if (value) {
+                params.set('search', value);
             } else {
                 params.delete('search');
             }
-            
-            if (selectedDate) {
-                // Convert to UTC date to match database storage
-                const utcDate = new Date(Date.UTC(
-                    selectedDate.getFullYear(),
-                    selectedDate.getMonth(),
-                    selectedDate.getDate()
-                ));
-                params.set('date', utcDate.toISOString().split('T')[0]);
-            } else {
-                params.delete('date');
-            }
-            
             params.set('page', '1');
             
             router.get(`${window.location.pathname}?${params.toString()}`, {}, {
@@ -71,10 +40,6 @@ export default function Index({ auth, items, status }) {
         }, 300);
         
         setSearchTimeout(timeout);
-    };
-
-    const clearDateFilter = () => {
-        handleDateFilter(null);
     };
 
     const deleteItem = (id) => {
@@ -94,7 +59,7 @@ export default function Index({ auth, items, status }) {
                     </h2>
                     <Link
                         href={route('items.create')}
-                        className="inline-flex items-center px-4 py-2 bg-gray-800 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-gray-700 focus:bg-gray-700 active:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition ease-in-out duration-150"
+                        className="inline-flex items-center px-4 py-2 bg-indigo-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-indigo-700 focus:bg-indigo-700 active:bg-indigo-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition ease-in-out duration-150"
                     >
                         <PlusIcon className="h-4 w-4 mr-2" />
                         Add New Tool/Material
@@ -107,116 +72,83 @@ export default function Index({ auth, items, status }) {
             <div className="py-12">
                 <div className="max-w-7xl mx-auto sm:px-6 lg:px-8">
                     {status && (
-                        <div className="mb-4 p-4 bg-green-100 text-green-700 rounded">
+                        <div className="mb-4 p-4 bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300 rounded">
                             {status}
                         </div>
                     )}
                     <div className="mb-6">
                         <div className="relative">
                             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                <MagnifyingGlassIcon className="h-5 w-5 text-gray-400" />
+                                <MagnifyingGlassIcon className="h-5 w-5 text-gray-400 dark:text-gray-500" />
                             </div>
                             <input
                                 type="text"
                                 value={search}
                                 onChange={(e) => handleSearch(e.target.value)}
                                 placeholder="Search tools and materials..."
-                                className="block w-full pl-10 pr-10 py-3 border border-gray-300 rounded-lg leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm transition duration-150 ease-in-out"
+                                className="block w-full pl-10 pr-10 py-3 border border-gray-300 dark:border-gray-600 rounded-lg leading-5 bg-white dark:bg-gray-700 placeholder-gray-500 dark:placeholder-gray-400 text-gray-900 dark:text-white focus:outline-none focus:placeholder-gray-400 dark:focus:placeholder-gray-500 focus:ring-1 focus:ring-indigo-500 dark:focus:ring-indigo-400 focus:border-indigo-500 dark:focus:border-indigo-400 sm:text-sm transition duration-150 ease-in-out"
                             />
                             {search && (
                                 <button
                                     onClick={() => handleSearch('')}
                                     className="absolute inset-y-0 right-0 pr-3 flex items-center"
                                 >
-                                    <svg className="h-5 w-5 text-gray-400 hover:text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <svg className="h-5 w-5 text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
                                     </svg>
                                 </button>
                             )}
                         </div>
-                        
-                        <div className="mt-4">
-                            <div className="max-w-xs">
-                                <label className="block text-sm font-medium text-gray-700 mb-2">
-                                    Filter by Date
-                                </label>
-                                <div className="relative">
-                                    <DatePicker
-                                        selected={date}
-                                        onChange={handleDateFilter}
-                                        placeholderText="Select date"
-                                        className="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                                        isClearable
-                                    />
-                                </div>
-                                {date && (
-                                    <button
-                                        onClick={clearDateFilter}
-                                        className="mt-2 inline-flex items-center px-3 py-1.5 border border-gray-300 rounded-md shadow-sm text-xs font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-                                    >
-                                        <XMarkIcon className="h-3 w-3 mr-1" />
-                                        Clear Date
-                                    </button>
-                                )}
-                            </div>
-                        </div>
                     </div>
                     
-                    <div className="bg-white overflow-hidden shadow-sm sm:rounded-lg">
+                    <div className="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
                         <div className="overflow-x-auto">
-                            <table className="min-w-full divide-y divide-gray-200">
-                                <thead className="bg-gray-50">
+                            <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                                <thead className="bg-gray-50 dark:bg-gray-700">
                                     <tr>
-                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                                             Name
                                         </th>
-                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                            Category
-                                        </th>
-                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                                             Quantity
                                         </th>
-                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                                             Date & Time
                                         </th>
-                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                                             Actions
                                         </th>
                                     </tr>
                                 </thead>
-                                <tbody className="bg-white divide-y divide-gray-200">
+                                <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
                                     {items.data.length > 0 ? (
                                         items.data.map((item) => (
                                         <tr key={item.id}>
                                             <td className="px-6 py-4 whitespace-nowrap">
-                                                <div className="text-sm font-medium text-gray-900">
+                                                <div className="text-sm font-medium text-gray-900 dark:text-gray-100">
                                                     {item.name}
                                                 </div>
                                                 {item.description && (
-                                                    <div className="text-sm text-gray-500">
+                                                    <div className="text-sm text-gray-500 dark:text-gray-400">
                                                         {item.description.length > 50
                                                             ? `${item.description.substring(0, 50)}...`
                                                             : item.description}
                                                     </div>
                                                 )}
                                             </td>
-                                            <td className="px-6 py-4 whitespace-nowrap">
-                                                <span className="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-indigo-100 text-indigo-800 capitalize">
-                                                    {item.category}
-                                                </span>
+                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                                                {item.unit === 'Quantity' ? Math.floor(item.quantity) : item.quantity} {item.unit === 'Quantity' ? 'pcs.' : item.unit}
                                             </td>
-                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                                {item.quantity}
-                                            </td>
-                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
                                                 {item.date_time ? new Date(item.date_time).toLocaleString() : 'N/A'}
                                             </td>
                                             <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                                                 <div className="flex space-x-2">
                                                     <Link
                                                         href={route('items.show', item.id)}
-                                                        className="text-indigo-600 hover:text-indigo-900"
-                                                        title="View Item"
+                                                        className="text-indigo-600 dark:text-indigo-400 hover:text-indigo-900 dark:hover:text-indigo-300"
+                                                        onMouseEnter={(e) => { const rect = e.currentTarget.getBoundingClientRect(); setTooltip({ show: true, text: 'View', x: rect.left + rect.width / 2, y: rect.top - 30 }); }}
+                                                        onMouseLeave={() => setTooltip({ show: false, text: '', x: 0, y: 0 })}
                                                     >
                                                         <EyeIcon className="h-5 w-5" />
                                                     </Link>
@@ -225,8 +157,9 @@ export default function Index({ auth, items, status }) {
                                                             setItemToDelete(item);
                                                             setConfirmingItemDeletion(true);
                                                         }}
-                                                        className="text-red-600 hover:text-red-900"
-                                                        title="Delete Item"
+                                                        className="text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-300"
+                                                        onMouseEnter={(e) => { const rect = e.currentTarget.getBoundingClientRect(); setTooltip({ show: true, text: 'Delete', x: rect.left + rect.width / 2, y: rect.top - 30 }); }}
+                                                        onMouseLeave={() => setTooltip({ show: false, text: '', x: 0, y: 0 })}
                                                     >
                                                         <TrashIcon className="h-5 w-5" />
                                                     </button>
@@ -236,21 +169,16 @@ export default function Index({ auth, items, status }) {
                                     ))
                                     ) : (
                                         <tr>
-                                            <td colSpan="5" className="px-6 py-12 text-center">
+                                            <td colSpan="4" className="px-6 py-12 text-center">
                                                 <div className="flex flex-col items-center">
-                                                    <MagnifyingGlassIcon className="h-12 w-12 text-gray-300 mb-3" />
-                                                    <p className="text-gray-500 text-sm">
+                                                    <MagnifyingGlassIcon className="h-12 w-12 text-gray-300 dark:text-gray-600 mb-3" />
+                                                    <p className="text-gray-500 dark:text-gray-400 text-sm">
                                                         {search ? `No results found for "${search}"` : 'No tools and materials found'}
-                                                        {date && (
-                                                            <span className="block mt-1 text-xs text-gray-400">
-                                                                Date filter: {date.toLocaleDateString()}
-                                                            </span>
-                                                        )}
                                                     </p>
                                                     {search && (
                                                         <button
                                                             onClick={() => handleSearch('')}
-                                                            className="mt-2 text-indigo-600 hover:text-indigo-800 text-sm font-medium"
+                                                            className="mt-2 text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300 text-sm font-medium"
                                                         >
                                                             Clear search
                                                         </button>
@@ -263,9 +191,9 @@ export default function Index({ auth, items, status }) {
                             </table>
                         </div>
                         {items.links && (
-                            <div className="px-6 py-4 bg-white border-t border-gray-200">
+                            <div className="px-6 py-4 bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700">
                                 <div className="flex justify-between items-center">
-                                    <div className="text-sm text-gray-700">
+                                    <div className="text-sm text-gray-700 dark:text-gray-300">
                                         Showing {items.from} to {items.to} of {items.total} results
                                     </div>
                                     <div className="flex space-x-1">
@@ -276,7 +204,7 @@ export default function Index({ auth, items, status }) {
                                                 className={`px-3 py-2 text-sm rounded-md ${
                                                     link.active
                                                         ? 'bg-indigo-600 text-white'
-                                                        : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50'
+                                                        : 'bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-600'
                                                 } ${!link.url ? 'opacity-50 cursor-not-allowed' : ''}`}
                                                 dangerouslySetInnerHTML={{ __html: link.label }}
                                             />
@@ -291,18 +219,18 @@ export default function Index({ auth, items, status }) {
 
             {/* Delete Confirmation Modal */}
             {confirmingItemDeletion && (
-                <div className="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-50">
-                    <div className="bg-white rounded-lg p-6 max-w-md w-full">
-                        <h3 className="text-lg font-medium text-gray-900 mb-4">
+                <div className="fixed inset-0 bg-gray-500 dark:bg-gray-600 bg-opacity-75 flex items-center justify-center z-50">
+                    <div className="bg-white dark:bg-gray-800 rounded-lg p-6 max-w-md w-full">
+                        <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-4">
                             Delete Tool/Material
                         </h3>
-                        <p className="text-gray-600 mb-6">
+                        <p className="text-gray-600 dark:text-gray-400 mb-6">
                             Are you sure you want to delete "{itemToDelete?.name}"? This action cannot be undone.
                         </p>
                         <div className="flex justify-end space-x-3">
                             <button
                                 onClick={() => setConfirmingItemDeletion(false)}
-                                className="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none"
+                                className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none"
                             >
                                 Cancel
                             </button>
@@ -314,6 +242,16 @@ export default function Index({ auth, items, status }) {
                             </button>
                         </div>
                     </div>
+                </div>
+            )}
+
+            {/* Custom Tooltip */}
+            {tooltip.show && (
+                <div
+                    className="fixed z-50 bg-gray-800 dark:bg-gray-900 text-white text-xs px-2 py-1 rounded shadow-lg pointer-events-none transform -translate-x-1/2"
+                    style={{ left: tooltip.x, top: tooltip.y }}
+                >
+                    {tooltip.text}
                 </div>
             )}
         </AuthenticatedLayout>

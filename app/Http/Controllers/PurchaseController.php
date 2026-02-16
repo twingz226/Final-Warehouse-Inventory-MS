@@ -62,7 +62,6 @@ class PurchaseController extends Controller
         return Inertia::render('Purchases/Index', [
             'purchases' => $purchases,
             'status' => session('status'),
-            'statusOptions' => ['' => 'All Statuses'] + Purchase::getStatusOptions(),
         ]);
     }
 
@@ -71,9 +70,7 @@ class PurchaseController extends Controller
      */
     public function create()
     {
-        return Inertia::render('Purchases/Form', [
-            'statusOptions' => Purchase::getStatusOptions(),
-        ]);
+        return Inertia::render('Purchases/Form');
     }
 
     /**
@@ -89,7 +86,6 @@ class PurchaseController extends Controller
             'description' => 'nullable|string',
             'quantity' => 'required|integer|min:1',
             'purchase_date' => 'required|date',
-            'status' => 'required|in:pending,ordered,received,cancelled',
             'notes' => 'nullable|string',
             'project_type' => 'nullable|string|max:255',
             'project_name' => 'nullable|string|max:255',
@@ -125,7 +121,6 @@ class PurchaseController extends Controller
     {
         return Inertia::render('Purchases/Form', [
             'purchase' => $purchase,
-            'statusOptions' => Purchase::getStatusOptions(),
         ]);
     }
 
@@ -144,13 +139,11 @@ class PurchaseController extends Controller
             'description' => 'nullable|string',
             'quantity' => 'required|integer|min:1',
             'purchase_date' => 'required|date',
-            'status' => 'required|in:pending,ordered,received,cancelled',
             'notes' => 'nullable|string',
             'project_type' => 'nullable|string|max:255',
             'project_name' => 'nullable|string|max:255',
         ]);
 
-        $oldStatus = $purchase->status;
         $purchase->update($validated);
 
         // Generate description based on what changed
@@ -161,14 +154,10 @@ class PurchaseController extends Controller
         if ($oldValues['item_name'] !== $validated['item_name']) {
             $changes[] = "item from '{$oldValues['item_name']}' to '{$validated['item_name']}'";
         }
-        if ($oldStatus !== $validated['status']) {
-            $changes[] = "status from {$oldStatus} to {$validated['status']}";
-        }
         
-        $action = $oldStatus !== $validated['status'] ? 'status_changed' : 'updated';
-        $description = count($changes) > 0 ? ucfirst($action) . " " . implode(', ', $changes) : ucfirst($action) . " distribution";
+        $description = count($changes) > 0 ? "Updated " . implode(', ', $changes) : "Updated distribution";
         
-        $this->logHistory($purchase, $action, $oldValues, $validated, $description);
+        $this->logHistory($purchase, 'updated', $oldValues, $validated, $description);
 
         return redirect()
             ->route('purchases.index')

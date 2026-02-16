@@ -14,12 +14,18 @@ class Item extends Model
         'description',
         'category',
         'quantity',
+        'unit',
         'date_time',
+    ];
+
+    protected $attributes = [
+        'unit' => 'Quantity',
     ];
 
     protected $casts = [
         'date_time' => 'datetime',
-        'quantity' => 'integer',
+        'quantity' => 'decimal:2',
+        'unit' => 'string',
     ];
 
     /**
@@ -31,7 +37,8 @@ class Item extends Model
         'name' => 'required|string|max:255',
         'description' => 'nullable|string',
         'category' => 'required|in:tool,material',
-        'quantity' => 'required|integer|min:0',
+        'quantity' => 'required|numeric|min:0',
+        'unit' => 'required|in:Quantity,Kg',
         'date_time' => 'nullable|date',
     ];
 

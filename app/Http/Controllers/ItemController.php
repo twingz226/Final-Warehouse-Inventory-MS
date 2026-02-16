@@ -72,7 +72,8 @@ class ItemController extends Controller
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
             'category' => 'required|in:tool,material',
-            'quantity' => 'required|integer|min:0',
+            'quantity' => 'required|numeric|min:0',
+            'unit' => 'required|in:Quantity,Kg',
             'date_time' => 'nullable|string',
         ]);
 
@@ -119,7 +120,8 @@ class ItemController extends Controller
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
             'category' => 'required|in:tool,material',
-            'quantity' => 'required|integer|min:0',
+            'quantity' => 'required|numeric|min:0',
+            'unit' => 'required|in:Quantity,Kg',
             'date_time' => 'nullable|string',
         ]);
 
@@ -141,6 +143,9 @@ class ItemController extends Controller
         }
         if ($oldValues['category'] !== $validated['category']) {
             $changes[] = "category from '{$oldValues['category']}' to '{$validated['category']}'";
+        }
+        if ($oldValues['unit'] !== $validated['unit']) {
+            $changes[] = "unit from '{$oldValues['unit']}' to '{$validated['unit']}'";
         }
         
         $description = count($changes) > 0 ? "Updated " . implode(', ', $changes) : "Updated item";

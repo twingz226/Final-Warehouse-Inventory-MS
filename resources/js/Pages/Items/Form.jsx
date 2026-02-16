@@ -33,6 +33,7 @@ export default function Form({ auth, item = null }) {
         description: item?.description || '',
         category: item?.category || 'tool',
         quantity: item?.quantity || 0,
+        unit: item?.unit || 'Quantity',
         date_time: item ? formatDateTimeForDisplay(item.date_time) : '',
     });
 
@@ -79,8 +80,8 @@ export default function Form({ auth, item = null }) {
 
             <div className="py-12">
                 <div className="max-w-7xl mx-auto sm:px-6 lg:px-8">
-                    <div className="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-                        <div className="p-6 bg-white border-b border-gray-200">
+                    <div className="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
+                        <div className="p-6 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
                             <form onSubmit={submit} className="space-y-6">
                                 <div>
                                     <InputLabel htmlFor="name" value="Name" />
@@ -100,7 +101,7 @@ export default function Form({ auth, item = null }) {
                                     <InputLabel htmlFor="description" value="Description" />
                                     <textarea
                                         id="description"
-                                        className="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm"
+                                        className="mt-1 block w-full border-gray-300 dark:border-gray-600 focus:border-indigo-500 dark:focus:border-indigo-400 focus:ring-indigo-500 dark:focus:ring-indigo-400 rounded-md shadow-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
                                         value={data.description}
                                         onChange={(e) => setData('description', e.target.value)}
                                         rows={3}
@@ -112,7 +113,7 @@ export default function Form({ auth, item = null }) {
                                     <InputLabel htmlFor="category" value="Category" />
                                     <select
                                         id="category"
-                                        className="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm"
+                                        className="mt-1 block w-full border-gray-300 dark:border-gray-600 focus:border-indigo-500 dark:focus:border-indigo-400 focus:ring-indigo-500 dark:focus:ring-indigo-400 rounded-md shadow-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
                                         value={data.category}
                                         onChange={(e) => setData('category', e.target.value)}
                                         required
@@ -126,16 +127,30 @@ export default function Form({ auth, item = null }) {
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                     <div>
                                         <InputLabel htmlFor="quantity" value="Quantity" />
-                                        <TextInput
-                                            id="quantity"
-                                            type="number"
-                                            min="0"
-                                            className="mt-1 block w-full"
-                                            value={data.quantity}
-                                            onChange={(e) => setData('quantity', e.target.value)}
-                                            required
-                                        />
+                                        <div className="flex space-x-2">
+                                            <TextInput
+                                                id="quantity"
+                                                type="number"
+                                                min="0"
+                                                step="0.01"
+                                                className="mt-1 block flex-1"
+                                                value={data.quantity}
+                                                onChange={(e) => setData('quantity', e.target.value)}
+                                                required
+                                            />
+                                            <select
+                                                id="unit"
+                                                className="mt-1 block w-32 border-gray-300 dark:border-gray-600 focus:border-indigo-500 dark:focus:border-indigo-400 focus:ring-indigo-500 dark:focus:ring-indigo-400 rounded-md shadow-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+                                                value={data.unit}
+                                                onChange={(e) => setData('unit', e.target.value)}
+                                                required
+                                            >
+                                                <option value="Quantity">pcs.</option>
+                                                <option value="Kg">Kg</option>
+                                            </select>
+                                        </div>
                                         <InputError message={errors.quantity} className="mt-2" />
+                                        <InputError message={errors.unit} className="mt-2" />
                                     </div>
 
                                     <div>
@@ -155,7 +170,7 @@ export default function Form({ auth, item = null }) {
                                 <div className="flex items-center justify-end space-x-4">
                                     <Link
                                         href={route('items.index')}
-                                        className="inline-flex items-center px-4 py-2 bg-white border border-gray-300 rounded-md font-semibold text-xs text-gray-700 uppercase tracking-widest shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:opacity-25 transition ease-in-out duration-150"
+                                        className="inline-flex items-center px-4 py-2 bg-gray-500 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest shadow-sm hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 disabled:opacity-25 transition ease-in-out duration-150"
                                     >
                                         Cancel
                                     </Link>

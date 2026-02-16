@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { PlusIcon, EyeIcon, TrashIcon, PrinterIcon } from '@heroicons/react/24/outline';
 
 export default function Index({ auth, purchases, status }) {
+    const [tooltip, setTooltip] = useState({ show: false, text: '', x: 0, y: 0 });
     const deletePurchase = (id) => {
         router.delete(route('purchases.destroy', id));
     };
@@ -284,7 +285,7 @@ export default function Index({ auth, purchases, status }) {
                     </h2>
                     <Link
                         href={route('purchases.create')}
-                        className="inline-flex items-center px-4 py-2 bg-gray-800 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-gray-700"
+                        className="inline-flex items-center px-4 py-2 bg-indigo-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-indigo-700"
                     >
                         <PlusIcon className="h-4 w-4 mr-2" />
                         Add New Distribution
@@ -297,79 +298,82 @@ export default function Index({ auth, purchases, status }) {
             <div className="py-12">
                 <div className="max-w-7xl mx-auto sm:px-6 lg:px-8">
                     {status && (
-                        <div className="mb-4 p-4 bg-green-100 text-green-700 rounded">
+                        <div className="mb-4 p-4 bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300 rounded">
                             {status}
                         </div>
                     )}
                     
-                    <div className="bg-white overflow-hidden shadow-sm sm:rounded-lg">
+                    <div className="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
                         <div className="overflow-x-auto">
-                            <table className="min-w-full divide-y divide-gray-200">
-                                <thead className="bg-gray-50">
+                            <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                                <thead className="bg-gray-50 dark:bg-gray-700">
                                     <tr>
-                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                                             Destination
                                         </th>
-                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                                             Item
                                         </th>
-                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                                             Category
                                         </th>
-                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                                             Quantity
                                         </th>
-                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                                             Actions
                                         </th>
                                     </tr>
                                 </thead>
-                                <tbody className="bg-white divide-y divide-gray-200">
+                                <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
                                     {purchases.data.length > 0 ? (
                                         purchases.data.map((purchase) => (
                                         <tr key={purchase.id}>
                                             <td className="px-6 py-4 whitespace-nowrap">
-                                                <div className="text-sm font-medium text-gray-900">
+                                                <div className="text-sm font-medium text-gray-900 dark:text-gray-100">
                                                     {purchase.supplier_name}
                                                 </div>
                                             </td>
                                             <td className="px-6 py-4 whitespace-nowrap">
-                                                <div className="text-sm font-medium text-gray-900">
+                                                <div className="text-sm font-medium text-gray-900 dark:text-gray-100">
                                                     {purchase.item_name}
                                                 </div>
                                             </td>
                                             <td className="px-6 py-4 whitespace-nowrap">
                                                 {purchase.item_category ? (
-                                                    <span className="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-indigo-100 text-indigo-800 capitalize">
+                                                    <span className="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-indigo-100 dark:bg-indigo-900 text-indigo-800 dark:text-indigo-200 capitalize">
                                                         {purchase.item_category}
                                                     </span>
                                                 ) : (
-                                                    <span className="text-sm text-gray-400">N/A</span>
+                                                    <span className="text-sm text-gray-400 dark:text-gray-500">N/A</span>
                                                 )}
                                             </td>
-                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
                                                 {purchase.quantity}
                                             </td>
                                             <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                                                 <div className="flex space-x-2">
                                                     <button
                                                         onClick={() => handlePrint(purchase)}
-                                                        className="text-green-600 hover:text-green-900"
-                                                        title="Print Purchase Details"
+                                                        className="text-green-600 dark:text-green-400 hover:text-green-900 dark:hover:text-green-300"
+                                                        onMouseEnter={(e) => { const rect = e.currentTarget.getBoundingClientRect(); setTooltip({ show: true, text: 'Print Purchase Details', x: rect.left + rect.width / 2, y: rect.top - 30 }); }}
+                                                        onMouseLeave={() => setTooltip({ show: false, text: '', x: 0, y: 0 })}
                                                     >
                                                         <PrinterIcon className="h-5 w-5" />
                                                     </button>
                                                     <Link
                                                         href={route('purchases.show', purchase.id)}
-                                                        className="text-indigo-600 hover:text-indigo-900"
-                                                        title="View Purchase"
+                                                        className="text-indigo-600 dark:text-indigo-400 hover:text-indigo-900 dark:hover:text-indigo-300"
+                                                        onMouseEnter={(e) => { const rect = e.currentTarget.getBoundingClientRect(); setTooltip({ show: true, text: 'View Purchase', x: rect.left + rect.width / 2, y: rect.top - 30 }); }}
+                                                        onMouseLeave={() => setTooltip({ show: false, text: '', x: 0, y: 0 })}
                                                     >
                                                         <EyeIcon className="h-5 w-5" />
                                                     </Link>
                                                     <button
                                                         onClick={() => deletePurchase(purchase.id)}
-                                                        className="text-red-600 hover:text-red-900"
-                                                        title="Delete Purchase"
+                                                        className="text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-300"
+                                                        onMouseEnter={(e) => { const rect = e.currentTarget.getBoundingClientRect(); setTooltip({ show: true, text: 'Delete Purchase', x: rect.left + rect.width / 2, y: rect.top - 30 }); }}
+                                                        onMouseLeave={() => setTooltip({ show: false, text: '', x: 0, y: 0 })}
                                                     >
                                                         <TrashIcon className="h-5 w-5" />
                                                     </button>
@@ -380,8 +384,8 @@ export default function Index({ auth, purchases, status }) {
                                     ) : (
                                         <tr>
                                             <td colSpan="5" className="px-6 py-12 text-center">
-                                                <p className="text-gray-500 text-sm">
-                                                    No purchase orders found
+                                                <p className="text-gray-500 dark:text-gray-400 text-sm">
+                                                    No distributions found
                                                 </p>
                                             </td>
                                         </tr>
@@ -392,6 +396,16 @@ export default function Index({ auth, purchases, status }) {
                     </div>
                 </div>
             </div>
+
+            {/* Custom Tooltip */}
+            {tooltip.show && (
+                <div
+                    className="fixed z-50 bg-gray-800 dark:bg-gray-900 text-white text-xs px-2 py-1 rounded shadow-lg pointer-events-none transform -translate-x-1/2"
+                    style={{ left: tooltip.x, top: tooltip.y }}
+                >
+                    {tooltip.text}
+                </div>
+            )}
         </AuthenticatedLayout>
     );
 }

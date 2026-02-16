@@ -18,7 +18,6 @@ class Purchase extends Model
         'description',
         'quantity',
         'purchase_date',
-        'status',
         'notes',
         'project_type',
         'project_name',
@@ -43,7 +42,6 @@ class Purchase extends Model
         'description' => 'nullable|string',
         'quantity' => 'required|integer|min:1',
         'purchase_date' => 'required|date',
-        'status' => 'required|in:pending,ordered,received,cancelled',
         'notes' => 'nullable|string',
         'project_type' => 'nullable|string|max:255',
         'project_name' => 'nullable|string|max:255',
@@ -65,33 +63,6 @@ class Purchase extends Model
         return $this->belongsTo(User::class, 'created_by');
     }
 
-
-    /**
-     * Get status options for dropdown.
-     */
-    public static function getStatusOptions(): array
-    {
-        return [
-            'pending' => 'Pending',
-            'ordered' => 'Ordered',
-            'received' => 'Received',
-            'cancelled' => 'Cancelled',
-        ];
-    }
-
-    /**
-     * Get status color for UI.
-     */
-    public function getStatusColor(): string
-    {
-        return match($this->status) {
-            'pending' => 'yellow',
-            'ordered' => 'blue',
-            'received' => 'green',
-            'cancelled' => 'red',
-            default => 'gray',
-        };
-    }
 
     /**
      * Validate the model attributes against the validation rules.

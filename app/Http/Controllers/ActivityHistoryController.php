@@ -16,7 +16,6 @@ class ActivityHistoryController extends Controller
     public function index(Request $request)
     {
         $search = $request->input('search');
-        $action = $request->input('action');
         $activityType = $request->input('activity_type');
         $date_from = $request->input('date_from');
         $date_to = $request->input('date_to');
@@ -35,10 +34,6 @@ class ActivityHistoryController extends Controller
                                    ->orWhere('supplier_name', 'like', '%' . $search . '%');
                   });
             });
-        }
-        
-        if ($action) {
-            $query->where('action', $action);
         }
         
         if ($activityType) {
@@ -65,9 +60,8 @@ class ActivityHistoryController extends Controller
             'history' => $history,
             'items' => $items,
             'distributions' => $distributions,
-            'filters' => $request->only(['search', 'action', 'activity_type', 'date_from', 'date_to']),
+            'filters' => $request->only(['search', 'activity_type', 'date_from', 'date_to']),
             'activityTypes' => ActivityHistory::getActivityTypeOptions(),
-            'actions' => ActivityHistory::getActionOptions(),
         ]);
     }
 }

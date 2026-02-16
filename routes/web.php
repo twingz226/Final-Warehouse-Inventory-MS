@@ -44,6 +44,11 @@ Route::middleware('auth')->group(function () {
     // Arrival routes
     Route::get('/arrival', [\App\Http\Controllers\ItemController::class, 'index'])->name('arrival.index');
     
+    // Borrowed routes
+    Route::resource('borrowings', \App\Http\Controllers\BorrowingController::class)->only([
+        'index', 'create', 'store', 'show', 'edit', 'update', 'destroy'
+    ]);
+    
     // Purchase routes  
     Route::resource('purchases', \App\Http\Controllers\PurchaseController::class)->only([
         'index', 'create', 'store', 'show', 'edit', 'update', 'destroy'
