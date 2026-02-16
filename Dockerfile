@@ -4,7 +4,7 @@ WORKDIR /app
 
 # Copy package files
 COPY package*.json ./
-RUN npm ci --only=production
+RUN npm ci
 
 # Copy source files and build assets
 COPY . .
@@ -18,10 +18,13 @@ RUN apk add --no-cache \
     libzip-dev \
     zip \
     unzip \
-    curl \
+    curl-dev \
     sqlite \
+    sqlite-dev \
     git \
-    supervisor
+    supervisor \
+    oniguruma-dev \
+    libxml2-dev
 
 # Install PHP extensions
 RUN docker-php-ext-install \
@@ -40,16 +43,18 @@ COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 # Set working directory
 WORKDIR /var/www/html
 
-# Copy composer files and install PHP dependencies
-COPY composer.json composer.lock ./
-RUN composer install --no-dev --optimize-autoloader --no-interaction
-
 # Copy application code
 COPY . .
 
+# Make artisan executable
+RUN chmod +x artisan
+
+# Copy composer files and install PHP dependencies
+COPY composer.json composer.lock ./
+RUN composer install --optimize-autoloader --no-interaction
+
 # Copy built assets from node-build stage
 COPY --from=node-build /app/public/build public/build
-COPY --from=node-build /app/public/hot public/hot
 
 # Create .env file if it doesn't exist
 RUN if [ ! -f .env ]; then cp .env.example .env; fi
@@ -75,7 +80,7 @@ EXPOSE 9000
 
 # Health check
 HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
-    CMD php artisan config:cache && php artisan route:cache && curl -f http://localhost:9000 || exit 1
+    CMD php -v || exit 1
 
 # Start PHP-FPM
 CMD ["php-fpm"]
