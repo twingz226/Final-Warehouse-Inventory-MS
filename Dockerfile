@@ -30,6 +30,9 @@ COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 WORKDIR /var/www/html
 COPY . .
 
+# Copy your new Nginx configuration
+COPY nginx.conf /etc/nginx/http.d/default.conf
+
 # Install PHP dependencies
 RUN composer install --optimize-autoloader --no-dev --no-interaction
 
