@@ -56,8 +56,12 @@ RUN sed -i 's/listen = 9000/listen = \/var\/run\/php-fpm.sock/g' /usr/local/etc/
     echo "listen.mode = 0666" >> /usr/local/etc/php-fpm.d/zz-docker.conf
 # -----------------------------------------------
 
+# Copy startup script
+COPY start.sh /usr/local/bin/start.sh
+RUN chmod +x /usr/local/bin/start.sh
+
 # Expose port 80 (Standard for Nginx)
 EXPOSE 80
 
-# Start: Clean old sockets, start PHP-FPM in background, then start Nginx
-CMD ["sh", "-c", "rm -f /var/run/php-fpm.sock && php-fpm -D && nginx -g 'daemon off;'"]
+# Use the startup script
+CMD ["/usr/local/bin/start.sh"]

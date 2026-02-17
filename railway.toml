@@ -3,10 +3,10 @@ builder = "dockerfile"
 dockerfilePath = "Dockerfile"
 
 [deploy]
-startCommand = "php-fpm -D && nginx -g 'daemon off;'"
+startCommand = "/usr/local/bin/start.sh"
 restartPolicyType = "on_failure"
 restartPolicyMaxRetries = 10
-preDeployCommand = "php artisan migrate:fresh --seed --force"
+preDeployCommand = "php artisan migrate --force && php artisan db:seed --force"
 
 [variables]
 APP_ENV = "production"
