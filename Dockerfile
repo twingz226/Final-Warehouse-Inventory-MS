@@ -42,14 +42,14 @@ COPY --from=node-build /app/public/build public/build
 # Set permissions for Laravel
 RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
 
-# --- UPDATED: CONFIGURE UNIX SOCKET FOR OPTION B ---
-# 1. Create directory and ensure both services can access the socket
-RUN mkdir -p /var/run && \
-    chown -R www-data:www-data /var/run && \
-    chmod -R 775 /var/run
+# --- CONFIGURE UNIX SOCKET AND RUN DIRECTORIES ---
+# 1. Alpine Nginx requires /run/nginx to store its PID and temp files
+# 2. /var/run is where the PHP socket will live
+RUN mkdir -p /run/nginx /var/run && \
+    chown -R www-data:www-data /run/nginx /var/run && \
+    chmod -R 777 /var/run
 
-# 2. Update PHP-FPM pool config to use the socket instead of Port 9000
-# We use 'zz-docker.conf' to override default image settings
+# 3. Force PHP-FPM to use the Unix socket with open permissions
 RUN sed -i 's/listen = 9000/listen = \/var\/run\/php-fpm.sock/g' /usr/local/etc/php-fpm.d/zz-docker.conf && \
     echo "listen.owner = www-data" >> /usr/local/etc/php-fpm.d/zz-docker.conf && \
     echo "listen.group = www-data" >> /usr/local/etc/php-fpm.d/zz-docker.conf && \
@@ -59,5 +59,5 @@ RUN sed -i 's/listen = 9000/listen = \/var\/run\/php-fpm.sock/g' /usr/local/etc/
 # Expose port 80 (Standard for Nginx)
 EXPOSE 80
 
-# Start PHP-FPM in the background (-D) and Nginx in the foreground
-CMD php-fpm -D && nginx -g "daemon off;"
+# Start: Clean old sockets, start PHP-FPM in background, then start Nginx
+CMD ["sh", "-c", "rm -f /var/run/php-fpm.sock && php-fpm -D && nginx -g 'daemon off;'"]
