@@ -53,7 +53,7 @@ RUN mkdir -p /var/run && \
 RUN sed -i 's/listen = 9000/listen = \/var\/run\/php-fpm.sock/g' /usr/local/etc/php-fpm.d/zz-docker.conf && \
     echo "listen.owner = www-data" >> /usr/local/etc/php-fpm.d/zz-docker.conf && \
     echo "listen.group = www-data" >> /usr/local/etc/php-fpm.d/zz-docker.conf && \
-    echo "listen.mode = 0660" >> /usr/local/etc/php-fpm.d/zz-docker.conf
+    echo "listen.mode = 0666" >> /usr/local/etc/php-fpm.d/zz-docker.conf
 # -----------------------------------------------
 
 # Expose port 80 (Standard for Nginx)
