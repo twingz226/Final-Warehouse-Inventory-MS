@@ -16,14 +16,20 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // Only run in non-production environments or when explicitly forced
-        if (app()->environment('local', 'testing') || $this->command->hasOption('force')) {
-            User::factory()->create([
+        // Using updateOrCreate ensures the user is added even in 'production' 
+        // without crashing if the command is run multiple times.
+        User::updateOrCreate(
+            ['email' => 'admin@example.com'], // The unique identifier
+            [
                 'name' => 'Admin User',
-                'email' => 'admin@example.com',
-                'password' => \Illuminate\Support\Facades\Hash::make('password'),
+                'password' => Hash::make('password'),
                 'email_verified_at' => now(),
-            ]);
-        }
+            ]
+        );
+
+        // If you have other seeders, you can call them here:
+        // $this->call([
+        //     ProductSeeder::class,
+        // ]);
     }
 }
