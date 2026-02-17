@@ -42,6 +42,10 @@ COPY --from=node-build /app/public/build public/build
 # Set permissions for Laravel
 RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
 
+# Run database migrations and seeders
+RUN php artisan migrate --force
+RUN php artisan db:seed --force
+
 # Expose port 80 (Standard for Nginx)
 EXPOSE 80
 

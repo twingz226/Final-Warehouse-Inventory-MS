@@ -1,0 +1,12 @@
+[build]
+builder = "nixpacks"
+
+[deploy]
+startCommand = "php-fpm -D && nginx -g 'daemon off;'"
+restartPolicyType = "on_failure"
+restartPolicyMaxRetries = 10
+
+[variables]
+APP_ENV = "production"
+APP_DEBUG = "false"
+LOG_LEVEL = "error"
