@@ -248,25 +248,7 @@ export default function InventoryIndex({ auth, items, summary, filters }) {
                                 </div>
                                 
                                 {/* Quick Filter Presets */}
-                                <div className="flex flex-wrap gap-2">
-                                    <button
-                                        onClick={() => {
-                                            setStockLevel('low_stock');
-                                            applyFilters();
-                                        }}
-                                        className="px-3 py-2 text-sm bg-red-100 text-red-700 rounded-md hover:bg-red-200 dark:bg-red-900 dark:text-red-300 dark:hover:bg-red-800"
-                                    >
-                                        Low Stock
-                                    </button>
-                                    <button
-                                        onClick={() => {
-                                            setStockLevel('out_of_stock');
-                                            applyFilters();
-                                        }}
-                                        className="px-3 py-2 text-sm bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600"
-                                    >
-                                        Out of Stock
-                                    </button>
+                                <div className="flex justify-end">
                                     <button
                                         onClick={clearFilters}
                                         className="px-3 py-2 text-sm bg-indigo-100 text-indigo-700 rounded-md hover:bg-indigo-200 dark:bg-indigo-900 dark:text-indigo-300 dark:hover:bg-indigo-800"

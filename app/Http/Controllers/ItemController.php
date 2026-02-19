@@ -33,8 +33,15 @@ class ItemController extends Controller
     {
         $search = $request->input('search');
         $date = $request->input('date');
+        $sort = $request->input('sort', 'date_time');
+        $direction = $request->input('direction', 'desc');
         
-        $query = Item::latest();
+        // Validate sort column and direction for security
+        $allowedSorts = ['name', 'quantity', 'date_time', 'created_at'];
+        $sort = in_array($sort, $allowedSorts) ? $sort : 'date_time';
+        $direction = in_array(strtolower($direction), ['asc', 'desc']) ? $direction : 'desc';
+        
+        $query = Item::query();
         
         if ($search) {
             $query->where(function($q) use ($search) {
@@ -46,6 +53,9 @@ class ItemController extends Controller
         if ($date) {
             $query->whereDate('date_time', $date);
         }
+        
+        // Apply sorting
+        $query->orderBy($sort, $direction);
         
         $items = $query->paginate(10)->withQueryString();
 
