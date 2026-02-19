@@ -14,8 +14,6 @@ export default function InventoryIndex({ auth, items, summary, filters }) {
     const [sortOrder, setSortOrder] = useState(filters.sort_order || 'asc');
     const [showFilters, setShowFilters] = useState(false);
     const [searchTimeout, setSearchTimeout] = useState(null);
-    const [selectedItems, setSelectedItems] = useState([]);
-    const [showBulkActions, setShowBulkActions] = useState(false);
 
     const performSearch = () => {
         if (searchTimeout) {
@@ -71,46 +69,6 @@ export default function InventoryIndex({ auth, items, summary, filters }) {
         applyFilters();
     };
 
-    const handleSelectItem = (itemId) => {
-        setSelectedItems(prev => 
-            prev.includes(itemId) 
-                ? prev.filter(id => id !== itemId)
-                : [...prev, itemId]
-        );
-    };
-
-    const handleSelectAll = () => {
-        if (selectedItems.length === items.length) {
-            setSelectedItems([]);
-        } else {
-            setSelectedItems(items.map(item => item.id));
-        }
-    };
-
-    const handleBulkAction = (action) => {
-        if (selectedItems.length === 0) return;
-        
-        switch (action) {
-            case 'export':
-                // Export selected items
-                const exportData = items.filter(item => selectedItems.includes(item.id));
-                console.log('Exporting items:', exportData);
-                // Implement export functionality
-                break;
-            case 'delete':
-                // Delete selected items (with confirmation)
-                if (confirm(`Are you sure you want to delete ${selectedItems.length} items?`)) {
-                    console.log('Deleting items:', selectedItems);
-                    // Implement bulk delete functionality
-                }
-                break;
-            case 'adjust_stock':
-                // Adjust stock for selected items
-                console.log('Adjusting stock for items:', selectedItems);
-                // Implement bulk stock adjustment functionality
-                break;
-        }
-    };
 
     const getCategoryIcon = (category) => {
         return category === 'tool' ? 
@@ -435,39 +393,7 @@ export default function InventoryIndex({ auth, items, summary, filters }) {
                             </div>
                         </div>
 
-                        {/* Bulk Actions Bar */}
-                        {selectedItems.length > 0 && (
-                            <div className="border-t border-b border-gray-200 dark:border-gray-700 px-4 py-3 bg-indigo-50 dark:bg-indigo-900">
-                                <div className="flex items-center justify-between">
-                                    <div className="flex items-center">
-                                        <span className="text-sm font-medium text-indigo-700 dark:text-indigo-300">
-                                            {selectedItems.length} item{selectedItems.length !== 1 ? 's' : ''} selected
-                                        </span>
-                                    </div>
-                                    <div className="flex gap-2">
-                                        <button
-                                            onClick={() => handleBulkAction('export')}
-                                            className="inline-flex items-center px-3 py-1.5 border border-gray-300 dark:border-gray-600 shadow-sm text-xs font-medium rounded text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700"
-                                        >
-                                            Export
-                                        </button>
-                                        <button
-                                            onClick={() => handleBulkAction('adjust_stock')}
-                                            className="inline-flex items-center px-3 py-1.5 border border-gray-300 dark:border-gray-600 shadow-sm text-xs font-medium rounded text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700"
-                                        >
-                                            Adjust Stock
-                                        </button>
-                                        <button
-                                            onClick={() => handleBulkAction('delete')}
-                                            className="inline-flex items-center px-3 py-1.5 border border-red-300 dark:border-red-600 shadow-sm text-xs font-medium rounded text-red-700 dark:text-red-300 bg-white dark:bg-gray-800 hover:bg-red-50 dark:hover:bg-red-900"
-                                        >
-                                            Delete
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        )}
-                        
+                                                
                         {items.length > 0 ? (
                             <div className="block lg:hidden">
                                 {/* Mobile Card View */}
@@ -477,23 +403,15 @@ export default function InventoryIndex({ auth, items, summary, filters }) {
                                             isLowStock(item.available_stock) ? 'border-red-200 dark:border-red-800' : 'border-gray-200 dark:border-gray-700'
                                         }`}>
                                             <div className="flex items-start justify-between mb-3">
-                                                <div className="flex items-center">
-                                                    <input
-                                                        type="checkbox"
-                                                        checked={selectedItems.includes(item.id)}
-                                                        onChange={() => handleSelectItem(item.id)}
-                                                        className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded mr-3"
-                                                    />
-                                                    <div>
-                                                        <h4 className="text-sm font-medium text-gray-900 dark:text-gray-100">
-                                                            {item.name}
-                                                        </h4>
-                                                        {item.description && (
-                                                            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                                                                {item.description}
-                                                            </p>
-                                                        )}
-                                                    </div>
+                                                <div>
+                                                    <h4 className="text-sm font-medium text-gray-900 dark:text-gray-100">
+                                                        {item.name}
+                                                    </h4>
+                                                    {item.description && (
+                                                        <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                                                            {item.description}
+                                                        </p>
+                                                    )}
                                                 </div>
                                                 <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
                                                     item.category === 'tool' 
@@ -536,25 +454,7 @@ export default function InventoryIndex({ auth, items, summary, filters }) {
                                                         </span>
                                                     )}
                                                 </div>
-                                                <div className="flex gap-2">
-                                                    <Link
-                                                        href={route('items.edit', item.id)}
-                                                        className="text-indigo-600 hover:text-indigo-900 dark:text-indigo-400 dark:hover:text-indigo-300 text-sm"
-                                                    >
-                                                        Edit
-                                                    </Link>
-                                                    <button
-                                                        onClick={() => {
-                                                            if (confirm(`Are you sure you want to delete ${item.name}?`)) {
-                                                                router.delete(route('items.destroy', item.id));
-                                                            }
-                                                        }}
-                                                        className="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300 text-sm"
-                                                    >
-                                                        Delete
-                                                    </button>
-                                                </div>
-                                            </div>
+                                                                                            </div>
                                         </div>
                                     ))}
                                 </div>
@@ -567,14 +467,6 @@ export default function InventoryIndex({ auth, items, summary, filters }) {
                                 <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
                                     <thead className="bg-gray-50 dark:bg-gray-700">
                                         <tr>
-                                            <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                                                <input
-                                                    type="checkbox"
-                                                    checked={selectedItems.length === items.length && items.length > 0}
-                                                    onChange={handleSelectAll}
-                                                    className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
-                                                />
-                                            </th>
                                             <th 
                                                 scope="col" 
                                                 className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600"
@@ -617,10 +509,7 @@ export default function InventoryIndex({ auth, items, summary, filters }) {
                                             <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                                                 Available Stocks
                                             </th>
-                                            <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                                                Actions
-                                            </th>
-                                        </tr>
+                                                                                    </tr>
                                     </thead>
                                     <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
                                         {sortedItems.map((item) => (
@@ -628,14 +517,6 @@ export default function InventoryIndex({ auth, items, summary, filters }) {
                                                 key={item.id} 
                                                 className={isLowStock(item.available_stock) ? 'bg-red-200 dark:bg-red-900' : ''}
                                             >
-                                                <td className="px-6 py-4 whitespace-nowrap">
-                                                    <input
-                                                        type="checkbox"
-                                                        checked={selectedItems.includes(item.id)}
-                                                        onChange={() => handleSelectItem(item.id)}
-                                                        className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
-                                                    />
-                                                </td>
                                                 <td className="px-6 py-4 whitespace-nowrap">
                                                     <div className="text-sm font-medium text-gray-900 dark:text-gray-100">
                                                         {item.name}
@@ -678,27 +559,7 @@ export default function InventoryIndex({ auth, items, summary, filters }) {
                                                         )}
                                                     </div>
                                                 </td>
-                                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
-                                                    <div className="flex gap-2">
-                                                        <Link
-                                                            href={route('items.edit', item.id)}
-                                                            className="text-indigo-600 hover:text-indigo-900 dark:text-indigo-400 dark:hover:text-indigo-300"
-                                                        >
-                                                            Edit
-                                                        </Link>
-                                                        <button
-                                                            onClick={() => {
-                                                                if (confirm(`Are you sure you want to delete ${item.name}?`)) {
-                                                                    router.delete(route('items.destroy', item.id));
-                                                                }
-                                                            }}
-                                                            className="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300"
-                                                        >
-                                                            Delete
-                                                        </button>
-                                                    </div>
-                                                </td>
-                                            </tr>
+                                                                                            </tr>
                                         ))}
                                     </tbody>
                                 </table>
