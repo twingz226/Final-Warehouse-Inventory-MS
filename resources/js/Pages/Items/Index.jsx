@@ -151,7 +151,7 @@ export default function Index({ auth, items, status }) {
             header={
                 <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                     <h2 className="font-semibold text-xl text-gray-800 leading-tight">
-                        Tools & Materials
+                        Incoming Items
                     </h2>
                     <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 w-full sm:w-auto">
                         {/* Desktop View Toggle */}
@@ -216,7 +216,7 @@ export default function Index({ auth, items, status }) {
                 </div>
             }
         >
-            <Head title="Tools & Materials" />
+            <Head title="Incoming Items" />
 
             <div className="py-12">
                 <div className="max-w-7xl mx-auto sm:px-6 lg:px-8">

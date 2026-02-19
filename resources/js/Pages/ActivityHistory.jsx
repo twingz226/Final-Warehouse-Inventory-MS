@@ -129,7 +129,7 @@ export default function ActivityHistory({ auth, history, items, distributions, f
             header={
                 <div className="flex justify-between items-center">
                     <h2 className="font-semibold text-xl text-gray-800 leading-tight">
-                        Activity History
+                        Activity Log
                     </h2>
                     <div className="text-sm text-gray-500">
                         All activities across items and distributions
@@ -137,7 +137,7 @@ export default function ActivityHistory({ auth, history, items, distributions, f
                 </div>
             }
         >
-            <Head title="Activity History" />
+            <Head title="Activity Log" />
 
             <div className="py-12">
                 <div className="max-w-7xl mx-auto sm:px-6 lg:px-8">

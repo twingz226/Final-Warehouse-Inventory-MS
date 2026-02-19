@@ -93,11 +93,11 @@ export default function Index({ auth, borrowings, status, statusOptions }) {
         <AuthenticatedLayout
             header={
                 <h2 className="font-semibold text-xl text-gray-800 dark:text-gray-100 leading-tight">
-                    Borrowed Tools & Materials
+                    Borrowed Items
                 </h2>
             }
         >
-            <Head title="Borrowed Tools & Materials" />
+            <Head title="Borrowed Items" />
 
             <div className="py-12">
                 <div className="max-w-7xl mx-auto sm:px-6 lg:px-8">
