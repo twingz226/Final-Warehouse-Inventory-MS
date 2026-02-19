@@ -15,16 +15,23 @@ export default function Index({ auth, items, status }) {
     const [sortDirection, setSortDirection] = useState('desc'); // 'asc' or 'desc'
     const [selectedItems, setSelectedItems] = useState([]);
     const [showBulkActions, setShowBulkActions] = useState(false);
+    const [date, setDate] = useState('');
 
     useEffect(() => {
         const urlParams = new URLSearchParams(window.location.search);
         const initialSearch = urlParams.get('search') || '';
         const initialSort = urlParams.get('sort') || 'date_time';
         const initialDirection = urlParams.get('direction') || 'desc';
+        const initialDate = urlParams.get('date') || '';
         
         setSearch(initialSearch);
         setSortColumn(initialSort);
         setSortDirection(initialDirection);
+        if (initialDate) {
+            setDate(initialDate);
+        } else {
+            setDate(new Date().toISOString().split('T')[0]);
+        }
     }, []);
 
     const handleSearch = (value) => {
@@ -50,6 +57,23 @@ export default function Index({ auth, items, status }) {
         }, 300);
         
         setSearchTimeout(timeout);
+    };
+
+    const handleDateChange = (value) => {
+        setDate(value);
+        
+        const params = new URLSearchParams(window.location.search);
+        if (value) {
+            params.set('date', value);
+        } else {
+            params.delete('date');
+        }
+        params.set('page', '1');
+        
+        router.get(`${window.location.pathname}?${params.toString()}`, {}, {
+            preserveScroll: true,
+            preserveState: true,
+        });
     };
 
     const handleSort = (column) => {
@@ -226,27 +250,51 @@ export default function Index({ auth, items, status }) {
                         </div>
                     )}
                     <div className="mb-6">
-                        <div className="relative">
-                            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                <MagnifyingGlassIcon className="h-5 w-5 text-gray-400 dark:text-gray-500" />
+                        <div className="flex flex-col sm:flex-row gap-4">
+                            <div className="flex-1">
+                                <div className="relative">
+                                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                        <MagnifyingGlassIcon className="h-5 w-5 text-gray-400 dark:text-gray-500" />
+                                    </div>
+                                    <input
+                                        type="text"
+                                        value={search}
+                                        onChange={(e) => handleSearch(e.target.value)}
+                                        placeholder="Search tools and materials..."
+                                        className="block w-full pl-10 pr-10 py-3 border border-gray-300 dark:border-gray-600 rounded-lg leading-5 bg-white dark:bg-gray-700 placeholder-gray-500 dark:placeholder-gray-400 text-gray-900 dark:text-white focus:outline-none focus:placeholder-gray-400 dark:focus:placeholder-gray-500 focus:ring-1 focus:ring-indigo-500 dark:focus:ring-indigo-400 focus:border-indigo-500 dark:focus:border-indigo-400 sm:text-sm transition duration-150 ease-in-out"
+                                    />
+                                    {search && (
+                                        <button
+                                            onClick={() => handleSearch('')}
+                                            className="absolute inset-y-0 right-0 pr-3 flex items-center"
+                                        >
+                                            <svg className="h-5 w-5 text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                                            </svg>
+                                        </button>
+                                    )}
+                                </div>
                             </div>
-                            <input
-                                type="text"
-                                value={search}
-                                onChange={(e) => handleSearch(e.target.value)}
-                                placeholder="Search tools and materials..."
-                                className="block w-full pl-10 pr-10 py-3 border border-gray-300 dark:border-gray-600 rounded-lg leading-5 bg-white dark:bg-gray-700 placeholder-gray-500 dark:placeholder-gray-400 text-gray-900 dark:text-white focus:outline-none focus:placeholder-gray-400 dark:focus:placeholder-gray-500 focus:ring-1 focus:ring-indigo-500 dark:focus:ring-indigo-400 focus:border-indigo-500 dark:focus:border-indigo-400 sm:text-sm transition duration-150 ease-in-out"
-                            />
-                            {search && (
-                                <button
-                                    onClick={() => handleSearch('')}
-                                    className="absolute inset-y-0 right-0 pr-3 flex items-center"
-                                >
-                                    <svg className="h-5 w-5 text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
-                                    </svg>
-                                </button>
-                            )}
+                            <div className="sm:w-48">
+                                <div className="relative">
+                                    <input
+                                        type="date"
+                                        value={date}
+                                        onChange={(e) => handleDateChange(e.target.value)}
+                                        className="block w-full px-3 py-3 border border-gray-300 dark:border-gray-600 rounded-lg leading-5 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:focus:ring-indigo-400 focus:border-indigo-500 dark:focus:border-indigo-400 sm:text-sm transition duration-150 ease-in-out"
+                                    />
+                                    {date && (
+                                        <button
+                                            onClick={() => handleDateChange('')}
+                                            className="absolute inset-y-0 right-0 pr-3 flex items-center"
+                                        >
+                                            <svg className="h-5 w-5 text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                                            </svg>
+                                        </button>
+                                    )}
+                                </div>
+                            </div>
                         </div>
                     </div>
                     

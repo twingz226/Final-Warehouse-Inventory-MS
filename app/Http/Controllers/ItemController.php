@@ -32,7 +32,7 @@ class ItemController extends Controller
     public function index(Request $request)
     {
         $search = $request->input('search');
-        $date = $request->input('date');
+        $date = $request->input('date', now()->toDateString());
         $sort = $request->input('sort', 'date_time');
         $direction = $request->input('direction', 'desc');
         
