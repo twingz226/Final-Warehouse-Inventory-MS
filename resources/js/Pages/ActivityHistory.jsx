@@ -98,6 +98,8 @@ export default function ActivityHistory({ auth, history, items, distributions, f
                 return 'text-blue-600 dark:text-blue-400 bg-blue-100 dark:bg-blue-900 border-blue-200 dark:border-blue-800';
             case 'distribution':
                 return 'text-green-600 dark:text-green-400 bg-green-100 dark:bg-green-900 border-green-200 dark:border-green-800';
+            case 'borrowing':
+                return 'text-purple-600 dark:text-purple-400 bg-purple-100 dark:bg-purple-900 border-purple-200 dark:border-purple-800';
             default:
                 return 'text-gray-600 dark:text-gray-400 bg-gray-100 dark:bg-gray-900 border-gray-200 dark:border-gray-800';
         }
@@ -236,7 +238,7 @@ export default function ActivityHistory({ auth, history, items, distributions, f
                                                                     {record.action_label}
                                                                 </span>
                                                                 <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getActivityTypeColor(record.activity_type)}`}>
-                                                                    {record.activity_type === 'item' ? 'Item' : 'Distribution'}
+                                                                    {record.activity_type === 'item' ? 'Item' : record.activity_type === 'distribution' ? 'Distribution' : 'Borrowing'}
                                                                 </span>
                                                                 <span className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 break-words">
                                                                     {new Date(record.created_at).toLocaleString()}
@@ -281,6 +283,25 @@ export default function ActivityHistory({ auth, history, items, distributions, f
                                                             {record.purchase.quantity !== undefined && (
                                                                 <span className="ml-2 text-xs sm:text-sm text-gray-500 dark:text-gray-400">
                                                                     (Qty: {record.purchase.quantity})
+                                                                </span>
+                                                            )}
+                                                        </div>
+                                                    )}
+                                                    
+                                                    {record.activity_type === 'borrowing' && record.borrowing && (
+                                                        <div className="mb-2">
+                                                            <Link
+                                                                href={route('borrowings.show', record.borrowing.id)}
+                                                                className="text-indigo-600 dark:text-indigo-400 hover:text-indigo-900 dark:hover:text-indigo-300 font-medium text-xs sm:text-sm break-words"
+                                                            >
+                                                                {record.borrowing.item_name}
+                                                            </Link>
+                                                            <span className="ml-2 text-xs sm:text-sm text-gray-500 dark:text-gray-400">
+                                                                (Borrower: {record.borrowing.borrower_name})
+                                                            </span>
+                                                            {record.borrowing.quantity !== undefined && (
+                                                                <span className="ml-2 text-xs sm:text-sm text-gray-500 dark:text-gray-400">
+                                                                    (Qty: {record.borrowing.quantity})
                                                                 </span>
                                                             )}
                                                         </div>

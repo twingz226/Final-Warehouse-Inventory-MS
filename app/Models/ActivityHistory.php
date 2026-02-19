@@ -49,11 +49,24 @@ class ActivityHistory extends Model
     }
 
     /**
+     * Get the related borrowing (for borrowing activities).
+     */
+    public function borrowing(): BelongsTo
+    {
+        return $this->belongsTo(Borrowing::class, 'entity_id');
+    }
+
+    /**
      * Get the related entity based on activity type.
      */
     public function getEntityAttribute()
     {
-        return $this->activity_type === 'item' ? $this->item : $this->purchase;
+        return match($this->activity_type) {
+            'item' => $this->item,
+            'distribution' => $this->purchase,
+            'borrowing' => $this->borrowing,
+            default => null,
+        };
     }
 
     /**
@@ -77,6 +90,7 @@ class ActivityHistory extends Model
         return [
             'item' => 'Items',
             'distribution' => 'Distributions',
+            'borrowing' => 'Borrowing',
         ];
     }
 
@@ -102,6 +116,7 @@ class ActivityHistory extends Model
         return match($this->activity_type) {
             'item' => 'blue',
             'distribution' => 'green',
+            'borrowing' => 'purple',
             default => 'gray',
         };
     }
@@ -111,9 +126,12 @@ class ActivityHistory extends Model
      */
     public function getEntityRoute(): string
     {
-        return $this->activity_type === 'item' 
-            ? route('items.show', $this->entity_id)
-            : route('purchases.show', $this->entity_id);
+        return match($this->activity_type) {
+            'item' => route('items.show', $this->entity_id),
+            'distribution' => route('purchases.show', $this->entity_id),
+            'borrowing' => route('borrowings.show', $this->entity_id),
+            default => '#',
+        };
     }
 
     /**
@@ -121,10 +139,11 @@ class ActivityHistory extends Model
      */
     public function getEntityName(): string
     {
-        if ($this->activity_type === 'item') {
-            return $this->item?->name ?? 'Unknown Item';
-        }
-        
-        return $this->purchase?->item_name ?? 'Unknown Distribution';
+        return match($this->activity_type) {
+            'item' => $this->item?->name ?? 'Unknown Item',
+            'distribution' => $this->purchase?->item_name ?? 'Unknown Distribution',
+            'borrowing' => $this->borrowing?->borrower_name ?? 'Unknown Borrowing',
+            default => 'Unknown',
+        };
     }
 }

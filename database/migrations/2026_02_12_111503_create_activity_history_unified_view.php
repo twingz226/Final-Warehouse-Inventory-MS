@@ -42,6 +42,21 @@ return new class extends Migration
                 created_at,
                 updated_at
             FROM purchase_histories
+
+            UNION ALL
+
+            SELECT 
+                id,
+                'borrowing' as activity_type,
+                borrowing_id as entity_id,
+                user_id,
+                action,
+                old_values,
+                new_values,
+                description,
+                created_at,
+                updated_at
+            FROM borrowing_history
         ");
     }
 

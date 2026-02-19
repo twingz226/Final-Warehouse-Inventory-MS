@@ -20,7 +20,7 @@ class ActivityHistoryController extends Controller
         $date_from = $request->input('date_from');
         $date_to = $request->input('date_to');
         
-        $query = ActivityHistory::with(['user', 'item', 'purchase']);
+        $query = ActivityHistory::with(['user', 'item', 'purchase', 'borrowing']);
         
         if ($search) {
             $query->where(function($q) use ($search) {
@@ -32,6 +32,10 @@ class ActivityHistoryController extends Controller
                   ->orWhereHas('purchase', function($purchaseQuery) use ($search) {
                       $purchaseQuery->where('item_name', 'like', '%' . $search . '%')
                                    ->orWhere('supplier_name', 'like', '%' . $search . '%');
+                  })
+                  ->orWhereHas('borrowing', function($borrowingQuery) use ($search) {
+                      $borrowingQuery->where('borrower_name', 'like', '%' . $search . '%')
+                                   ->orWhere('item_name', 'like', '%' . $search . '%');
                   });
             });
         }
