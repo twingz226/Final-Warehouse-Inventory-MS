@@ -400,7 +400,7 @@ export default function Index({ auth, items, status }) {
                                                                 : 'Get started by adding your first tool or material to the inventory. You can track quantities, manage borrowing, and keep everything organized.'
                                                             }
                                                         </p>
-                                                        <div className="flex space-x-3">
+                                                        <div className="hidden flex space-x-3">
                                                             {search && (
                                                                 <button
                                                                     onClick={() => handleSearch('')}

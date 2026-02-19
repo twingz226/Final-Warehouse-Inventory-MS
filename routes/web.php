@@ -15,7 +15,18 @@ Route::get('/', function () {
 });
 
 Route::get('/dashboard', function () {
-    return Inertia::render('Dashboard');
+    $data = [
+        'totalItems' => \App\Models\Item::count(),
+        'totalStock' => \App\Models\Item::sum('quantity'),
+        'distributedStock' => \App\Models\Purchase::where('status', 'received')->sum('quantity'),
+        'availableStock' => \App\Models\Item::sum('quantity') - \App\Models\Purchase::where('status', 'received')->sum('quantity'),
+        'lowStockItems' => \App\Models\Item::whereRaw('quantity - (SELECT COALESCE(SUM(quantity), 0) FROM purchases WHERE item_name = items.name AND status = "received") < 10')->count(),
+        'pendingPurchases' => \App\Models\Purchase::where('status', 'pending')->count(),
+        'activeBorrowings' => \App\Models\Borrowing::whereIn('status', ['borrowed', 'overdue'])->count(),
+        'overdueBorrowings' => \App\Models\Borrowing::where('status', 'overdue')->count(),
+        'recentActivities' => \App\Models\ActivityHistory::with('user')->latest()->limit(5)->get(),
+    ];
+    return Inertia::render('Dashboard', $data);
 })->middleware(['auth', 'verified'])->name('dashboard');
 
 // Item search route for autocomplete (temporarily public for testing)
