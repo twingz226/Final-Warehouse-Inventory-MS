@@ -47,7 +47,7 @@ export default function AuthenticatedLayout({ header, children }) {
                             <svg className="mr-3 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
                             </svg>
-                            Inventory Management
+                            Inventory
                         </SidebarNavLink>
                         <SidebarNavLink
                             href={route('activity-history.index')}
@@ -56,7 +56,7 @@ export default function AuthenticatedLayout({ header, children }) {
                             <svg className="mr-3 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                             </svg>
-                            Activity History
+                            Activity Log
                         </SidebarNavLink>
                         <Dropdown>
                             <Dropdown.Trigger>
@@ -64,7 +64,7 @@ export default function AuthenticatedLayout({ header, children }) {
                                     <svg className="mr-3 h-5 w-5 text-white/80 group-hover:text-white transition-colors duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
                                     </svg>
-                                    <span className="flex-1">Record Tools & Materials</span>
+                                    <span className="flex-1">Transactions</span>
                                     <svg className="ml-2 h-4 w-4 text-white/60 group-hover:text-white transition-all duration-300 group-hover:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
                                     </svg>
@@ -80,7 +80,7 @@ export default function AuthenticatedLayout({ header, children }) {
                                             </svg>
                                         </div>
                                         <div className="flex-1">
-                                            <div className="font-medium">Arrival</div>
+                                            <div className="font-medium">Incoming Items</div>
                                             <div className="text-xs text-gray-500">Manage incoming items</div>
                                         </div>
                                         <svg className="h-4 w-4 text-gray-400 group-hover:text-indigo-500 transition-colors duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -96,7 +96,7 @@ export default function AuthenticatedLayout({ header, children }) {
                                             </svg>
                                         </div>
                                         <div className="flex-1">
-                                            <div className="font-medium">Distribution</div>
+                                            <div className="font-medium">Outgoing Items</div>
                                             <div className="text-xs text-gray-500">Manage distribution orders</div>
                                         </div>
                                         <svg className="h-4 w-4 text-gray-400 group-hover:text-indigo-500 transition-colors duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -112,7 +112,7 @@ export default function AuthenticatedLayout({ header, children }) {
                                             </svg>
                                         </div>
                                         <div className="flex-1">
-                                            <div className="font-medium">Borrowed Tools & Materials</div>
+                                            <div className="font-medium">Borrowed Items</div>
                                             <div className="text-xs text-gray-500">Track borrowed items</div>
                                         </div>
                                         <svg className="h-4 w-4 text-gray-400 group-hover:text-indigo-500 transition-colors duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -152,7 +152,7 @@ export default function AuthenticatedLayout({ header, children }) {
                                 <svg className="mr-3 h-4 w-4 text-white/70 group-hover:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                                 </svg>
-                                Profile
+                                Account Settings
                             </ResponsiveNavLink>
                             <button
                                 onClick={() => setShowLogoutDialog(true)}
@@ -161,7 +161,7 @@ export default function AuthenticatedLayout({ header, children }) {
                                 <svg className="mr-3 h-4 w-4 text-white/70 group-hover:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
                                 </svg>
-                                Log Out
+                                Sign Out
                             </button>
                         </div>
                     </div>
@@ -242,7 +242,7 @@ export default function AuthenticatedLayout({ header, children }) {
                                         href={route('inventory.index')}
                                         active={route().current('inventory.index')}
                                     >
-                                        Inventory Management
+                                        Inventory
                                     </ResponsiveNavLink>
                                     <Dropdown>
                                     <Dropdown.Trigger>
@@ -250,7 +250,7 @@ export default function AuthenticatedLayout({ header, children }) {
                                             <svg className="mr-3 h-5 w-5 text-gray-500 group-hover:text-indigo-600 transition-colors duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
                                             </svg>
-                                            <span className="flex-1">Record Tools & Materials</span>
+                                            <span className="flex-1">Transactions</span>
                                             <svg className="ml-2 h-4 w-4 text-gray-400 group-hover:text-indigo-600 transition-all duration-300 group-hover:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
                                             </svg>
@@ -268,7 +268,7 @@ export default function AuthenticatedLayout({ header, children }) {
                                                     </svg>
                                                 </div>
                                                 <div className="flex-1">
-                                                    <div className="font-medium">Arrival</div>
+                                                    <div className="font-medium">Incoming Items</div>
                                                     <div className="text-xs text-gray-500">Manage incoming items</div>
                                                 </div>
                                                 <svg className="h-4 w-4 text-gray-400 group-hover:text-indigo-500 transition-colors duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -284,7 +284,7 @@ export default function AuthenticatedLayout({ header, children }) {
                                                     </svg>
                                                 </div>
                                                 <div className="flex-1">
-                                                    <div className="font-medium">Distribution</div>
+                                                    <div className="font-medium">Outgoing Items</div>
                                                     <div className="text-xs text-gray-500">Manage distribution orders</div>
                                                 </div>
                                                 <svg className="h-4 w-4 text-gray-400 group-hover:text-indigo-500 transition-colors duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -300,7 +300,7 @@ export default function AuthenticatedLayout({ header, children }) {
                                                     </svg>
                                                 </div>
                                                 <div className="flex-1">
-                                                    <div className="font-medium">Borrowed Tools & Materials</div>
+                                                    <div className="font-medium">Borrowed Items</div>
                                                     <div className="text-xs text-gray-500">Track borrowed items</div>
                                                 </div>
                                                 <svg className="h-4 w-4 text-gray-400 group-hover:text-indigo-500 transition-colors duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -339,7 +339,7 @@ export default function AuthenticatedLayout({ header, children }) {
                                         <svg className="mr-3 h-4 w-4 text-gray-400 group-hover:text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                                         </svg>
-                                        Profile
+                                        Account Settings
                                     </ResponsiveNavLink>
                                     <button
                                         onClick={() => setShowLogoutDialog(true)}
@@ -348,7 +348,7 @@ export default function AuthenticatedLayout({ header, children }) {
                                         <svg className="mr-3 h-4 w-4 text-gray-400 group-hover:text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
                                         </svg>
-                                        Log Out
+                                        Sign Out
                                     </button>
                                 </div>
                             </div>
@@ -393,11 +393,11 @@ export default function AuthenticatedLayout({ header, children }) {
                                     </div>
                                     <div className="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
                                         <h3 className="text-lg leading-6 font-medium text-gray-900 dark:text-gray-100">
-                                            Confirm Logout
+                                            Confirm Sign Out
                                         </h3>
                                         <div className="mt-2">
                                             <p className="text-sm text-gray-500 dark:text-gray-400">
-                                                Are you sure you want to log out? You will need to sign in again to access your account.
+                                                Are you sure you want to sign out? You will need to sign in again to access your account.
                                             </p>
                                         </div>
                                     </div>
@@ -412,7 +412,7 @@ export default function AuthenticatedLayout({ header, children }) {
                                     }}
                                     className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-red-600 dark:bg-red-700 text-base font-medium text-white hover:bg-red-700 dark:hover:bg-red-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 dark:focus:ring-red-600 sm:ml-3 sm:w-auto sm:text-sm"
                                 >
-                                    Log Out
+                                    Sign Out
                                 </button>
                                 <button
                                     type="button"
