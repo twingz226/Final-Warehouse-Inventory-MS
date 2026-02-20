@@ -236,6 +236,16 @@ export default function Index({ auth, items, status }) {
                             <span className="hidden sm:inline">Add New Tool/Material</span>
                             <span className="sm:hidden">Add New</span>
                         </Link>
+                        <Link
+                            href={route('items.add-stock')}
+                            className="inline-flex items-center justify-center px-4 py-2 bg-emerald-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-emerald-700 focus:bg-emerald-700 active:bg-emerald-900 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 transition ease-in-out duration-150"
+                        >
+                            <svg className="h-4 w-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                            </svg>
+                            <span className="hidden sm:inline">Add Incoming Stock</span>
+                            <span className="sm:hidden">Add Stock</span>
+                        </Link>
                     </div>
                 </div>
             }
@@ -345,7 +355,7 @@ export default function Index({ auth, items, status }) {
                                                     onClick={() => handleSort('name')}
                                                     className="group flex items-center hover:text-gray-700 dark:hover:text-gray-200 transition-colors"
                                                 >
-                                                    Name
+                                                    Item
                                                     {getSortIcon('name')}
                                                 </button>
                                             </th>

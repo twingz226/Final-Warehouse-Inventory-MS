@@ -84,7 +84,7 @@ export default function Form({ auth, item = null }) {
                         <div className="p-6 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
                             <form onSubmit={submit} className="space-y-6">
                                 <div>
-                                    <InputLabel htmlFor="name" value="Name" />
+                                    <InputLabel htmlFor="name" value="Item Name" />
                                     <TextInput
                                         id="name"
                                         type="text"

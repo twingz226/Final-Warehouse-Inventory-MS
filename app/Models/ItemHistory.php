@@ -48,6 +48,7 @@ class ItemHistory extends Model
             'created' => 'Created',
             'updated' => 'Updated',
             'deleted' => 'Deleted',
+            'stock_added' => 'Stock Added',
             default => ucfirst($this->action),
         };
     }
@@ -61,6 +62,7 @@ class ItemHistory extends Model
             'created' => 'green',
             'updated' => 'blue',
             'deleted' => 'red',
+            'stock_added' => 'emerald',
             default => 'gray',
         };
     }

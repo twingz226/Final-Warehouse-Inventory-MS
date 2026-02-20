@@ -68,6 +68,10 @@ Route::middleware('auth')->group(function () {
         'index', 'create', 'store', 'show', 'edit', 'update', 'destroy'
     ]);
     
+    // Add stock routes
+    Route::get('items/add-stock', [\App\Http\Controllers\ItemController::class, 'addStock'])->name('items.add-stock');
+    Route::post('items/add-stock', [\App\Http\Controllers\ItemController::class, 'storeStock'])->name('items.store-stock');
+    
     // Item History routes
     Route::get('items/{item}/history', [\App\Http\Controllers\ItemHistoryController::class, 'index'])->name('items.history');
     

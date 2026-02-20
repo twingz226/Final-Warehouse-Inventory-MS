@@ -203,4 +203,48 @@ class ItemController extends Controller
             ->route('items.index')
             ->with('status', 'Item deleted successfully.');
     }
+
+    /**
+     * Show the form for adding incoming stock to an existing item.
+     */
+    public function addStock()
+    {
+        return Inertia::render('Items/AddStock', [
+            'items' => Item::select('id', 'name', 'description', 'quantity', 'unit')->get(),
+        ]);
+    }
+
+    /**
+     * Store the incoming stock addition.
+     */
+    public function storeStock(Request $request)
+    {
+        $validated = $request->validate([
+            'item_id' => 'required|exists:items,id',
+            'quantity' => 'required|numeric|min:0.01',
+        ]);
+
+        $item = Item::findOrFail($validated['item_id']);
+        $oldValues = $item->toArray();
+        $oldQuantity = $item->quantity;
+
+        // Add the incoming quantity to the existing quantity
+        $item->quantity += $validated['quantity'];
+        $item->date_time = now();
+        $item->save();
+
+        $newValues = $item->toArray();
+
+        $this->logHistory(
+            $item,
+            'stock_added',
+            $oldValues,
+            $newValues,
+            "Added {$validated['quantity']} {$item->unit} to stock. Quantity changed from {$oldQuantity} to {$item->quantity}"
+        );
+
+        return redirect()
+            ->route('items.index')
+            ->with('status', "Stock added successfully. {$item->name} now has {$item->quantity} {$item->unit}.");
+    }
 }
