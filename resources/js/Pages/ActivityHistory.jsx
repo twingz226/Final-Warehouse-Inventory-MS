@@ -12,7 +12,8 @@ import {
     TrashIcon,
     UserIcon,
     FunnelIcon,
-    CalendarIcon
+    CalendarIcon,
+    ExclamationTriangleIcon
 } from '@heroicons/react/24/outline';
 
 export default function ActivityHistory({ auth, history, items, distributions, filters, activityTypes, actions }) {
@@ -92,16 +93,26 @@ export default function ActivityHistory({ auth, history, items, distributions, f
         }
     };
 
-    const getActivityTypeColor = (activityType) => {
-        switch (activityType) {
-            case 'item':
-                return 'text-blue-600 dark:text-blue-400 bg-blue-100 dark:bg-blue-900 border-blue-200 dark:border-blue-800';
-            case 'distribution':
-                return 'text-green-600 dark:text-green-400 bg-green-100 dark:bg-green-900 border-green-200 dark:border-green-800';
-            case 'borrowing':
-                return 'text-purple-600 dark:text-purple-400 bg-purple-100 dark:bg-purple-900 border-purple-200 dark:border-purple-800';
-            default:
-                return 'text-gray-600 dark:text-gray-400 bg-gray-100 dark:bg-gray-900 border-gray-200 dark:border-gray-800';
+    const getActivityTypeColor = (record) => {
+        const activityType = record.activity_type;
+        if (activityType === 'borrowing') {
+            switch (record.borrowing?.status) {
+                case 'returned':
+                    return 'text-green-600 dark:text-green-400 bg-green-100 dark:bg-green-900 border-green-200 dark:border-green-800';
+                case 'overdue':
+                    return 'text-red-600 dark:text-red-400 bg-red-100 dark:bg-red-900 border-red-200 dark:border-red-800';
+                default:
+                    return 'text-purple-600 dark:text-purple-400 bg-purple-100 dark:bg-purple-900 border-purple-200 dark:border-purple-800';
+            }
+        } else {
+            switch (activityType) {
+                case 'item':
+                    return 'text-blue-600 dark:text-blue-400 bg-blue-100 dark:bg-blue-900 border-blue-200 dark:border-blue-800';
+                case 'distribution':
+                    return 'text-green-600 dark:text-green-400 bg-green-100 dark:bg-green-900 border-green-200 dark:border-green-800';
+                default:
+                    return 'text-gray-600 dark:text-gray-400 bg-gray-100 dark:bg-gray-900 border-gray-200 dark:border-gray-800';
+            }
         }
     };
 
@@ -237,8 +248,14 @@ export default function ActivityHistory({ auth, history, items, distributions, f
                                                                 <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getActionColor(record.action)}`}>
                                                                     {record.action_label}
                                                                 </span>
-                                                                <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getActivityTypeColor(record.activity_type)}`}>
-                                                                    {record.activity_type === 'item' ? 'Item' : record.activity_type === 'distribution' ? 'Distribution' : 'Borrowing'}
+                                                                <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getActivityTypeColor(record)}`}>
+                                                                    {record.activity_type === 'item' ? 'Item' : record.activity_type === 'distribution' ? 'Distribution' : (
+                                                                        <>
+                                                                            {record.borrowing?.status === 'returned' && <CheckCircleIcon className="h-3 w-3 mr-1" />}
+                                                                            {record.borrowing?.status === 'overdue' && <ExclamationTriangleIcon className="h-3 w-3 mr-1" />}
+                                                                            {record.borrowing?.status.charAt(0).toUpperCase() + record.borrowing?.status.slice(1)}
+                                                                        </>
+                                                                    )}
                                                                 </span>
                                                                 <span className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 break-words">
                                                                     {new Date(record.created_at).toLocaleString()}

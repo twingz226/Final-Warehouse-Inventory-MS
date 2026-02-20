@@ -278,23 +278,25 @@ export default function Form({ auth, borrowing, statusOptions }) {
                                     {errors.expected_return_date && <p className="mt-2 text-sm text-red-600">{errors.expected_return_date}</p>}
                                 </div>
 
-                                <div>
-                                    <label htmlFor="status" className="block text-sm font-medium text-gray-700">
-                                        Status *
-                                    </label>
-                                    <select
-                                        id="status"
-                                        value={data.status}
-                                        onChange={(e) => setData('status', e.target.value)}
-                                        className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
-                                        required
-                                    >
-                                        {Object.entries(statusOptions).map(([value, label]) => (
-                                            <option key={value} value={value}>{label}</option>
-                                        ))}
-                                    </select>
-                                    {errors.status && <p className="mt-2 text-sm text-red-600">{errors.status}</p>}
-                                </div>
+                                {borrowing && (
+                                    <div>
+                                        <label htmlFor="status" className="block text-sm font-medium text-gray-700">
+                                            Status *
+                                        </label>
+                                        <select
+                                            id="status"
+                                            value={data.status}
+                                            onChange={(e) => setData('status', e.target.value)}
+                                            className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                                            required
+                                        >
+                                            {Object.entries(statusOptions).map(([value, label]) => (
+                                                <option key={value} value={value}>{label}</option>
+                                            ))}
+                                        </select>
+                                        {errors.status && <p className="mt-2 text-sm text-red-600">{errors.status}</p>}
+                                    </div>
+                                )}
 
                                 {/* Project Information */}
                                 <div className="md:col-span-2">
