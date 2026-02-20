@@ -25,6 +25,28 @@ Route::get('/dashboard', function () {
         'activeBorrowings' => \App\Models\Borrowing::whereIn('status', ['borrowed', 'overdue'])->count(),
         'overdueBorrowings' => \App\Models\Borrowing::where('status', 'overdue')->count(),
         'recentActivities' => \App\Models\ActivityHistory::with('user')->latest()->limit(5)->get(),
+        // Additional data for graphs
+        'itemsByCategory' => [
+            'tools' => \App\Models\Item::where('category', 'tool')->count(),
+            'materials' => \App\Models\Item::where('category', 'material')->count(),
+        ],
+        'stockDistribution' => [
+            'available' => \App\Models\Item::sum('quantity') - \App\Models\Purchase::where('status', 'received')->sum('quantity'),
+            'distributed' => \App\Models\Purchase::where('status', 'received')->sum('quantity'),
+            'total' => \App\Models\Item::sum('quantity'),
+        ],
+        'monthlyBorrowings' => \App\Models\Borrowing::selectRaw('MONTH(created_at) as month, YEAR(created_at) as year, COUNT(*) as count')
+            ->where('created_at', '>=', now()->subMonths(6))
+            ->groupBy('year', 'month')
+            ->orderBy('year')
+            ->orderBy('month')
+            ->get()
+            ->map(function ($item) {
+                return [
+                    'month' => date('M Y', strtotime($item->year . '-' . $item->month . '-01')),
+                    'count' => $item->count
+                ];
+            }),
     ];
     return Inertia::render('Dashboard', $data);
 })->middleware(['auth', 'verified'])->name('dashboard');

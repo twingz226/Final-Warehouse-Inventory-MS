@@ -75,6 +75,7 @@ class InventoryController extends Controller
         
         $items = $query->get()->map(function ($item) {
             $totalDistributed = Purchase::where('item_name', $item->name)
+                ->where('status', 'received')
                 ->sum('quantity');
             
             return (object) [

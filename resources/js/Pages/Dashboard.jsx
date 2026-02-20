@@ -1,5 +1,31 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, Link } from '@inertiajs/react';
+import {
+    Chart as ChartJS,
+    ArcElement,
+    Tooltip,
+    Legend,
+    CategoryScale,
+    LinearScale,
+    BarElement,
+    LineElement,
+    PointElement,
+    Title,
+} from 'chart.js';
+import { Pie, Bar, Line } from 'react-chartjs-2';
+
+// Register Chart.js components
+ChartJS.register(
+    ArcElement,
+    Tooltip,
+    Legend,
+    CategoryScale,
+    LinearScale,
+    BarElement,
+    LineElement,
+    PointElement,
+    Title,
+);
 
 export default function Dashboard({
     totalItems,
@@ -9,8 +35,112 @@ export default function Dashboard({
     pendingPurchases,
     activeBorrowings,
     overdueBorrowings,
-    recentActivities
+    recentActivities,
+    itemsByCategory,
+    stockDistribution,
+    monthlyBorrowings
 }) {
+    // Prepare data for pie chart (items by category)
+    const pieData = {
+        labels: ['Tools', 'Materials'],
+        datasets: [{
+            data: [itemsByCategory?.tools || 0, itemsByCategory?.materials || 0],
+            backgroundColor: [
+                'rgba(59, 130, 246, 0.8)', // Blue
+                'rgba(16, 185, 129, 0.8)', // Green
+            ],
+            borderColor: [
+                'rgba(59, 130, 246, 1)',
+                'rgba(16, 185, 129, 1)',
+            ],
+            borderWidth: 1,
+        }],
+    };
+
+    // Prepare data for bar chart (stock distribution)
+    const barData = {
+        labels: ['Available Stock', 'Distributed Stock', 'Total Stock'],
+        datasets: [{
+            label: 'Stock Quantity',
+            data: [
+                stockDistribution?.available || 0,
+                stockDistribution?.distributed || 0,
+                stockDistribution?.total || 0
+            ],
+            backgroundColor: [
+                'rgba(34, 197, 94, 0.8)', // Green for available
+                'rgba(251, 146, 60, 0.8)', // Orange for distributed
+                'rgba(139, 69, 19, 0.8)', // Brown for total
+            ],
+            borderColor: [
+                'rgba(34, 197, 94, 1)',
+                'rgba(251, 146, 60, 1)',
+                'rgba(139, 69, 19, 1)',
+            ],
+            borderWidth: 1,
+        }],
+    };
+
+    // Prepare data for line chart (monthly borrowings)
+    const lineData = {
+        labels: monthlyBorrowings?.map(item => item.month) || [],
+        datasets: [{
+            label: 'Borrowings',
+            data: monthlyBorrowings?.map(item => item.count) || [],
+            borderColor: 'rgba(147, 51, 234, 1)', // Purple
+            backgroundColor: 'rgba(147, 51, 234, 0.1)',
+            tension: 0.4,
+            fill: true,
+        }],
+    };
+
+    const pieOptions = {
+        responsive: true,
+        plugins: {
+            legend: {
+                position: 'bottom',
+            },
+            title: {
+                display: true,
+                text: 'Items by Category',
+            },
+        },
+    };
+
+    const barOptions = {
+        responsive: true,
+        plugins: {
+            legend: {
+                position: 'top',
+            },
+            title: {
+                display: true,
+                text: 'Stock Distribution',
+            },
+        },
+    };
+
+    const lineOptions = {
+        responsive: true,
+        plugins: {
+            legend: {
+                position: 'top',
+            },
+            title: {
+                display: true,
+                text: 'Monthly Borrowing Trends',
+            },
+        },
+        scales: {
+            y: {
+                beginAtZero: true,
+                ticks: {
+                    stepSize: 1,
+                },
+            },
+        },
+    };
+
     return (
         <AuthenticatedLayout
             header={
@@ -183,8 +313,38 @@ export default function Dashboard({
                         </div>
                     </div>
 
+                    {/* Charts Section */}
+                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+                        {/* Pie Chart - Items by Category */}
+                        <div className="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
+                            <div className="p-6">
+                                <div className="h-80">
+                                    <Pie data={pieData} options={pieOptions} />
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Bar Chart - Stock Distribution */}
+                        <div className="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
+                            <div className="p-6">
+                                <div className="h-80">
+                                    <Bar data={barData} options={barOptions} />
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Line Chart - Monthly Borrowing Trends */}
+                        <div className="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
+                            <div className="p-6">
+                                <div className="h-80">
+                                    <Line data={lineData} options={lineOptions} />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
                     {/* Recent Activities */}
-                    <div className="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
+                    <div className="hidden bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
                         <div className="p-6">
                             <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-4">
                                 Recent Activities
