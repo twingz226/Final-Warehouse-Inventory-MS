@@ -6,7 +6,7 @@ dockerfilePath = "Dockerfile"
 startCommand = "/usr/local/bin/start.sh"
 restartPolicyType = "on_failure"
 restartPolicyMaxRetries = 10
-preDeployCommand = "php artisan migrate:fresh --seed"
+preDeployCommand = "php artisan migrate --force && php artisan db:seed --force"
 
 [variables]
 APP_ENV = "production"
