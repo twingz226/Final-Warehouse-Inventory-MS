@@ -285,10 +285,11 @@ export default function Index({ auth, purchases, status }) {
                     </h2>
                     <Link
                         href={route('purchases.create')}
-                        className="inline-flex items-center px-4 py-2 bg-indigo-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-indigo-700"
+                        className="inline-flex items-center justify-center p-2 bg-indigo-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-indigo-700 focus:bg-indigo-700 active:bg-indigo-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition ease-in-out duration-150"
+                        onMouseEnter={(e) => { const rect = e.currentTarget.getBoundingClientRect(); setTooltip({ show: true, text: 'Add New Distribution', x: rect.left + rect.width / 2, y: rect.bottom + 10 }); }}
+                        onMouseLeave={() => setTooltip({ show: false, text: '', x: 0, y: 0 })}
                     >
-                        <PlusIcon className="h-4 w-4 mr-2" />
-                        Add New Distribution
+                        <PlusIcon className="h-5 w-5" />
                     </Link>
                 </div>
             }

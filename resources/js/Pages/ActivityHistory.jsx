@@ -144,9 +144,6 @@ export default function ActivityHistory({ auth, history, items, distributions, f
                     <h2 className="font-semibold text-xl text-gray-800 leading-tight">
                         Activity Log
                     </h2>
-                    <div className="text-sm text-gray-500">
-                        All activities across items and distributions
-                    </div>
                 </div>
             }
         >
@@ -330,7 +327,7 @@ export default function ActivityHistory({ auth, history, items, distributions, f
                                                         
                                                         {changes && changes.length > 0 && (
                                                             <div className="space-y-2">
-                                                                {changes.map((change, idx) => (
+                                                                {changes.filter(change => !['updated_at', 'date_time'].includes(change.field)).map((change, idx) => (
                                                                     <div key={idx} className="bg-white dark:bg-gray-800 p-2 sm:p-3 rounded border border-gray-100 dark:border-gray-700">
                                                                         <div className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1">
                                                                             {change.field}

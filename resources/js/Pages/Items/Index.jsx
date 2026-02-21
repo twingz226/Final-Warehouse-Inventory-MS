@@ -231,7 +231,7 @@ export default function Index({ auth, items, status }) {
                         <Link
                             href={route('items.create')}
                             className="inline-flex items-center justify-center p-2 bg-indigo-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-indigo-700 focus:bg-indigo-700 active:bg-indigo-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition ease-in-out duration-150"
-                            onMouseEnter={(e) => { const rect = e.currentTarget.getBoundingClientRect(); setTooltip({ show: true, text: 'Add New Tool/Material', x: rect.left + rect.width / 2, y: rect.top - 30 }); }}
+                            onMouseEnter={(e) => { const rect = e.currentTarget.getBoundingClientRect(); setTooltip({ show: true, text: 'Add New Tool/Material', x: rect.left + rect.width / 2, y: rect.bottom + 10 }); }}
                             onMouseLeave={() => setTooltip({ show: false, text: '', x: 0, y: 0 })}
                         >
                             <PlusIcon className="h-5 w-5" />
@@ -239,7 +239,7 @@ export default function Index({ auth, items, status }) {
                         <Link
                             href={route('items.add-stock')}
                             className="inline-flex items-center justify-center p-2 bg-emerald-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-emerald-700 focus:bg-emerald-700 active:bg-emerald-900 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 transition ease-in-out duration-150"
-                            onMouseEnter={(e) => { const rect = e.currentTarget.getBoundingClientRect(); setTooltip({ show: true, text: 'Add Incoming Stock', x: rect.left + rect.width / 2, y: rect.top - 30 }); }}
+                            onMouseEnter={(e) => { const rect = e.currentTarget.getBoundingClientRect(); setTooltip({ show: true, text: 'Add Incoming Stock', x: rect.left + rect.width / 2, y: rect.bottom + 10 }); }}
                             onMouseLeave={() => setTooltip({ show: false, text: '', x: 0, y: 0 })}
                         >
                             <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -422,7 +422,7 @@ export default function Index({ auth, items, status }) {
                                                         <Link
                                                             href={route('items.show', item.id)}
                                                             className="text-indigo-600 dark:text-indigo-400 hover:text-indigo-900 dark:hover:text-indigo-300"
-                                                            onMouseEnter={(e) => { const rect = e.currentTarget.getBoundingClientRect(); setTooltip({ show: true, text: 'View', x: rect.left + rect.width / 2, y: rect.top - 30 }); }}
+                                                            onMouseEnter={(e) => { const rect = e.currentTarget.getBoundingClientRect(); setTooltip({ show: true, text: 'View', x: rect.left + rect.width / 2, y: rect.bottom + 10 }); }}
                                                             onMouseLeave={() => setTooltip({ show: false, text: '', x: 0, y: 0 })}
                                                         >
                                                             <EyeIcon className="h-5 w-5" />
@@ -433,7 +433,7 @@ export default function Index({ auth, items, status }) {
                                                                 setConfirmingItemDeletion(true);
                                                             }}
                                                             className="text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-300"
-                                                            onMouseEnter={(e) => { const rect = e.currentTarget.getBoundingClientRect(); setTooltip({ show: true, text: 'Delete', x: rect.left + rect.width / 2, y: rect.top - 30 }); }}
+                                                            onMouseEnter={(e) => { const rect = e.currentTarget.getBoundingClientRect(); setTooltip({ show: true, text: 'Delete', x: rect.left + rect.width / 2, y: rect.bottom + 10 }); }}
                                                             onMouseLeave={() => setTooltip({ show: false, text: '', x: 0, y: 0 })}
                                                         >
                                                             <TrashIcon className="h-5 w-5" />

@@ -33,7 +33,7 @@ export default function Form({ auth, purchase, statusOptions }) {
             clearTimeout(searchTimeout);
         }
         
-        if (value.length < 2) {
+        if (value.length > 0 && value.length < 2) {
             setSearchResults([]);
             setIsSearching(false);
             return;
@@ -71,8 +71,9 @@ export default function Form({ auth, purchase, statusOptions }) {
 
     // Handle input focus
     const handleInputFocus = () => {
-        if (searchQuery.length >= 2) {
-            setShowDropdown(true);
+        setShowDropdown(true);
+        if (searchQuery.length < 2) {
+            handleSearch('');
         }
     };
 
@@ -192,6 +193,7 @@ export default function Form({ auth, purchase, statusOptions }) {
                                                     handleSearch(e.target.value);
                                                 }}
                                                 onFocus={handleInputFocus}
+                                                onClick={handleInputFocus}
                                                 className="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-indigo-500 dark:focus:ring-indigo-400 focus:border-indigo-500 dark:focus:border-indigo-400 sm:text-sm"
                                                 required
                                             />
@@ -203,28 +205,35 @@ export default function Form({ auth, purchase, statusOptions }) {
                                                     </svg>
                                                 </div>
                                             )}
-                                            {showDropdown && searchResults.length > 0 && (
-                                                <div className="absolute z-10 w-full mt-1 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-lg max-h-60 overflow-auto">
-                                                    {searchResults.map((item) => (
-                                                        <button
-                                                            key={item.id}
-                                                            type="button"
-                                                            onClick={() => handleItemSelect(item)}
-                                                            className="w-full px-4 py-3 text-left hover:bg-gray-100 dark:hover:bg-gray-600 focus:bg-gray-100 dark:focus:bg-gray-600 focus:outline-none border-b border-gray-100 dark:border-gray-600 last:border-b-0"
-                                                        >
-                                                            <div className="flex flex-col">
-                                                                <div className="font-medium text-gray-900 dark:text-gray-100">{item.name}</div>
+                                            {showDropdown && (
+                                                <div className="absolute z-10 mt-1 w-full bg-white dark:bg-gray-800 shadow-lg max-h-60 rounded-md py-1 text-base ring-1 ring-black dark:ring-gray-600 ring-opacity-5 overflow-auto focus:outline-none sm:text-sm">
+                                                    {isSearching ? (
+                                                        <div className="px-4 py-2 text-gray-500 dark:text-gray-400">Searching...</div>
+                                                    ) : searchResults.length > 0 ? (
+                                                        searchResults.map((item) => (
+                                                            <div
+                                                                key={item.id}
+                                                                className="cursor-pointer select-none relative py-2 pl-3 pr-9 bg-gray-50 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-500 rounded-md transition-colors duration-200"
+                                                                onClick={() => handleItemSelect(item)}
+                                                            >
+                                                                <div className="flex items-center">
+                                                                    <span className="font-normal ml-3 block truncate text-gray-900 dark:text-gray-100">
+                                                                        {item.name}
+                                                                    </span>
+                                                                    <span className="text-gray-500 dark:text-gray-400 ml-2">
+                                                                        ({item.quantity} available)
+                                                                    </span>
+                                                                </div>
                                                                 {item.description && (
-                                                                    <div className="text-sm text-gray-500 dark:text-gray-400">{item.description}</div>
+                                                                    <span className="text-gray-400 dark:text-gray-500 ml-3 block truncate text-sm">
+                                                                        {item.description}
+                                                                    </span>
                                                                 )}
                                                             </div>
-                                                        </button>
-                                                    ))}
-                                                    {searchResults.length === 0 && !isSearching && (
-                                                        <div className="px-4 py-3 text-sm text-gray-500 dark:text-gray-400">
-                                                            No results found
-                                                        </div>
-                                                    )}
+                                                        ))
+                                                    ) : searchQuery.length >= 2 ? (
+                                                        <div className="px-4 py-2 text-gray-500 dark:text-gray-400">No items found</div>
+                                                    ) : null}
                                                 </div>
                                             )}
                                         </div>
