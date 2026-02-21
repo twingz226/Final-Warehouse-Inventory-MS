@@ -181,14 +181,6 @@ const InventoryCharts = ({ items, summary }) => {
                 </div>
             </div>
 
-            {/* Low Stock Alert Chart */}
-            {lowStockItems.length > 0 && (
-                <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow lg:col-span-2">
-                    <div style={{ height: '250px' }}>
-                        <Bar data={lowStockData} options={lowStockOptions} />
-                    </div>
-                </div>
-            )}
         </div>
     );
 };
