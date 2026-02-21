@@ -64,13 +64,13 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
     // Items routes
-    Route::resource('items', \App\Http\Controllers\ItemController::class)->only([
-        'index', 'create', 'store', 'show', 'edit', 'update', 'destroy'
-    ]);
-    
     // Add stock routes
     Route::get('items/add-stock', [\App\Http\Controllers\ItemController::class, 'addStock'])->name('items.add-stock');
     Route::post('items/add-stock', [\App\Http\Controllers\ItemController::class, 'storeStock'])->name('items.store-stock');
+    
+    Route::resource('items', \App\Http\Controllers\ItemController::class)->only([
+        'index', 'create', 'store', 'show', 'edit', 'update', 'destroy'
+    ]);
     
     // Item History routes
     Route::get('items/{item}/history', [\App\Http\Controllers\ItemHistoryController::class, 'index'])->name('items.history');
