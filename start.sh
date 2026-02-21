@@ -12,5 +12,12 @@ php-fpm -D
 # Wait a moment for PHP-FPM to start
 sleep 2
 
+# --- ADD THESE COMMANDS HERE ---
+# Run migrations and seeds with --force for production
+echo "Running migrations and seeders..."
+php artisan migrate --force --seed
+# -------------------------------
+
 # Start Nginx in foreground
+echo "Starting Nginx..."
 nginx -g "daemon off;"
