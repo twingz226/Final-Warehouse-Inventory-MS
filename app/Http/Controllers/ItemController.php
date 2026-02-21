@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Item;
 use App\Models\ItemHistory;
+use App\Models\Purchase;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Illuminate\Support\Facades\DB;
@@ -174,14 +175,34 @@ class ItemController extends Controller
     {
         $search = $request->input('search');
         
-        if (empty($search)) {
-            return response()->json([]);
+        $query = Item::query();
+        
+        if (!empty($search)) {
+            $query->where(function($q) use ($search) {
+                $q->where('name', 'like', '%' . $search . '%')
+                  ->orWhere('description', 'like', '%' . $search . '%');
+            });
         }
         
-        $items = Item::where('name', 'like', '%' . $search . '%')
-            ->limit(10)
-            ->get(['id', 'name', 'description', 'quantity']);
+        $items = $query->get()->map(function ($item) {
+            $totalDistributed = Purchase::where('item_name', $item->name)
+                ->where('status', 'received')
+                ->sum('quantity');
             
+            $available = $item->quantity - $totalDistributed;
+            
+            if ($available <= 0) {
+                return null; // Skip items with no available stock
+            }
+            
+            return [
+                'id' => $item->id,
+                'name' => $item->name,
+                'description' => $item->description,
+                'quantity' => $available,
+            ];
+        })->filter()->take(50)->values();
+                
         return response()->json($items);
     }
 

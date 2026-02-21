@@ -32,7 +32,6 @@ export default function Dashboard({
     totalStock,
     availableStock,
     lowStockItems,
-    pendingPurchases,
     activeBorrowings,
     overdueBorrowings,
     recentActivities,
@@ -245,28 +244,7 @@ export default function Dashboard({
                     </div>
 
                     {/* Additional Stats */}
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-                        <div className="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
-                            <div className="p-6">
-                                <div className="flex items-center">
-                                    <div className="flex-shrink-0">
-                                        <svg className="h-8 w-8 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
-                                        </svg>
-                                    </div>
-                                    <div className="ml-5 w-0 flex-1">
-                                        <dl>
-                                            <dt className="text-sm font-medium text-gray-500 dark:text-gray-400 truncate">
-                                                Pending Purchases
-                                            </dt>
-                                            <dd className="text-lg font-medium text-gray-900 dark:text-gray-100">
-                                                {pendingPurchases}
-                                            </dd>
-                                        </dl>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
 
                         <div className="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
                             <div className="p-6">
