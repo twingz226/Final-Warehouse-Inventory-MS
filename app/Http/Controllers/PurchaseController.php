@@ -34,7 +34,6 @@ class PurchaseController extends Controller
     {
         $search = $request->input('search');
         $date = $request->input('date');
-        $status = $request->input('status');
         
         $query = Purchase::with('creator')
             ->leftJoin('items', 'purchases.item_name', '=', 'items.name')
@@ -51,10 +50,6 @@ class PurchaseController extends Controller
         
         if ($date) {
             $query->whereDate('purchases.purchase_date', $date);
-        }
-        
-        if ($status) {
-            $query->where('purchases.status', $status);
         }
         
         $purchases = $query->paginate(10)->withQueryString();
@@ -94,6 +89,9 @@ class PurchaseController extends Controller
         $validated['created_by'] = Auth::id();
 
         $purchase = Purchase::create($validated);
+        
+        // Automatically set status to received for all new purchases
+        $purchase->update(['status' => 'received']);
 
         $this->logHistory($purchase, 'created', null, $validated, "Created distribution order for '{$purchase->item_name}' to {$purchase->supplier_name}");
 

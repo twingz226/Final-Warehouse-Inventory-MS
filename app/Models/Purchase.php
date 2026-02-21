@@ -21,6 +21,7 @@ class Purchase extends Model
         'notes',
         'project_type',
         'project_name',
+        'status',
         'created_by',
     ];
 

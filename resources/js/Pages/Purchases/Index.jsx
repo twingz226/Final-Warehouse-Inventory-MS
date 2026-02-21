@@ -383,7 +383,7 @@ export default function Index({ auth, purchases, status }) {
                                     ))
                                     ) : (
                                         <tr>
-                                            <td colSpan="5" className="px-6 py-12 text-center">
+                                            <td colSpan="6" className="px-6 py-12 text-center">
                                                 <p className="text-gray-500 dark:text-gray-400 text-sm">
                                                     No distributions found
                                                 </p>

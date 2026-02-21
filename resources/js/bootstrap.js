@@ -10,3 +10,15 @@ if (token) {
 } else {
     console.error('CSRF token not found: https://laravel.com/docs/csrf#csrf-x-csrf-token');
 }
+
+// Add response interceptor to handle 419 CSRF errors
+axios.interceptors.response.use(
+    response => response,
+    error => {
+        if (error.response && error.response.status === 419) {
+            // CSRF token mismatch, refresh the page to get new token
+            window.location.reload();
+        }
+        return Promise.reject(error);
+    }
+);
