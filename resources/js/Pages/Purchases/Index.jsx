@@ -342,7 +342,11 @@ export default function Index({ auth, purchases, status }) {
                                             </td>
                                             <td className="px-6 py-4 whitespace-nowrap">
                                                 {purchase.item_category ? (
-                                                    <span className="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-indigo-100 dark:bg-indigo-900 text-indigo-800 dark:text-indigo-200 capitalize">
+                                                    <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full capitalize ${
+                                                        purchase.item_category === 'material' ? 'bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200' :
+                                                        purchase.item_category === 'tool' ? 'bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200' :
+                                                        'bg-indigo-100 dark:bg-indigo-900 text-indigo-800 dark:text-indigo-200'
+                                                    }`}>
                                                         {purchase.item_category}
                                                     </span>
                                                 ) : (
