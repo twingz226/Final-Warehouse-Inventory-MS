@@ -95,6 +95,10 @@ export default function Dashboard({
 
     const pieOptions = {
         responsive: true,
+        animation: {
+            duration: 1000,
+            easing: 'easeOutQuart',
+        },
         plugins: {
             legend: {
                 position: 'bottom',
@@ -108,6 +112,10 @@ export default function Dashboard({
 
     const barOptions = {
         responsive: true,
+        animation: {
+            duration: 1000,
+            easing: 'easeOutQuart',
+        },
         plugins: {
             legend: {
                 position: 'top',
@@ -121,6 +129,10 @@ export default function Dashboard({
 
     const lineOptions = {
         responsive: true,
+        animation: {
+            duration: 1000,
+            easing: 'easeOutQuart',
+        },
         plugins: {
             legend: {
                 position: 'top',
