@@ -6,6 +6,7 @@ use App\Models\User;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
 
 class DatabaseSeeder extends Seeder
 {
@@ -16,9 +17,10 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
+        Log::info('Starting database seeding');
         // Using updateOrCreate ensures the user is added even in 'production' 
         // without crashing if the command is run multiple times.
-        User::updateOrCreate(
+        $user = User::updateOrCreate(
             ['email' => 'admin@example.com'], // The unique identifier
             [
                 'name' => 'Admin User',
@@ -26,6 +28,8 @@ class DatabaseSeeder extends Seeder
                 'email_verified_at' => now(),
             ]
         );
+
+        Log::info('Admin user seeded with ID: ' . $user->id);
 
         // If you have other seeders, you can call them here:
         // $this->call([
