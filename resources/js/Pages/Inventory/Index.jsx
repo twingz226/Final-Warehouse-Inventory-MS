@@ -106,7 +106,7 @@ export default function InventoryIndex({ auth, items, summary, filters }) {
             <Head title="Inventory Management" />
 
             <div className="py-6">
-                <div className="max-w-7xl mx-auto sm:px-6 lg:px-8">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     {/* Summary Cards */}
                     <div className="grid grid-cols-2 lg:grid-cols-5 gap-3 lg:gap-4 mb-6">
                         <div className="bg-white dark:bg-gray-800 overflow-hidden shadow rounded-lg">
@@ -211,7 +211,7 @@ export default function InventoryIndex({ auth, items, summary, filters }) {
                     </div>
 
                     {/* Inventory Charts */}
-                    <div className="overflow-hidden">
+                    <div className="overflow-x-auto mb-6">
                         <InventoryCharts items={items} summary={summary} />
                     </div>
 
