@@ -166,11 +166,13 @@ const InventoryCharts = ({ items, summary }) => {
     };
 
     return (
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-            {/* Category Distribution Pie Chart */}
-            <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow">
-                <div style={{ height: '300px' }}>
-                    <Pie data={categoryData} options={pieOptions} />
+        <div className="mb-6">
+            {/* Category Distribution Pie Chart - New Section */}
+            <div className="mb-6">
+                <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow">
+                    <div style={{ height: '300px' }}>
+                        <Pie data={categoryData} options={pieOptions} />
+                    </div>
                 </div>
             </div>
 
@@ -180,7 +182,6 @@ const InventoryCharts = ({ items, summary }) => {
                     <Bar data={stockLevelData} options={barOptions} />
                 </div>
             </div>
-
         </div>
     );
 };
