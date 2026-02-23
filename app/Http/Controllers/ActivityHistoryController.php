@@ -17,8 +17,7 @@ class ActivityHistoryController extends Controller
     {
         $search = $request->input('search');
         $activityType = $request->input('activity_type');
-        $date_from = $request->input('date_from');
-        $date_to = $request->input('date_to');
+        $date = $request->input('date');
         
         $query = ActivityHistory::with(['user', 'item', 'purchase', 'borrowing']);
         
@@ -44,12 +43,8 @@ class ActivityHistoryController extends Controller
             $query->where('activity_type', $activityType);
         }
         
-        if ($date_from) {
-            $query->whereDate('created_at', '>=', $date_from);
-        }
-        
-        if ($date_to) {
-            $query->whereDate('created_at', '<=', $date_to);
+        if ($date) {
+            $query->whereDate('created_at', $date);
         }
         
         $history = $query->latest()->paginate(25)->withQueryString();
@@ -64,7 +59,7 @@ class ActivityHistoryController extends Controller
             'history' => $history,
             'items' => $items,
             'distributions' => $distributions,
-            'filters' => $request->only(['search', 'activity_type', 'date_from', 'date_to']),
+            'filters' => $request->only(['search', 'activity_type', 'date']),
             'activityTypes' => ActivityHistory::getActivityTypeOptions(),
         ]);
     }

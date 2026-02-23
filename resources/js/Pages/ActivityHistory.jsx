@@ -2,9 +2,9 @@
 import { Head, Link, router } from '@inertiajs/react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { useState, useEffect } from 'react';
-import { 
-    ArrowPathIcon, 
-    MagnifyingGlassIcon, 
+import {
+    ArrowPathIcon,
+    MagnifyingGlassIcon,
     XMarkIcon,
     ClockIcon,
     CheckCircleIcon,
@@ -19,52 +19,61 @@ import {
 export default function ActivityHistory({ auth, history, items, distributions, filters, activityTypes, actions }) {
     const [search, setSearch] = useState(filters.search || '');
     const [activityType, setActivityType] = useState(filters.activity_type || '');
+    const [date, setDate] = useState(filters.date || '');
     const [searchTimeout, setSearchTimeout] = useState(null);
 
     useEffect(() => {
         const urlParams = new URLSearchParams(window.location.search);
         setSearch(urlParams.get('search') || '');
         setActivityType(urlParams.get('activity_type') || '');
+        setDate(urlParams.get('date') || '');
     }, []);
 
     const performSearch = () => {
         if (searchTimeout) {
             clearTimeout(searchTimeout);
         }
-        
+
         const timeout = setTimeout(() => {
             const params = new URLSearchParams(window.location.search);
-            
+
             if (search) {
                 params.set('search', search);
             } else {
                 params.delete('search');
             }
-            
+
             if (activityType) {
                 params.set('activity_type', activityType);
             } else {
                 params.delete('activity_type');
             }
-            
+
+            if (date) {
+                params.set('date', date);
+            } else {
+                params.delete('date');
+            }
+
             params.set('page', '1');
-            
+
             router.get(`/activity-history?${params.toString()}`, {}, {
                 preserveScroll: true,
                 preserveState: true,
             });
         }, 300);
-        
+
         setSearchTimeout(timeout);
     };
 
     useEffect(() => {
         performSearch();
-    }, [search, activityType]);
+    }, [search, activityType, date]);
 
     const clearFilters = () => {
         setSearch('');
         setActivityType('');
+        setDate('');
     };
 
     const getActionIcon = (action) => {
@@ -118,9 +127,9 @@ export default function ActivityHistory({ auth, history, items, distributions, f
 
     const formatChanges = (oldValues, newValues) => {
         if (!oldValues && !newValues) return null;
-        
+
         const changes = [];
-        
+
         if (oldValues && newValues) {
             Object.keys(newValues).forEach(key => {
                 if (oldValues[key] !== newValues[key]) {
@@ -132,7 +141,7 @@ export default function ActivityHistory({ auth, history, items, distributions, f
                 }
             });
         }
-        
+
         return changes;
     };
 
@@ -157,7 +166,7 @@ export default function ActivityHistory({ auth, history, items, distributions, f
                             <FunnelIcon className="h-5 w-5 text-gray-500 dark:text-gray-400 mr-2" />
                             <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100">Filters</h3>
                         </div>
-                        
+
                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-4">
                             {/* Search */}
                             <div>
@@ -185,7 +194,7 @@ export default function ActivityHistory({ auth, history, items, distributions, f
                                     )}
                                 </div>
                             </div>
-                            
+
                             {/* Activity Type Filter */}
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
@@ -204,8 +213,24 @@ export default function ActivityHistory({ auth, history, items, distributions, f
                                     ))}
                                 </select>
                             </div>
+
+                            {/* Date Filter */}
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                    <span className="flex items-center gap-1">
+                                        <CalendarIcon className="h-4 w-4" />
+                                        Date
+                                    </span>
+                                </label>
+                                <input
+                                    type="date"
+                                    value={date}
+                                    onChange={(e) => setDate(e.target.value)}
+                                    className="block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                                />
+                            </div>
                         </div>
-                        
+
                         <div className="mt-4 flex justify-end">
                             <button
                                 onClick={clearFilters}
@@ -223,10 +248,10 @@ export default function ActivityHistory({ auth, history, items, distributions, f
                                 <div className="relative">
                                     {/* Timeline Line */}
                                     <div className="hidden sm:block absolute left-8 top-0 bottom-0 w-0.5 bg-gray-200 dark:bg-gray-700"></div>
-                                    
+
                                     {/* Mobile Timeline Line */}
                                     <div className="sm:hidden absolute left-4 top-8 bottom-0 w-0.5 bg-gray-200 dark:bg-gray-700"></div>
-                                    
+
                                     {/* Timeline Items */}
                                     {history.data.map((record, index) => {
                                         const changes = formatChanges(record.old_values, record.new_values);
@@ -236,7 +261,7 @@ export default function ActivityHistory({ auth, history, items, distributions, f
                                                 <div className={`flex items-center justify-center w-12 h-12 sm:w-16 sm:h-16 rounded-full border-2 ${getActionColor(record.action)} z-10 flex-shrink-0`}>
                                                     {getActionIcon(record.action)}
                                                 </div>
-                                                
+
                                                 {/* Content */}
                                                 <div className="ml-4 sm:ml-6 flex-1 min-w-0">
                                                     <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-3 sm:p-4 border border-gray-200 dark:border-gray-600">
@@ -265,66 +290,66 @@ export default function ActivityHistory({ auth, history, items, distributions, f
                                                                 </div>
                                                             )}
                                                         </div>
-                                                        
+
                                                         {/* Entity Link */}
-                                                    {record.activity_type === 'item' && record.item && (
-                                                        <div className="mb-2">
-                                                            <Link
-                                                                href={route('items.show', record.item.id)}
-                                                                className="text-indigo-600 dark:text-indigo-400 hover:text-indigo-900 dark:hover:text-indigo-300 font-medium text-xs sm:text-sm break-words"
-                                                            >
-                                                                {record.item.name}
-                                                            </Link>
-                                                            {record.item.quantity !== undefined && (
+                                                        {record.activity_type === 'item' && record.item && (
+                                                            <div className="mb-2">
+                                                                <Link
+                                                                    href={route('items.show', record.item.id)}
+                                                                    className="text-indigo-600 dark:text-indigo-400 hover:text-indigo-900 dark:hover:text-indigo-300 font-medium text-xs sm:text-sm break-words"
+                                                                >
+                                                                    {record.item.name}
+                                                                </Link>
+                                                                {record.item.quantity !== undefined && (
+                                                                    <span className="ml-2 text-xs sm:text-sm text-gray-500 dark:text-gray-400">
+                                                                        (Qty: {record.item.quantity})
+                                                                    </span>
+                                                                )}
+                                                            </div>
+                                                        )}
+
+                                                        {record.activity_type === 'distribution' && record.purchase && (
+                                                            <div className="mb-2">
+                                                                <Link
+                                                                    href={route('purchases.show', record.purchase.id)}
+                                                                    className="text-indigo-600 dark:text-indigo-400 hover:text-indigo-900 dark:hover:text-indigo-300 font-medium text-xs sm:text-sm break-words"
+                                                                >
+                                                                    {record.purchase.item_name}
+                                                                </Link>
                                                                 <span className="ml-2 text-xs sm:text-sm text-gray-500 dark:text-gray-400">
-                                                                    (Qty: {record.item.quantity})
+                                                                    (To: {record.purchase.supplier_name})
                                                                 </span>
-                                                            )}
-                                                        </div>
-                                                    )}
-                                                    
-                                                    {record.activity_type === 'distribution' && record.purchase && (
-                                                        <div className="mb-2">
-                                                            <Link
-                                                                href={route('purchases.show', record.purchase.id)}
-                                                                className="text-indigo-600 dark:text-indigo-400 hover:text-indigo-900 dark:hover:text-indigo-300 font-medium text-xs sm:text-sm break-words"
-                                                            >
-                                                                {record.purchase.item_name}
-                                                            </Link>
-                                                            <span className="ml-2 text-xs sm:text-sm text-gray-500 dark:text-gray-400">
-                                                                (To: {record.purchase.supplier_name})
-                                                            </span>
-                                                            {record.purchase.quantity !== undefined && (
+                                                                {record.purchase.quantity !== undefined && (
+                                                                    <span className="ml-2 text-xs sm:text-sm text-gray-500 dark:text-gray-400">
+                                                                        (Qty: {record.purchase.quantity})
+                                                                    </span>
+                                                                )}
+                                                            </div>
+                                                        )}
+
+                                                        {record.activity_type === 'borrowing' && record.borrowing && (
+                                                            <div className="mb-2">
+                                                                <Link
+                                                                    href={route('borrowings.show', record.borrowing.id)}
+                                                                    className="text-indigo-600 dark:text-indigo-400 hover:text-indigo-900 dark:hover:text-indigo-300 font-medium text-xs sm:text-sm break-words"
+                                                                >
+                                                                    {record.borrowing.item_name}
+                                                                </Link>
                                                                 <span className="ml-2 text-xs sm:text-sm text-gray-500 dark:text-gray-400">
-                                                                    (Qty: {record.purchase.quantity})
+                                                                    (Borrower: {record.borrowing.borrower_name})
                                                                 </span>
-                                                            )}
-                                                        </div>
-                                                    )}
-                                                    
-                                                    {record.activity_type === 'borrowing' && record.borrowing && (
-                                                        <div className="mb-2">
-                                                            <Link
-                                                                href={route('borrowings.show', record.borrowing.id)}
-                                                                className="text-indigo-600 dark:text-indigo-400 hover:text-indigo-900 dark:hover:text-indigo-300 font-medium text-xs sm:text-sm break-words"
-                                                            >
-                                                                {record.borrowing.item_name}
-                                                            </Link>
-                                                            <span className="ml-2 text-xs sm:text-sm text-gray-500 dark:text-gray-400">
-                                                                (Borrower: {record.borrowing.borrower_name})
-                                                            </span>
-                                                            {record.borrowing.quantity !== undefined && (
-                                                                <span className="ml-2 text-xs sm:text-sm text-gray-500 dark:text-gray-400">
-                                                                    (Qty: {record.borrowing.quantity})
-                                                                </span>
-                                                            )}
-                                                        </div>
-                                                    )}
-                                                        
+                                                                {record.borrowing.quantity !== undefined && (
+                                                                    <span className="ml-2 text-xs sm:text-sm text-gray-500 dark:text-gray-400">
+                                                                        (Qty: {record.borrowing.quantity})
+                                                                    </span>
+                                                                )}
+                                                            </div>
+                                                        )}
+
                                                         {record.description && (
                                                             <p className="text-gray-700 dark:text-gray-300 text-xs sm:text-sm mb-3 break-words">{record.description}</p>
                                                         )}
-                                                        
+
                                                         {changes && changes.length > 0 && (
                                                             <div className="space-y-2">
                                                                 {changes.filter(change => !['updated_at', 'date_time'].includes(change.field)).map((change, idx) => (
@@ -356,8 +381,8 @@ export default function ActivityHistory({ auth, history, items, distributions, f
                             <div className="p-8 sm:p-12 text-center">
                                 <ClockIcon className="h-8 w-8 sm:h-12 sm:w-12 text-gray-300 dark:text-gray-500 mx-auto mb-3" />
                                 <p className="text-gray-500 dark:text-gray-400 text-xs sm:text-sm">
-                                    {search || activityType 
-                                        ? 'No activities found matching your filters' 
+                                    {search || activityType
+                                        ? 'No activities found matching your filters'
                                         : 'No activities found'}
                                 </p>
                                 {(search || activityType) && (
@@ -370,7 +395,7 @@ export default function ActivityHistory({ auth, history, items, distributions, f
                                 )}
                             </div>
                         )}
-                        
+
                         {/* Pagination */}
                         {history.links && (
                             <div className="px-4 sm:px-6 py-3 sm:py-4 bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700">
@@ -383,11 +408,10 @@ export default function ActivityHistory({ auth, history, items, distributions, f
                                             <Link
                                                 key={link.url || link.label + '-' + index}
                                                 href={link.url || '#'}
-                                                className={`px-2 sm:px-3 py-2 text-xs sm:text-sm rounded-md ${
-                                                    link.active
+                                                className={`px-2 sm:px-3 py-2 text-xs sm:text-sm rounded-md ${link.active
                                                         ? 'bg-indigo-600 text-white'
                                                         : 'bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-600'
-                                                } ${!link.url ? 'opacity-50 cursor-not-allowed' : ''}`}
+                                                    } ${!link.url ? 'opacity-50 cursor-not-allowed' : ''}`}
                                                 dangerouslySetInnerHTML={{ __html: link.label }}
                                             />
                                         ))}
