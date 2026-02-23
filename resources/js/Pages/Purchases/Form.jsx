@@ -25,8 +25,8 @@ export default function Form({ auth, purchase, statusOptions }) {
         project_name: purchase?.project_name || '',
         // For CREATE: array of rows. For EDIT: single item kept flat.
         items: purchase
-            ? [{ item_name: purchase.item_name, quantity: purchase.quantity, description: purchase.description || '' }]
-            : [{ item_name: '', quantity: '', description: '' }],
+            ? [{ item_name: purchase.item_name, quantity: purchase.quantity, description: purchase.description || '', available_quantity: null }]
+            : [{ item_name: '', quantity: '', description: '', available_quantity: null }],
     });
 
     // ── Per-row search UI state ────────────────────────────────────────────────
@@ -82,7 +82,7 @@ export default function Form({ auth, purchase, statusOptions }) {
     };
 
     const handleItemSelect = (index, item) => {
-        updateItem(index, { item_name: item.name, description: item.description || '' });
+        updateItem(index, { item_name: item.name, description: item.description || '', available_quantity: item.quantity });
         updateRowSearch(index, { query: item.name, showDropdown: false, results: [] });
     };
 
@@ -92,7 +92,7 @@ export default function Form({ auth, purchase, statusOptions }) {
     };
 
     const addRow = () => {
-        setData('items', [...data.items, { item_name: '', quantity: '', description: '' }]);
+        setData('items', [...data.items, { item_name: '', quantity: '', description: '', available_quantity: null }]);
         setRowSearches(prev => [...prev, emptyRowSearch()]);
     };
 
@@ -288,8 +288,14 @@ export default function Form({ auth, purchase, statusOptions }) {
                                                             onChange={(e) => updateItem(index, { quantity: parseInt(e.target.value) || '' })}
                                                             className={inputCls}
                                                             min="1"
+                                                            max={item.available_quantity !== null ? item.available_quantity : undefined}
                                                             required
                                                         />
+                                                        {item.available_quantity !== null && item.quantity > item.available_quantity && (
+                                                            <p className="mt-1 text-sm text-red-600 dark:text-red-400">
+                                                                Exceeds available stock ({item.available_quantity}).
+                                                            </p>
+                                                        )}
                                                         {errors[`items.${index}.quantity`] && (
                                                             <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors[`items.${index}.quantity`]}</p>
                                                         )}
