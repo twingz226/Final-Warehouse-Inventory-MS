@@ -178,8 +178,10 @@ const InventoryCharts = ({ items, summary }) => {
 
             {/* Stock Levels Bar Chart */}
             <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow">
-                <div style={{ height: '300px' }}>
-                    <Bar data={stockLevelData} options={barOptions} />
+                <div style={{ overflowX: 'auto' }}>
+                    <div style={{ height: '300px', minWidth: `${Math.max(items.length * 80, 400)}px` }}>
+                        <Bar data={stockLevelData} options={barOptions} />
+                    </div>
                 </div>
             </div>
         </div>
