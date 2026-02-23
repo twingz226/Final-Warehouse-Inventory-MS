@@ -92,6 +92,20 @@ class InventoryController extends Controller
                 'updated_at' => $item->updated_at,
             ];
         });
+
+        // Fetch ALL low-stock items across all pages for the alert banner
+        $allLowStockItems = Item::all()->map(function ($item) {
+            $totalDistributed = Purchase::where('item_name', $item->name)
+                ->where('status', 'received')
+                ->sum('quantity');
+            $availableStock = $item->quantity - $totalDistributed;
+            return [
+                'id' => $item->id,
+                'name' => $item->name,
+                'unit' => $item->unit,
+                'available_stock' => $availableStock,
+            ];
+        })->filter(fn($item) => $item['available_stock'] <= 10)->values();
         
         // Calculate summary metrics
         $allItems = Item::all();
@@ -105,6 +119,7 @@ class InventoryController extends Controller
         
         return inertia('Inventory/Index', [
             'items' => $items,
+            'low_stock_items' => $allLowStockItems,
             'summary' => $summary,
             'filters' => [
                 'search' => $request->input('search', ''),

@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { MagnifyingGlassIcon, CubeIcon, WrenchIcon, TruckIcon, ChartBarIcon, FunnelIcon, ChevronUpDownIcon } from '@heroicons/react/24/outline';
 import InventoryCharts from '@/Components/InventoryCharts';
 
-export default function InventoryIndex({ auth, items, summary, filters }) {
+export default function InventoryIndex({ auth, items, low_stock_items, summary, filters }) {
     const [search, setSearch] = useState(filters.search || '');
     const [category, setCategory] = useState(filters.category || 'all');
     const [stockLevel, setStockLevel] = useState(filters.stock_level || 'all');
@@ -85,15 +85,7 @@ export default function InventoryIndex({ auth, items, summary, filters }) {
         return availableStock <= 10;
     };
 
-    const sortedItems = [...items.data].sort((a, b) => {
-        const aLow = isLowStock(a.available_stock);
-        const bLow = isLowStock(b.available_stock);
-        if (aLow && !bLow) return -1;
-        if (!aLow && bLow) return 1;
-        return 0;
-    });
-
-    const lowStockItems = sortedItems.filter(item => isLowStock(item.available_stock));
+    const lowStockItems = low_stock_items || [];
 
     return (
         <AuthenticatedLayout
@@ -375,7 +367,7 @@ export default function InventoryIndex({ auth, items, summary, filters }) {
                             <div className="block lg:hidden">
                                 {/* Mobile Card View */}
                                 <div className="space-y-4">
-                                    {sortedItems.map((item) => (
+                                    {items.data.map((item) => (
                                         <div key={item.id} className={`bg-white dark:bg-gray-800 rounded-lg shadow p-4 border ${isLowStock(item.available_stock) ? 'border-red-200 dark:border-red-800' : 'border-gray-200 dark:border-gray-700'
                                             }`}>
                                             <div className="flex items-start justify-between mb-3">
@@ -486,7 +478,7 @@ export default function InventoryIndex({ auth, items, summary, filters }) {
                                         </tr>
                                     </thead>
                                     <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
-                                        {sortedItems.map((item) => (
+                                        {items.data.map((item) => (
                                             <tr
                                                 key={item.id}
                                                 className={isLowStock(item.available_stock) ? 'bg-red-200 dark:bg-red-900' : ''}
@@ -561,8 +553,8 @@ export default function InventoryIndex({ auth, items, summary, filters }) {
                                                 key={index}
                                                 href={link.url || '#'}
                                                 className={`px-3 py-2 text-sm rounded-md ${link.active
-                                                        ? 'bg-indigo-600 text-white'
-                                                        : 'bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-600'
+                                                    ? 'bg-indigo-600 text-white'
+                                                    : 'bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-600'
                                                     } ${!link.url ? 'opacity-50 cursor-not-allowed pointer-events-none' : ''}`}
                                                 dangerouslySetInnerHTML={{ __html: link.label }}
                                                 preserveScroll
