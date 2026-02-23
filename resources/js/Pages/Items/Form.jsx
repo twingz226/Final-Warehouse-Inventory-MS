@@ -5,27 +5,27 @@ import InputError from '@/Components/InputError';
 import TextInput from '@/Components/TextInput';
 import InputLabel from '@/Components/InputLabel';
 import PrimaryButton from '@/Components/PrimaryButton';
-import { useEffect } from 'react';
+import { useEffect, useState, useRef } from 'react';
 
 // Format datetime for display
-    function formatDateTimeForDisplay(dateTime) {
-        if (!dateTime) return '';
-        
-        // If it's a string, parse it first
-        const date = typeof dateTime === 'string' ? new Date(dateTime) : dateTime;
-        
-        const options = {
-            timeZone: 'Asia/Manila',
-            year: 'numeric',
-            month: '2-digit',
-            day: '2-digit',
-            hour: '2-digit',
-            minute: '2-digit',
-            hour12: true
-        };
-        
-        return new Intl.DateTimeFormat('en-US', options).format(date);
-    }
+function formatDateTimeForDisplay(dateTime) {
+    if (!dateTime) return '';
+
+    // If it's a string, parse it first
+    const date = typeof dateTime === 'string' ? new Date(dateTime) : dateTime;
+
+    const options = {
+        timeZone: 'Asia/Manila',
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: true
+    };
+
+    return new Intl.DateTimeFormat('en-US', options).format(date);
+}
 
 export default function Form({ auth, item = null }) {
     const { data, setData, post, put, processing, errors, reset } = useForm({
@@ -36,6 +36,10 @@ export default function Form({ auth, item = null }) {
         unit: item?.unit || 'Quantity',
         date_time: item ? formatDateTimeForDisplay(item.date_time) : '',
     });
+
+    const [nameExists, setNameExists] = useState(false);
+    const [nameChecking, setNameChecking] = useState(false);
+    const debounceRef = useRef(null);
 
     // Auto-populate current datetime for new items
     useEffect(() => {
@@ -51,12 +55,45 @@ export default function Form({ auth, item = null }) {
                 minute: '2-digit',
                 hour12: true
             };
-            
+
             const formatter = new Intl.DateTimeFormat('en-US', options);
             const formattedDateTime = formatter.format(now);
             setData('date_time', formattedDateTime);
         }
     }, [item, data.date_time, setData]);
+
+    // Real-time duplicate-name check (debounced 400 ms)
+    useEffect(() => {
+        const trimmed = data.name.trim();
+
+        // Reset immediately if field is empty
+        if (!trimmed) {
+            setNameExists(false);
+            setNameChecking(false);
+            clearTimeout(debounceRef.current);
+            return;
+        }
+
+        setNameChecking(true);
+        clearTimeout(debounceRef.current);
+
+        debounceRef.current = setTimeout(async () => {
+            try {
+                const params = new URLSearchParams({ name: trimmed });
+                if (item?.id) params.append('ignore_id', item.id);
+
+                const res = await fetch(`/items/check-name?${params}`);
+                const json = await res.json();
+                setNameExists(json.exists);
+            } catch {
+                setNameExists(false);
+            } finally {
+                setNameChecking(false);
+            }
+        }, 400);
+
+        return () => clearTimeout(debounceRef.current);
+    }, [data.name, item]);
 
     const submit = (e) => {
         e.preventDefault();
@@ -88,13 +125,33 @@ export default function Form({ auth, item = null }) {
                                     <TextInput
                                         id="name"
                                         type="text"
-                                        className="mt-1 block w-full"
+                                        className={`mt-1 block w-full ${nameExists
+                                                ? 'border-amber-400 focus:border-amber-500 focus:ring-amber-500'
+                                                : ''
+                                            }`}
                                         value={data.name}
                                         onChange={(e) => setData('name', e.target.value)}
                                         required
                                         autoFocus
                                     />
+                                    {/* Server-side error (after submit) */}
                                     <InputError message={errors.name} className="mt-2" />
+                                    {/* Real-time feedback */}
+                                    {nameChecking && !nameExists && (
+                                        <p className="mt-1 text-xs text-gray-400 dark:text-gray-500 italic">
+                                            Checking availability…
+                                        </p>
+                                    )}
+                                    {!nameChecking && nameExists && (
+                                        <div className="mt-2 flex items-start gap-2 rounded-md border border-amber-300 bg-amber-50 dark:bg-amber-900/20 dark:border-amber-600 px-3 py-2">
+                                            <svg className="mt-0.5 h-4 w-4 flex-shrink-0 text-amber-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                                                <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v4m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z" />
+                                            </svg>
+                                            <p className="text-sm text-amber-700 dark:text-amber-400">
+                                                An item named <strong>&ldquo;{data.name.trim()}&rdquo;</strong> already exists. Please use a different name.
+                                            </p>
+                                        </div>
+                                    )}
                                 </div>
 
                                 <div>

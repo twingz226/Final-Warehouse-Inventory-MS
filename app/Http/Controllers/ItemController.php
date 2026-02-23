@@ -80,7 +80,7 @@ class ItemController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'name' => 'required|string|max:255',
+            'name' => 'required|string|max:255|unique:items,name',
             'description' => 'nullable|string',
             'category' => 'required|in:tool,material',
             'quantity' => 'required|numeric|min:0',
@@ -129,7 +129,7 @@ class ItemController extends Controller
         $oldValues = $item->toArray();
 
         $validated = $request->validate([
-            'name' => 'required|string|max:255',
+            'name' => ['required', 'string', 'max:255', Rule::unique('items', 'name')->ignore($item->id)],
             'description' => 'nullable|string',
             'category' => 'required|in:tool,material',
             'quantity' => 'required|numeric|min:0',
@@ -208,6 +208,23 @@ class ItemController extends Controller
         })->filter()->take(50)->values();
 
         return response()->json($items);
+    }
+
+    /**
+     * Check if an item name already exists (for real-time validation).
+     */
+    public function checkName(Request $request)
+    {
+        $name    = $request->input('name', '');
+        $ignoreId = $request->input('ignore_id'); // current item ID when editing
+
+        $query = Item::whereRaw('LOWER(name) = ?', [strtolower(trim($name))]);
+
+        if ($ignoreId) {
+            $query->where('id', '!=', $ignoreId);
+        }
+
+        return response()->json(['exists' => $query->exists()]);
     }
 
     /**
