@@ -37,6 +37,7 @@ export default function InventoryIndex({ auth, items, summary, filters }) {
         if (dateTo) params.set('date_to', dateTo);
         if (sortBy !== 'name') params.set('sort_by', sortBy);
         if (sortOrder !== 'asc') params.set('sort_order', sortOrder);
+        params.set('page', '1');
 
         const url = params.toString() ? `/inventory?${params.toString()}` : '/inventory';
         router.visit(url, {
@@ -53,7 +54,7 @@ export default function InventoryIndex({ auth, items, summary, filters }) {
         setDateTo('');
         setSortBy('name');
         setSortOrder('asc');
-        router.visit('/inventory', {
+        router.visit('/inventory?page=1', {
             preserveState: true,
             preserveScroll: true,
         });
@@ -84,7 +85,7 @@ export default function InventoryIndex({ auth, items, summary, filters }) {
         return availableStock <= 10;
     };
 
-    const sortedItems = [...items].sort((a, b) => {
+    const sortedItems = [...items.data].sort((a, b) => {
         const aLow = isLowStock(a.available_stock);
         const bLow = isLowStock(b.available_stock);
         if (aLow && !bLow) return -1;
@@ -212,7 +213,7 @@ export default function InventoryIndex({ auth, items, summary, filters }) {
 
                     {/* Inventory Charts */}
                     <div className="overflow-x-auto mb-6">
-                        <InventoryCharts items={items} summary={summary} />
+                        <InventoryCharts items={items.data} summary={summary} />
                     </div>
 
                     {/* Enhanced Filters */}
@@ -370,7 +371,7 @@ export default function InventoryIndex({ auth, items, summary, filters }) {
                         </div>
 
 
-                        {items.length > 0 ? (
+                        {items.data.length > 0 ? (
                             <div className="block lg:hidden">
                                 {/* Mobile Card View */}
                                 <div className="space-y-4">
@@ -435,7 +436,7 @@ export default function InventoryIndex({ auth, items, summary, filters }) {
                         ) : null}
 
                         {/* Desktop Table View */}
-                        {items.length > 0 ? (
+                        {items.data.length > 0 ? (
                             <div className="hidden lg:block overflow-x-auto">
                                 <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
                                     <thead className="bg-gray-50 dark:bg-gray-700">
@@ -544,6 +545,31 @@ export default function InventoryIndex({ auth, items, summary, filters }) {
                                         ? 'Try adjusting your search.'
                                         : 'Get started by adding items to your inventory.'}
                                 </p>
+                            </div>
+                        )}
+
+                        {/* Pagination */}
+                        {items.last_page > 1 && (
+                            <div className="px-6 py-4 bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700">
+                                <div className="flex flex-col sm:flex-row justify-between items-center gap-3">
+                                    <div className="text-sm text-gray-700 dark:text-gray-300">
+                                        Showing {items.from} to {items.to} of {items.total} results
+                                    </div>
+                                    <div className="flex flex-wrap justify-center gap-1">
+                                        {items.links.map((link, index) => (
+                                            <Link
+                                                key={index}
+                                                href={link.url || '#'}
+                                                className={`px-3 py-2 text-sm rounded-md ${link.active
+                                                        ? 'bg-indigo-600 text-white'
+                                                        : 'bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-600'
+                                                    } ${!link.url ? 'opacity-50 cursor-not-allowed pointer-events-none' : ''}`}
+                                                dangerouslySetInnerHTML={{ __html: link.label }}
+                                                preserveScroll
+                                            />
+                                        ))}
+                                    </div>
+                                </div>
                             </div>
                         )}
                     </div>

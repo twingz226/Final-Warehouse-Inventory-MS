@@ -73,12 +73,12 @@ class InventoryController extends Controller
             $query->orderBy('name', 'asc');
         }
         
-        $items = $query->get()->map(function ($item) {
+        $items = $query->paginate(10)->through(function ($item) {
             $totalDistributed = Purchase::where('item_name', $item->name)
                 ->where('status', 'received')
                 ->sum('quantity');
             
-            return (object) [
+            return [
                 'id' => $item->id,
                 'name' => $item->name,
                 'description' => $item->description,
