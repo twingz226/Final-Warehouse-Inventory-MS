@@ -93,7 +93,8 @@ class ItemController extends Controller
 
         $item = Item::create($validated);
 
-        $this->logHistory($item, 'created', null, $validated, "Created '{$item->name}' with quantity {$item->quantity}");
+        $unit = $item->unit === 'Kg' ? 'kg' : 'pcs';
+        $this->logHistory($item, 'created', null, $validated, "New item '{$item->name}' added — {$item->quantity} {$unit} in stock.");
 
         return redirect()
             ->route('items.index')
@@ -144,22 +145,25 @@ class ItemController extends Controller
         // Generate description based on what changed
         $changes = [];
         if ($oldValues['name'] !== $validated['name']) {
-            $changes[] = "name from '{$oldValues['name']}' to '{$validated['name']}'";
+            $changes[] = "• Name: \"{$oldValues['name']}\" → \"{$validated['name']}\"";
         }
         if ($oldValues['quantity'] != $validated['quantity']) {
-            $changes[] = "quantity from {$oldValues['quantity']} to {$validated['quantity']}";
+            $unit = $validated['unit'] === 'Kg' ? 'kg' : 'pcs';
+            $changes[] = "• Quantity: {$oldValues['quantity']} → {$validated['quantity']} {$unit}";
         }
         if ($oldValues['description'] !== $validated['description']) {
-            $changes[] = "description";
+            $changes[] = "• Description updated";
         }
         if ($oldValues['category'] !== $validated['category']) {
-            $changes[] = "category from '{$oldValues['category']}' to '{$validated['category']}'";
+            $changes[] = "• Category: {$oldValues['category']} → {$validated['category']}";
         }
         if ($oldValues['unit'] !== $validated['unit']) {
-            $changes[] = "unit from '{$oldValues['unit']}' to '{$validated['unit']}'";
+            $changes[] = "• Unit: {$oldValues['unit']} → {$validated['unit']}";
         }
 
-        $description = count($changes) > 0 ? "Updated " . implode(', ', $changes) : "Updated item";
+        $description = count($changes) > 0
+            ? "'{$item->name}' was updated:\n" . implode("\n", $changes)
+            : "'{$item->name}' details reviewed — no changes made.";
 
         $this->logHistory($item, 'updated', $oldValues, $validated, $description);
 
@@ -216,7 +220,7 @@ class ItemController extends Controller
         $itemId = $item->id;
 
         // Log history before deleting
-        $this->logHistory($item, 'deleted', $oldValues, null, "Deleted '{$itemName}'");
+        $this->logHistory($item, 'deleted', $oldValues, null, "\u2018{$itemName}\u2019 has been removed from inventory.");
 
         $item->delete();
 
@@ -261,7 +265,10 @@ class ItemController extends Controller
             'stock_added',
             $oldValues,
             $newValues,
-            "Added {$validated['quantity']} {$item->unit} to stock. Quantity changed from {$oldQuantity} to {$item->quantity}"
+            (function() use ($validated, $item, $oldQuantity) {
+                $unit = $item->unit === 'Kg' ? 'kg' : 'pcs';
+                return "+{$validated['quantity']} {$unit} added to '{$item->name}' — stock updated from {$oldQuantity} to {$item->quantity} {$unit}.";
+            })()
         );
 
         return redirect()
