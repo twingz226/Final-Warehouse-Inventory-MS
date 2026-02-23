@@ -31,7 +31,7 @@ export default function AuthenticatedLayout({ header, children }) {
 
                     <nav className="mt-5 flex-1 px-3 flex flex-col gap-1">
                         {/* ── MAIN section ── */}
-                        <p className="px-3 pt-2 pb-1 text-[10px] font-semibold uppercase tracking-widest text-white/40 select-none">
+                        <p className="px-3 pt-2 pb-1 text-[10px] font-semibold uppercase tracking-widest text-white/65 select-none">
                             Main
                         </p>
 
@@ -67,7 +67,7 @@ export default function AuthenticatedLayout({ header, children }) {
 
                         {/* ── TRANSACTIONS section ── */}
                         <div className="mt-4">
-                            <p className="px-3 pb-1 text-[10px] font-semibold uppercase tracking-widest text-white/40 select-none">
+                            <p className="px-3 pb-1 text-[10px] font-semibold uppercase tracking-widest text-white/65 select-none">
                                 Transactions
                             </p>
 
@@ -83,7 +83,7 @@ export default function AuthenticatedLayout({ header, children }) {
                                 </span>
                                 <span className="flex-1">
                                     <span className="block text-sm font-medium leading-tight">Incoming Items</span>
-                                    <span className="block text-xs text-white/50 group-hover:text-white/70 transition-colors">Manage incoming items</span>
+                                    <span className="block text-xs text-white/75 group-hover:text-white/90 transition-colors">Manage incoming items</span>
                                 </span>
                             </SidebarNavLink>
 
@@ -99,7 +99,7 @@ export default function AuthenticatedLayout({ header, children }) {
                                 </span>
                                 <span className="flex-1">
                                     <span className="block text-sm font-medium leading-tight">Outgoing Items</span>
-                                    <span className="block text-xs text-white/50 group-hover:text-white/70 transition-colors">Manage distribution orders</span>
+                                    <span className="block text-xs text-white/75 group-hover:text-white/90 transition-colors">Manage distribution orders</span>
                                 </span>
                             </SidebarNavLink>
 
@@ -115,7 +115,7 @@ export default function AuthenticatedLayout({ header, children }) {
                                 </span>
                                 <span className="flex-1">
                                     <span className="block text-sm font-medium leading-tight">Borrowed Items</span>
-                                    <span className="block text-xs text-white/50 group-hover:text-white/70 transition-colors">Track borrowed items</span>
+                                    <span className="block text-xs text-white/75 group-hover:text-white/90 transition-colors">Track borrowed items</span>
                                 </span>
                             </SidebarNavLink>
                         </div>
