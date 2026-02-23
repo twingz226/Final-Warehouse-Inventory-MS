@@ -211,7 +211,9 @@ export default function InventoryIndex({ auth, items, summary, filters }) {
                     </div>
 
                     {/* Inventory Charts */}
-                    <InventoryCharts items={items} summary={summary} />
+                    <div className="overflow-hidden">
+                        <InventoryCharts items={items} summary={summary} />
+                    </div>
 
                     {/* Enhanced Filters */}
                     <div className="bg-white dark:bg-gray-800 shadow rounded-lg mb-6">
@@ -387,8 +389,8 @@ export default function InventoryIndex({ auth, items, summary, filters }) {
                                                     )}
                                                 </div>
                                                 <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${item.category === 'tool'
-                                                        ? 'bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200'
-                                                        : 'bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200'
+                                                    ? 'bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200'
+                                                    : 'bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200'
                                                     }`}>
                                                     {getCategoryIcon(item.category)}
                                                     <span className="ml-1">{item.category}</span>
@@ -414,8 +416,8 @@ export default function InventoryIndex({ auth, items, summary, filters }) {
                                                 <div className="flex items-center">
                                                     <p className="text-xs text-gray-500 dark:text-gray-400 mr-2">Available:</p>
                                                     <span className={`text-sm font-medium ${isLowStock(item.available_stock)
-                                                            ? 'text-red-600 dark:text-red-400'
-                                                            : 'text-green-600 dark:text-green-400'
+                                                        ? 'text-red-600 dark:text-red-400'
+                                                        : 'text-green-600 dark:text-green-400'
                                                         }`}>
                                                         {item.unit === 'Quantity' ? Math.floor(item.available_stock) : item.available_stock} {item.unit === 'Quantity' ? 'pcs.' : item.unit}
                                                     </span>
@@ -500,8 +502,8 @@ export default function InventoryIndex({ auth, items, summary, filters }) {
                                                 </td>
                                                 <td className="px-6 py-4 whitespace-nowrap">
                                                     <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${item.category === 'tool'
-                                                            ? 'bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200'
-                                                            : 'bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200'
+                                                        ? 'bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200'
+                                                        : 'bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200'
                                                         }`}>
                                                         {getCategoryIcon(item.category)}
                                                         <span className="ml-1">{item.category}</span>
@@ -516,8 +518,8 @@ export default function InventoryIndex({ auth, items, summary, filters }) {
                                                 <td className="px-6 py-4 whitespace-nowrap">
                                                     <div className="flex items-center">
                                                         <span className={`text-sm font-medium ${isLowStock(item.available_stock)
-                                                                ? 'text-red-600 dark:text-red-400'
-                                                                : 'text-green-600 dark:text-green-400'
+                                                            ? 'text-red-600 dark:text-red-400'
+                                                            : 'text-green-600 dark:text-green-400'
                                                             }`}>
                                                             {item.unit === 'Quantity' ? Math.floor(item.available_stock) : item.available_stock} {item.unit === 'Quantity' ? 'pcs.' : item.unit}
                                                         </span>
