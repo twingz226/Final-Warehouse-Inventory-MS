@@ -13,6 +13,7 @@ import {
     Title,
 } from 'chart.js';
 import { Pie, Bar, Line } from 'react-chartjs-2';
+import InventoryCharts from '@/Components/InventoryCharts';
 
 // Register Chart.js components
 ChartJS.register(
@@ -37,7 +38,9 @@ export default function Dashboard({
     recentActivities,
     itemsByCategory,
     stockDistribution,
-    monthlyBorrowings
+    monthlyBorrowings,
+    items,
+    summary
 }) {
     // Prepare data for pie chart (items by category)
     const pieData = {
@@ -303,6 +306,9 @@ export default function Dashboard({
                         </div>
                     </div>
 
+                    {/* Inventory Charts from Inventory Page */}
+                    <InventoryCharts items={items} summary={summary} />
+
                     {/* Charts Section */}
                     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
                         {/* Pie Chart - Items by Category */}
@@ -344,15 +350,14 @@ export default function Dashboard({
                                     {recentActivities.map((activity) => (
                                         <div key={activity.id} className="flex items-start space-x-3">
                                             <div className="flex-shrink-0">
-                                                <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
-                                                    activity.activity_type === 'item' ? 'bg-blue-100 text-blue-600' :
-                                                    activity.activity_type === 'distribution' ? 'bg-green-100 text-green-600' :
-                                                    activity.activity_type === 'borrowing' ? 'bg-purple-100 text-purple-600' :
-                                                    'bg-gray-100 text-gray-600'
-                                                }`}>
+                                                <div className={`w-8 h-8 rounded-full flex items-center justify-center ${activity.activity_type === 'item' ? 'bg-blue-100 text-blue-600' :
+                                                        activity.activity_type === 'distribution' ? 'bg-green-100 text-green-600' :
+                                                            activity.activity_type === 'borrowing' ? 'bg-purple-100 text-purple-600' :
+                                                                'bg-gray-100 text-gray-600'
+                                                    }`}>
                                                     {activity.activity_type === 'item' ? 'I' :
-                                                     activity.activity_type === 'distribution' ? 'D' :
-                                                     activity.activity_type === 'borrowing' ? 'B' : '?'}
+                                                        activity.activity_type === 'distribution' ? 'D' :
+                                                            activity.activity_type === 'borrowing' ? 'B' : '?'}
                                                 </div>
                                             </div>
                                             <div className="flex-1 min-w-0">

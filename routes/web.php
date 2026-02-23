@@ -47,6 +47,25 @@ Route::get('/dashboard', function () {
                     'count' => $item->count
                 ];
             }),
+        'items' => \App\Models\Item::all()->map(function ($item) {
+            $totalDistributed = \App\Models\Purchase::where('item_name', $item->name)
+                ->where('status', 'received')
+                ->sum('quantity');
+            return [
+                'id' => $item->id,
+                'name' => $item->name,
+                'category' => $item->category,
+                'total_stock' => $item->quantity,
+                'total_distributed' => $totalDistributed,
+                'available_stock' => $item->quantity - $totalDistributed,
+            ];
+        }),
+        'summary' => [
+            'total_items' => \App\Models\Item::count(),
+            'total_tools' => \App\Models\Item::where('category', 'tool')->count(),
+            'total_materials' => \App\Models\Item::where('category', 'material')->count(),
+            'total_distributed' => \App\Models\Purchase::where('status', 'received')->sum('quantity'),
+        ],
     ];
     return Inertia::render('Dashboard', $data);
 })->middleware(['auth', 'verified'])->name('dashboard');

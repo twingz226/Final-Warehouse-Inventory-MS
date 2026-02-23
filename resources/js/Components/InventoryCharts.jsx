@@ -167,15 +167,6 @@ const InventoryCharts = ({ items, summary }) => {
 
     return (
         <div className="mb-6">
-            {/* Category Distribution Pie Chart - New Section */}
-            <div className="mb-6">
-                <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow">
-                    <div style={{ height: '300px' }}>
-                        <Pie data={categoryData} options={pieOptions} />
-                    </div>
-                </div>
-            </div>
-
             {/* Stock Levels Bar Chart */}
             <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow">
                 <div style={{ overflowX: 'auto' }}>

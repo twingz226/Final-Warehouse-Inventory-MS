@@ -2,7 +2,6 @@ import { Head, Link, router } from '@inertiajs/react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { useState } from 'react';
 import { MagnifyingGlassIcon, CubeIcon, WrenchIcon, TruckIcon, ChartBarIcon, FunnelIcon, ChevronUpDownIcon } from '@heroicons/react/24/outline';
-import InventoryCharts from '@/Components/InventoryCharts';
 
 export default function InventoryIndex({ auth, items, low_stock_items, summary, filters }) {
     const [search, setSearch] = useState(filters.search || '');
@@ -201,11 +200,6 @@ export default function InventoryIndex({ auth, items, low_stock_items, summary, 
                                 </div>
                             </div>
                         </div>
-                    </div>
-
-                    {/* Inventory Charts */}
-                    <div className="overflow-x-auto mb-6">
-                        <InventoryCharts items={items.data} summary={summary} />
                     </div>
 
                     {/* Enhanced Filters */}
