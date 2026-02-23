@@ -12,12 +12,12 @@ export default function Index({ auth, purchases, status }) {
     const handlePrint = (purchase) => {
         // Create a new window for printing
         const printWindow = window.open('', '_blank', 'width=800,height=600,scrollbars=yes,resizable=yes');
-        
+
         if (!printWindow) {
             alert('Please allow popups to print the withdrawal slip');
             return;
         }
-        
+
         // Generate detailed print content
         const printContent = `
             <!DOCTYPE html>
@@ -253,18 +253,18 @@ export default function Index({ auth, purchases, status }) {
             </body>
             </html>
         `;
-        
+
         // Write content to the new window
         printWindow.document.write(printContent);
         printWindow.document.close();
-        
+
         // Wait for content to load, then print
-        printWindow.onload = function() {
+        printWindow.onload = function () {
             printWindow.focus();
             printWindow.print();
             printWindow.close();
         };
-        
+
         // Fallback for browsers that don't support onload properly
         setTimeout(() => {
             if (printWindow && !printWindow.closed) {
@@ -303,7 +303,7 @@ export default function Index({ auth, purchases, status }) {
                             {status}
                         </div>
                     )}
-                    
+
                     <div className="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
                         <div className="overflow-x-auto">
                             <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
@@ -329,63 +329,62 @@ export default function Index({ auth, purchases, status }) {
                                 <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
                                     {purchases.data.length > 0 ? (
                                         purchases.data.map((purchase, index) => (
-                                        <tr key={index}>
-                                            <td className="px-6 py-4 whitespace-nowrap">
-                                                <div className="text-sm font-medium text-gray-900 dark:text-gray-100">
-                                                    {purchase.supplier_name}
-                                                </div>
-                                            </td>
-                                            <td className="px-6 py-4 whitespace-nowrap">
-                                                <div className="text-sm font-medium text-gray-900 dark:text-gray-100">
-                                                    {purchase.item_name}
-                                                </div>
-                                            </td>
-                                            <td className="px-6 py-4 whitespace-nowrap">
-                                                {purchase.item_category ? (
-                                                    <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full capitalize ${
-                                                        purchase.item_category === 'material' ? 'bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200' :
-                                                        purchase.item_category === 'tool' ? 'bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200' :
-                                                        'bg-indigo-100 dark:bg-indigo-900 text-indigo-800 dark:text-indigo-200'
-                                                    }`}>
-                                                        {purchase.item_category}
-                                                    </span>
-                                                ) : (
-                                                    <span className="text-sm text-gray-400 dark:text-gray-500">N/A</span>
-                                                )}
-                                            </td>
-                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
-                                                {purchase.quantity}
-                                            </td>
-                                            <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                                <div className="flex space-x-2">
-                                                    <button
-                                                        onClick={() => handlePrint(purchase)}
-                                                        className="text-green-600 dark:text-green-400 hover:text-green-900 dark:hover:text-green-300"
-                                                        onMouseEnter={(e) => { const rect = e.currentTarget.getBoundingClientRect(); setTooltip({ show: true, text: 'Print Purchase Details', x: rect.left + rect.width / 2, y: rect.top - 30 }); }}
-                                                        onMouseLeave={() => setTooltip({ show: false, text: '', x: 0, y: 0 })}
-                                                    >
-                                                        <PrinterIcon className="h-5 w-5" />
-                                                    </button>
-                                                    <Link
-                                                        href={route('purchases.show', purchase.id)}
-                                                        className="text-indigo-600 dark:text-indigo-400 hover:text-indigo-900 dark:hover:text-indigo-300"
-                                                        onMouseEnter={(e) => { const rect = e.currentTarget.getBoundingClientRect(); setTooltip({ show: true, text: 'View Purchase', x: rect.left + rect.width / 2, y: rect.top - 30 }); }}
-                                                        onMouseLeave={() => setTooltip({ show: false, text: '', x: 0, y: 0 })}
-                                                    >
-                                                        <EyeIcon className="h-5 w-5" />
-                                                    </Link>
-                                                    <button
-                                                        onClick={() => deletePurchase(purchase.id)}
-                                                        className="text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-300"
-                                                        onMouseEnter={(e) => { const rect = e.currentTarget.getBoundingClientRect(); setTooltip({ show: true, text: 'Delete Purchase', x: rect.left + rect.width / 2, y: rect.top - 30 }); }}
-                                                        onMouseLeave={() => setTooltip({ show: false, text: '', x: 0, y: 0 })}
-                                                    >
-                                                        <TrashIcon className="h-5 w-5" />
-                                                    </button>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    ))
+                                            <tr key={index}>
+                                                <td className="px-6 py-4 whitespace-nowrap">
+                                                    <div className="text-sm font-medium text-gray-900 dark:text-gray-100">
+                                                        {purchase.supplier_name}
+                                                    </div>
+                                                </td>
+                                                <td className="px-6 py-4 whitespace-nowrap">
+                                                    <div className="text-sm font-medium text-gray-900 dark:text-gray-100">
+                                                        {purchase.item_name}
+                                                    </div>
+                                                </td>
+                                                <td className="px-6 py-4 whitespace-nowrap">
+                                                    {purchase.item_category ? (
+                                                        <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full capitalize ${purchase.item_category === 'material' ? 'bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200' :
+                                                            purchase.item_category === 'tool' ? 'bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200' :
+                                                                'bg-indigo-100 dark:bg-indigo-900 text-indigo-800 dark:text-indigo-200'
+                                                            }`}>
+                                                            {purchase.item_category}
+                                                        </span>
+                                                    ) : (
+                                                        <span className="text-sm text-gray-400 dark:text-gray-500">N/A</span>
+                                                    )}
+                                                </td>
+                                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                                                    {purchase.quantity}
+                                                </td>
+                                                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                                    <div className="flex space-x-2">
+                                                        <button
+                                                            onClick={() => handlePrint(purchase)}
+                                                            className="text-green-600 dark:text-green-400 hover:text-green-900 dark:hover:text-green-300"
+                                                            onMouseEnter={(e) => { const rect = e.currentTarget.getBoundingClientRect(); setTooltip({ show: true, text: 'Print Withdrawal Slip', x: rect.left + rect.width / 2, y: rect.top - 30 }); }}
+                                                            onMouseLeave={() => setTooltip({ show: false, text: '', x: 0, y: 0 })}
+                                                        >
+                                                            <PrinterIcon className="h-5 w-5" />
+                                                        </button>
+                                                        <Link
+                                                            href={route('purchases.show', purchase.id)}
+                                                            className="text-indigo-600 dark:text-indigo-400 hover:text-indigo-900 dark:hover:text-indigo-300"
+                                                            onMouseEnter={(e) => { const rect = e.currentTarget.getBoundingClientRect(); setTooltip({ show: true, text: 'View Details', x: rect.left + rect.width / 2, y: rect.top - 30 }); }}
+                                                            onMouseLeave={() => setTooltip({ show: false, text: '', x: 0, y: 0 })}
+                                                        >
+                                                            <EyeIcon className="h-5 w-5" />
+                                                        </Link>
+                                                        <button
+                                                            onClick={() => deletePurchase(purchase.id)}
+                                                            className="text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-300"
+                                                            onMouseEnter={(e) => { const rect = e.currentTarget.getBoundingClientRect(); setTooltip({ show: true, text: 'Delete Record', x: rect.left + rect.width / 2, y: rect.top - 30 }); }}
+                                                            onMouseLeave={() => setTooltip({ show: false, text: '', x: 0, y: 0 })}
+                                                        >
+                                                            <TrashIcon className="h-5 w-5" />
+                                                        </button>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        ))
                                     ) : (
                                         <tr>
                                             <td colSpan="6" className="px-6 py-12 text-center">
