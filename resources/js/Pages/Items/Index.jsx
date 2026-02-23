@@ -17,6 +17,12 @@ export default function Index({ auth, items, status }) {
     const [showBulkActions, setShowBulkActions] = useState(false);
     const [date, setDate] = useState('');
 
+    const formatDateDisplay = (dateStr) => {
+        if (!dateStr) return '';
+        const [y, m, d] = dateStr.split('-');
+        return `${m}/${d}/${y}`;
+    };
+
     useEffect(() => {
         const urlParams = new URLSearchParams(window.location.search);
         const initialSearch = urlParams.get('search') || '';
@@ -283,17 +289,25 @@ export default function Index({ auth, items, status }) {
                             </div>
                             <div className="sm:w-48">
                                 <div className="relative">
+                                    {/* Single native date input — color:transparent hides OS-formatted text, picker icon/calendar remain fully functional */}
                                     <input
                                         type="date"
-                                        lang="en-US"
                                         value={date}
                                         onChange={(e) => handleDateChange(e.target.value)}
-                                        className="block w-full px-3 py-3 border border-gray-300 dark:border-gray-600 rounded-lg leading-5 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:focus:ring-indigo-400 focus:border-indigo-500 dark:focus:border-indigo-400 sm:text-sm transition duration-150 ease-in-out"
+                                        style={{ color: 'transparent', caretColor: 'transparent' }}
+                                        className="block w-full px-3 py-3 border border-gray-300 dark:border-gray-600 rounded-lg leading-5 bg-white dark:bg-gray-700 focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:focus:ring-indigo-400 focus:border-indigo-500 dark:focus:border-indigo-400 sm:text-sm transition duration-150 ease-in-out cursor-pointer"
                                     />
+                                    {/* Overlay div — shows date as MM/DD/YYYY (or placeholder), pointer-events-none so clicks pass through to the date input */}
+                                    <div className="absolute inset-y-0 left-0 right-8 px-3 flex items-center pointer-events-none">
+                                        {date
+                                            ? <span className="text-gray-900 dark:text-white sm:text-sm">{formatDateDisplay(date)}</span>
+                                            : <span className="text-gray-400 dark:text-gray-500 sm:text-sm">MM/DD/YYYY</span>
+                                        }
+                                    </div>
                                     {date && (
                                         <button
                                             onClick={() => handleDateChange('')}
-                                            className="absolute inset-y-0 right-0 pr-3 flex items-center"
+                                            className="absolute inset-y-0 right-0 pr-3 flex items-center z-10"
                                         >
                                             <svg className="h-5 w-5 text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
