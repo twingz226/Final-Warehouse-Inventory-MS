@@ -1,109 +1,128 @@
 // resources/js/Pages/Purchases/Form.jsx
 import { Head, Link, useForm } from '@inertiajs/react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 
+// ── Per-row search state factory ──────────────────────────────────────────────
+const emptyRowSearch = () => ({
+    query: '',
+    results: [],
+    showDropdown: false,
+    isSearching: false,
+    timeout: null,
+});
+
 export default function Form({ auth, purchase, statusOptions }) {
+    // ── Shared form data (Inertia) ─────────────────────────────────────────────
     const { data, setData, post, put, processing, errors, reset } = useForm({
         supplier_name: purchase?.supplier_name || '',
         supplier_email: purchase?.supplier_email || '',
         supplier_phone: purchase?.supplier_phone || '',
-        item_name: purchase?.item_name || '',
-        description: purchase?.description || '',
-        quantity: purchase?.quantity || '',
         purchase_date: purchase?.purchase_date || new Date().toISOString().split('T')[0],
         notes: purchase?.notes || '',
         project_type: purchase?.project_type || '',
         project_name: purchase?.project_name || '',
+        // For CREATE: array of rows. For EDIT: single item kept flat.
+        items: purchase
+            ? [{ item_name: purchase.item_name, quantity: purchase.quantity, description: purchase.description || '' }]
+            : [{ item_name: '', quantity: '', description: '' }],
     });
 
-    const [searchQuery, setSearchQuery] = useState('');
-    const [searchResults, setSearchResults] = useState([]);
-    const [showDropdown, setShowDropdown] = useState(false);
-    const [isSearching, setIsSearching] = useState(false);
-    const [searchTimeout, setSearchTimeout] = useState(null);
+    // ── Per-row search UI state ────────────────────────────────────────────────
+    const [rowSearches, setRowSearches] = useState(() =>
+    (purchase
+        ? [{ ...emptyRowSearch(), query: purchase.item_name || '' }]
+        : [emptyRowSearch()]
+    )
+    );
 
-    // Handle search with debouncing
-    const handleSearch = async (value) => {
-        setSearchQuery(value);
-        setShowDropdown(true);
-        
-        if (searchTimeout) {
-            clearTimeout(searchTimeout);
-        }
-        
-        if (value.length > 0 && value.length < 2) {
-            setSearchResults([]);
-            setIsSearching(false);
-            return;
-        }
-        
-        setIsSearching(true);
-        
-        const timeout = setTimeout(async () => {
-            try {
-                const response = await axios.get(route('items.search'), {
-                    params: { search: value }
-                });
-                setSearchResults(response.data);
-            } catch (error) {
-                console.error('Error searching items:', error);
-                setSearchResults([]);
-            } finally {
-                setIsSearching(false);
-            }
-        }, 300);
-        
-        setSearchTimeout(timeout);
-    };
+    const containerRef = useRef(null);
 
-    // Handle item selection from dropdown
-    const handleItemSelect = (item) => {
-        setData('item_name', item.name);
-        if (item.description) {
-            setData('description', item.description);
-        }
-        setSearchQuery(item.name);
-        setShowDropdown(false);
-        setSearchResults([]);
-    };
-
-    // Handle input focus
-    const handleInputFocus = () => {
-        setShowDropdown(true);
-        if (searchQuery.length < 2) {
-            handleSearch('');
-        }
-    };
-
-    // Handle click outside to close dropdown
+    // ── Close all dropdowns on outside click ──────────────────────────────────
     useEffect(() => {
-        const handleClickOutside = (event) => {
-            if (!event.target.closest('.searchable-dropdown')) {
-                setShowDropdown(false);
+        const handler = (e) => {
+            if (containerRef.current && !containerRef.current.contains(e.target)) {
+                setRowSearches(prev => prev.map(r => ({ ...r, showDropdown: false })));
             }
         };
-
-        document.addEventListener('mousedown', handleClickOutside);
-        return () => {
-            document.removeEventListener('mousedown', handleClickOutside);
-        };
+        document.addEventListener('mousedown', handler);
+        return () => document.removeEventListener('mousedown', handler);
     }, []);
 
+    // ── Helpers ───────────────────────────────────────────────────────────────
+    const updateRowSearch = (index, patch) =>
+        setRowSearches(prev => prev.map((r, i) => i === index ? { ...r, ...patch } : r));
+
+    const updateItem = (index, patch) =>
+        setData('items', data.items.map((item, i) => i === index ? { ...item, ...patch } : item));
+
+    const handleSearch = (index, value) => {
+        const prev = rowSearches[index];
+        if (prev.timeout) clearTimeout(prev.timeout);
+
+        updateRowSearch(index, { query: value, showDropdown: true, isSearching: value.length >= 2 });
+        updateItem(index, { item_name: value });
+
+        if (value.length < 2) {
+            updateRowSearch(index, { results: [], isSearching: false });
+            return;
+        }
+
+        const timeout = setTimeout(async () => {
+            try {
+                const response = await axios.get(route('items.search'), { params: { search: value } });
+                updateRowSearch(index, { results: response.data, isSearching: false });
+            } catch {
+                updateRowSearch(index, { results: [], isSearching: false });
+            }
+        }, 300);
+
+        updateRowSearch(index, { timeout });
+    };
+
+    const handleItemSelect = (index, item) => {
+        updateItem(index, { item_name: item.name, description: item.description || '' });
+        updateRowSearch(index, { query: item.name, showDropdown: false, results: [] });
+    };
+
+    const handleFocus = (index) => {
+        updateRowSearch(index, { showDropdown: true });
+        if (rowSearches[index].query.length < 2) handleSearch(index, '');
+    };
+
+    const addRow = () => {
+        setData('items', [...data.items, { item_name: '', quantity: '', description: '' }]);
+        setRowSearches(prev => [...prev, emptyRowSearch()]);
+    };
+
+    const removeRow = (index) => {
+        setData('items', data.items.filter((_, i) => i !== index));
+        setRowSearches(prev => prev.filter((_, i) => i !== index));
+    };
+
+    // ── Submit ────────────────────────────────────────────────────────────────
     const handleSubmit = (e) => {
         e.preventDefault();
-        
         if (purchase) {
+            // Edit: flatten the first (only) item row back to top-level fields
+            const flat = {
+                ...data,
+                item_name: data.items[0].item_name,
+                quantity: data.items[0].quantity,
+                description: data.items[0].description,
+            };
             put(route('purchases.update', purchase.id), {
+                data: flat,
                 onSuccess: () => reset(),
             });
         } else {
-            post(route('purchases.store'), {
-                onSuccess: () => reset(),
-            });
+            post(route('purchases.store'), { onSuccess: () => reset() });
         }
     };
+
+    // ── Shared input class ────────────────────────────────────────────────────
+    const inputCls = "mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-indigo-500 dark:focus:ring-indigo-400 focus:border-indigo-500 dark:focus:border-indigo-400 sm:text-sm";
 
     return (
         <AuthenticatedLayout
@@ -119,8 +138,9 @@ export default function Form({ auth, purchase, statusOptions }) {
             <div className="py-12">
                 <div className="max-w-4xl mx-auto sm:px-6 lg:px-8">
                     <div className="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
-                        <form onSubmit={handleSubmit} className="p-6 space-y-6">
-                            {/* Destination Information Section */}
+                        <form onSubmit={handleSubmit} className="p-6 space-y-6" ref={containerRef}>
+
+                            {/* ── Destination Information ─────────────────── */}
                             <div>
                                 <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-4">Destination Information</h3>
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -133,14 +153,11 @@ export default function Form({ auth, purchase, statusOptions }) {
                                             id="supplier_name"
                                             value={data.supplier_name}
                                             onChange={(e) => setData('supplier_name', e.target.value)}
-                                            className="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-indigo-500 dark:focus:ring-indigo-400 focus:border-indigo-500 dark:focus:border-indigo-400 sm:text-sm"
+                                            className={inputCls}
                                             required
                                         />
-                                        {errors.supplier_name && (
-                                            <p className="mt-2 text-sm text-red-600 dark:text-red-400">{errors.supplier_name}</p>
-                                        )}
+                                        {errors.supplier_name && <p className="mt-2 text-sm text-red-600 dark:text-red-400">{errors.supplier_name}</p>}
                                     </div>
-
                                     <div>
                                         <label htmlFor="supplier_email" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
                                             Destination Email
@@ -150,13 +167,10 @@ export default function Form({ auth, purchase, statusOptions }) {
                                             id="supplier_email"
                                             value={data.supplier_email}
                                             onChange={(e) => setData('supplier_email', e.target.value)}
-                                            className="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-indigo-500 dark:focus:ring-indigo-400 focus:border-indigo-500 dark:focus:border-indigo-400 sm:text-sm"
+                                            className={inputCls}
                                         />
-                                        {errors.supplier_email && (
-                                            <p className="mt-2 text-sm text-red-600 dark:text-red-400">{errors.supplier_email}</p>
-                                        )}
+                                        {errors.supplier_email && <p className="mt-2 text-sm text-red-600 dark:text-red-400">{errors.supplier_email}</p>}
                                     </div>
-
                                     <div>
                                         <label htmlFor="supplier_phone" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
                                             Destination Phone
@@ -166,100 +180,156 @@ export default function Form({ auth, purchase, statusOptions }) {
                                             id="supplier_phone"
                                             value={data.supplier_phone}
                                             onChange={(e) => setData('supplier_phone', e.target.value)}
-                                            className="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-indigo-500 dark:focus:ring-indigo-400 focus:border-indigo-500 dark:focus:border-indigo-400 sm:text-sm"
+                                            className={inputCls}
                                         />
-                                        {errors.supplier_phone && (
-                                            <p className="mt-2 text-sm text-red-600 dark:text-red-400">{errors.supplier_phone}</p>
-                                        )}
+                                        {errors.supplier_phone && <p className="mt-2 text-sm text-red-600 dark:text-red-400">{errors.supplier_phone}</p>}
                                     </div>
                                 </div>
                             </div>
 
-                            {/* Tools & Materials Section */}
+                            {/* ── Tools & Materials ───────────────────────── */}
                             <div>
-                                <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-4">Tools & Materials</h3>
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                    <div className="searchable-dropdown relative">
-                                        <label htmlFor="item_name" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                                            Tools & Materials Name *
-                                        </label>
-                                        <div className="relative">
-                                            <input
-                                                type="text"
-                                                id="item_name"
-                                                value={searchQuery || data.item_name}
-                                                onChange={(e) => {
-                                                    setData('item_name', e.target.value);
-                                                    handleSearch(e.target.value);
-                                                }}
-                                                onFocus={handleInputFocus}
-                                                onClick={handleInputFocus}
-                                                className="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-indigo-500 dark:focus:ring-indigo-400 focus:border-indigo-500 dark:focus:border-indigo-400 sm:text-sm"
-                                                required
-                                            />
-                                            {isSearching && (
-                                                <div className="absolute inset-y-0 right-0 pr-3 flex items-center">
-                                                    <svg className="animate-spin h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24">
-                                                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                                                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12V4zm2 12.297a7.001 7.001 0 01-14 0 7.001 7.001 0 0114 0z"></path>
-                                                    </svg>
+                                <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-4">Tools &amp; Materials</h3>
+
+                                <div className="space-y-4">
+                                    {data.items.map((item, index) => {
+                                        const rs = rowSearches[index] || emptyRowSearch();
+                                        return (
+                                            <div
+                                                key={index}
+                                                className="relative border border-gray-200 dark:border-gray-600 rounded-lg p-4 bg-gray-50 dark:bg-gray-700/50"
+                                            >
+                                                {/* Row header */}
+                                                <div className="flex items-center justify-between mb-3">
+                                                    <span className="text-sm font-semibold text-gray-600 dark:text-gray-300">
+                                                        Item {index + 1}
+                                                    </span>
+                                                    {data.items.length > 1 && (
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => removeRow(index)}
+                                                            className="text-xs text-red-500 hover:text-red-700 dark:hover:text-red-400 font-medium transition-colors"
+                                                        >
+                                                            ✕ Remove
+                                                        </button>
+                                                    )}
                                                 </div>
-                                            )}
-                                            {showDropdown && (
-                                                <div className="absolute z-10 mt-1 w-full bg-white dark:bg-gray-800 shadow-lg max-h-60 rounded-md py-1 text-base ring-1 ring-black dark:ring-gray-600 ring-opacity-5 overflow-auto focus:outline-none sm:text-sm">
-                                                    {isSearching ? (
-                                                        <div className="px-4 py-2 text-gray-500 dark:text-gray-400">Searching...</div>
-                                                    ) : searchResults.length > 0 ? (
-                                                        searchResults.map((item) => (
-                                                            <div
-                                                                key={item.id}
-                                                                className="cursor-pointer select-none relative py-2 pl-3 pr-9 bg-gray-50 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-500 rounded-md transition-colors duration-200"
-                                                                onClick={() => handleItemSelect(item)}
-                                                            >
-                                                                <div className="flex items-center">
-                                                                    <span className="font-normal ml-3 block truncate text-gray-900 dark:text-gray-100">
-                                                                        {item.name}
-                                                                    </span>
-                                                                    <span className="text-gray-500 dark:text-gray-400 ml-2">
-                                                                        ({item.quantity} available)
-                                                                    </span>
+
+                                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                                    {/* Item name (searchable) */}
+                                                    <div className="searchable-dropdown relative">
+                                                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                                                            Tools &amp; Materials Name *
+                                                        </label>
+                                                        <div className="relative">
+                                                            <input
+                                                                type="text"
+                                                                value={rs.query || item.item_name}
+                                                                onChange={(e) => handleSearch(index, e.target.value)}
+                                                                onFocus={() => handleFocus(index)}
+                                                                onClick={() => handleFocus(index)}
+                                                                className={inputCls}
+                                                                required
+                                                                placeholder="Search item..."
+                                                            />
+                                                            {rs.isSearching && (
+                                                                <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                                                                    <svg className="animate-spin h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24">
+                                                                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                                                                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12V4zm2 12.297a7.001 7.001 0 01-14 0 7.001 7.001 0 0114 0z" />
+                                                                    </svg>
                                                                 </div>
-                                                                {item.description && (
-                                                                    <span className="text-gray-400 dark:text-gray-500 ml-3 block truncate text-sm">
-                                                                        {item.description}
-                                                                    </span>
-                                                                )}
-                                                            </div>
-                                                        ))
-                                                    ) : searchQuery.length >= 2 ? (
-                                                        <div className="px-4 py-2 text-gray-500 dark:text-gray-400">No items found</div>
-                                                    ) : null}
+                                                            )}
+                                                            {rs.showDropdown && (rs.isSearching || rs.results.length > 0 || rs.query.length >= 2) && (
+                                                                <div className="absolute z-10 mt-1 w-full bg-white dark:bg-gray-800 shadow-lg max-h-60 rounded-md py-1 text-base ring-1 ring-black dark:ring-gray-600 ring-opacity-5 overflow-auto focus:outline-none sm:text-sm">
+                                                                    {rs.isSearching ? (
+                                                                        <div className="px-4 py-2 text-gray-500 dark:text-gray-400">Searching...</div>
+                                                                    ) : rs.results.length > 0 ? (
+                                                                        rs.results.map((result) => (
+                                                                            <div
+                                                                                key={result.id}
+                                                                                className="cursor-pointer select-none relative py-2 pl-3 pr-9 bg-gray-50 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-500 rounded-md transition-colors duration-200"
+                                                                                onMouseDown={(e) => { e.preventDefault(); handleItemSelect(index, result); }}
+                                                                            >
+                                                                                <div className="flex items-center">
+                                                                                    <span className="font-normal ml-3 block truncate text-gray-900 dark:text-gray-100">
+                                                                                        {result.name}
+                                                                                    </span>
+                                                                                    <span className="text-gray-500 dark:text-gray-400 ml-2 text-xs">
+                                                                                        ({result.quantity} available)
+                                                                                    </span>
+                                                                                </div>
+                                                                                {result.description && (
+                                                                                    <span className="text-gray-400 dark:text-gray-500 ml-3 block truncate text-sm">
+                                                                                        {result.description}
+                                                                                    </span>
+                                                                                )}
+                                                                            </div>
+                                                                        ))
+                                                                    ) : (
+                                                                        <div className="px-4 py-2 text-gray-500 dark:text-gray-400">No items found</div>
+                                                                    )}
+                                                                </div>
+                                                            )}
+                                                        </div>
+                                                        {errors[`items.${index}.item_name`] && (
+                                                            <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors[`items.${index}.item_name`]}</p>
+                                                        )}
+                                                    </div>
+
+                                                    {/* Quantity */}
+                                                    <div>
+                                                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                                                            Quantity *
+                                                        </label>
+                                                        <input
+                                                            type="number"
+                                                            value={item.quantity}
+                                                            onChange={(e) => updateItem(index, { quantity: parseInt(e.target.value) || '' })}
+                                                            className={inputCls}
+                                                            min="1"
+                                                            required
+                                                        />
+                                                        {errors[`items.${index}.quantity`] && (
+                                                            <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors[`items.${index}.quantity`]}</p>
+                                                        )}
+                                                    </div>
+
+                                                    {/* Description (full width) */}
+                                                    <div className="md:col-span-2">
+                                                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                                                            Description
+                                                        </label>
+                                                        <input
+                                                            type="text"
+                                                            value={item.description}
+                                                            onChange={(e) => updateItem(index, { description: e.target.value })}
+                                                            className={inputCls}
+                                                            placeholder="Enter item description or specifications..."
+                                                        />
+                                                    </div>
                                                 </div>
-                                            )}
-                                        </div>
-                                        {errors.item_name && (
-                                            <p className="mt-2 text-sm text-red-600 dark:text-red-400">{errors.item_name}</p>
-                                        )}
-                                    </div>
+                                            </div>
+                                        );
+                                    })}
+                                </div>
 
-                                    <div>
-                                        <label htmlFor="quantity" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                                            Quantity *
-                                        </label>
-                                        <input
-                                            type="number"
-                                            id="quantity"
-                                            value={data.quantity}
-                                            onChange={(e) => setData('quantity', parseInt(e.target.value) || 0)}
-                                            className="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-indigo-500 dark:focus:ring-indigo-400 focus:border-indigo-500 dark:focus:border-indigo-400 sm:text-sm"
-                                            min="1"
-                                            required
-                                        />
-                                        {errors.quantity && (
-                                            <p className="mt-2 text-sm text-red-600 dark:text-red-400">{errors.quantity}</p>
-                                        )}
-                                    </div>
+                                {/* Add row button — only on create */}
+                                {!purchase && (
+                                    <button
+                                        type="button"
+                                        onClick={addRow}
+                                        className="mt-4 flex items-center gap-2 px-4 py-2 text-sm font-medium text-indigo-600 dark:text-indigo-400 border border-dashed border-indigo-400 dark:border-indigo-500 rounded-lg hover:bg-indigo-50 dark:hover:bg-indigo-900/20 transition-colors"
+                                    >
+                                        <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                                        </svg>
+                                        Add Another Item
+                                    </button>
+                                )}
 
+                                {/* Project fields */}
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
                                     <div>
                                         <label htmlFor="project_name" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
                                             Name of Project
@@ -269,13 +339,10 @@ export default function Form({ auth, purchase, statusOptions }) {
                                             id="project_name"
                                             value={data.project_name}
                                             onChange={(e) => setData('project_name', e.target.value)}
-                                            className="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-indigo-500 dark:focus:ring-indigo-400 focus:border-indigo-500 dark:focus:border-indigo-400 sm:text-sm"
+                                            className={inputCls}
                                         />
-                                        {errors.project_name && (
-                                            <p className="mt-2 text-sm text-red-600 dark:text-red-400">{errors.project_name}</p>
-                                        )}
+                                        {errors.project_name && <p className="mt-2 text-sm text-red-600 dark:text-red-400">{errors.project_name}</p>}
                                     </div>
-
                                     <div>
                                         <label htmlFor="project_type" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
                                             Type of Project
@@ -285,33 +352,14 @@ export default function Form({ auth, purchase, statusOptions }) {
                                             id="project_type"
                                             value={data.project_type}
                                             onChange={(e) => setData('project_type', e.target.value)}
-                                            className="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-indigo-500 dark:focus:ring-indigo-400 focus:border-indigo-500 dark:focus:border-indigo-400 sm:text-sm"
+                                            className={inputCls}
                                         />
-                                        {errors.project_type && (
-                                            <p className="mt-2 text-sm text-red-600 dark:text-red-400">{errors.project_type}</p>
-                                        )}
-                                    </div>
-
-                                    <div className="md:col-span-2">
-                                        <label htmlFor="description" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                                            Description
-                                        </label>
-                                        <textarea
-                                            id="description"
-                                            value={data.description}
-                                            onChange={(e) => setData('description', e.target.value)}
-                                            rows={3}
-                                            className="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-indigo-500 dark:focus:ring-indigo-400 focus:border-indigo-500 dark:focus:border-indigo-400 sm:text-sm"
-                                            placeholder="Enter item description or specifications..."
-                                        />
-                                        {errors.description && (
-                                            <p className="mt-2 text-sm text-red-600 dark:text-red-400">{errors.description}</p>
-                                        )}
+                                        {errors.project_type && <p className="mt-2 text-sm text-red-600 dark:text-red-400">{errors.project_type}</p>}
                                     </div>
                                 </div>
                             </div>
 
-                            {/* Purchase Details Section */}
+                            {/* ── Distribution Details ─────────────────────── */}
                             <div>
                                 <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-4">Distribution Details</h3>
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -324,14 +372,11 @@ export default function Form({ auth, purchase, statusOptions }) {
                                             id="purchase_date"
                                             value={data.purchase_date}
                                             onChange={(e) => setData('purchase_date', e.target.value)}
-                                            className="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-indigo-500 dark:focus:ring-indigo-400 focus:border-indigo-500 dark:focus:border-indigo-400 sm:text-sm"
+                                            className={inputCls}
                                             required
                                         />
-                                        {errors.purchase_date && (
-                                            <p className="mt-2 text-sm text-red-600 dark:text-red-400">{errors.purchase_date}</p>
-                                        )}
+                                        {errors.purchase_date && <p className="mt-2 text-sm text-red-600 dark:text-red-400">{errors.purchase_date}</p>}
                                     </div>
-
                                     <div className="md:col-span-2">
                                         <label htmlFor="notes" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
                                             Notes
@@ -341,17 +386,15 @@ export default function Form({ auth, purchase, statusOptions }) {
                                             value={data.notes}
                                             onChange={(e) => setData('notes', e.target.value)}
                                             rows={3}
-                                            className="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-indigo-500 dark:focus:ring-indigo-400 focus:border-indigo-500 dark:focus:border-indigo-400 sm:text-sm"
+                                            className={inputCls}
                                             placeholder="Enter any additional notes or special instructions..."
                                         />
-                                        {errors.notes && (
-                                            <p className="mt-2 text-sm text-red-600 dark:text-red-400">{errors.notes}</p>
-                                        )}
+                                        {errors.notes && <p className="mt-2 text-sm text-red-600 dark:text-red-400">{errors.notes}</p>}
                                     </div>
                                 </div>
                             </div>
 
-                            {/* Form Actions */}
+                            {/* ── Form Actions ─────────────────────────────── */}
                             <div className="flex justify-end space-x-3 pt-6 border-t border-gray-200 dark:border-gray-700">
                                 <Link
                                     href={route('purchases.index')}
@@ -367,6 +410,7 @@ export default function Form({ auth, purchase, statusOptions }) {
                                     {processing ? 'Saving...' : (purchase ? 'Update Distribution' : 'Create Distribution')}
                                 </button>
                             </div>
+
                         </form>
                     </div>
                 </div>

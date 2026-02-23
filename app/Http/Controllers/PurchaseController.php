@@ -70,30 +70,55 @@ class PurchaseController extends Controller
 
     /**
      * Store a newly created resource in storage.
+     * Accepts an 'items' array to create multiple Purchase records in one submission.
      */
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'supplier_name' => 'required|string|max:255',
-            'supplier_email' => 'nullable|email|max:255',
-            'supplier_phone' => 'nullable|string|max:20',
-            'item_name' => 'required|string|max:255',
-            'description' => 'nullable|string',
-            'quantity' => 'required|integer|min:1',
-            'purchase_date' => 'required|date',
-            'notes' => 'nullable|string',
-            'project_type' => 'nullable|string|max:255',
-            'project_name' => 'nullable|string|max:255',
+            'supplier_name'          => 'required|string|max:255',
+            'supplier_email'         => 'nullable|email|max:255',
+            'supplier_phone'         => 'nullable|string|max:20',
+            'purchase_date'          => 'required|date',
+            'notes'                  => 'nullable|string',
+            'project_type'           => 'nullable|string|max:255',
+            'project_name'           => 'nullable|string|max:255',
+            'items'                  => 'required|array|min:1',
+            'items.*.item_name'      => 'required|string|max:255',
+            'items.*.quantity'       => 'required|integer|min:1',
+            'items.*.description'    => 'nullable|string',
         ]);
 
-        $validated['created_by'] = Auth::id();
+        $shared = [
+            'supplier_name'  => $validated['supplier_name'],
+            'supplier_email' => $validated['supplier_email'] ?? null,
+            'supplier_phone' => $validated['supplier_phone'] ?? null,
+            'purchase_date'  => $validated['purchase_date'],
+            'notes'          => $validated['notes'] ?? null,
+            'project_type'   => $validated['project_type'] ?? null,
+            'project_name'   => $validated['project_name'] ?? null,
+            'status'         => 'received',
+            'created_by'     => Auth::id(),
+        ];
 
-        $purchase = Purchase::create($validated);
-        
-        // Automatically set status to received for all new purchases
-        $purchase->update(['status' => 'received']);
+        DB::transaction(function () use ($shared, $validated) {
+            foreach ($validated['items'] as $itemRow) {
+                $data = array_merge($shared, [
+                    'item_name'   => $itemRow['item_name'],
+                    'quantity'    => $itemRow['quantity'],
+                    'description' => $itemRow['description'] ?? null,
+                ]);
 
-        $this->logHistory($purchase, 'created', null, $validated, "Created distribution order for '{$purchase->item_name}' to {$purchase->supplier_name}");
+                $purchase = Purchase::create($data);
+
+                $this->logHistory(
+                    $purchase,
+                    'created',
+                    null,
+                    $data,
+                    "Created distribution order for '{$purchase->item_name}' to {$purchase->supplier_name}"
+                );
+            }
+        });
 
         return redirect()
             ->route('purchases.index')

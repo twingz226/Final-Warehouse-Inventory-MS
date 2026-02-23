@@ -221,10 +221,13 @@ export default function Index({ auth, purchases, status }) {
                             </tr>
                         </thead>
                         <tbody>
-                            <tr>
-                                <td class="qty-col">${purchase.quantity}</td>
-                                <td class="description-col">${purchase.item_name}${purchase.description ? ' - ' + purchase.description : ''}</td>
-                            </tr>
+                            ${(purchase._groupItems || [{ item_name: purchase.item_name, quantity: purchase.quantity, description: purchase.description }])
+                                .map(item => `
+                                <tr>
+                                    <td class="qty-col">${item.quantity}</td>
+                                    <td class="description-col">${item.item_name}${item.description ? ' - ' + item.description : ''}</td>
+                                </tr>
+                            `).join('')}
                         </tbody>
                     </table>
                     
@@ -347,67 +350,154 @@ export default function Index({ auth, purchases, status }) {
                                         </tr>
                                     </thead>
                                     <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
-                                        {purchases.data.length > 0 ? (
-                                            purchases.data.map((purchase, index) => (
-                                                <tr key={index}>
-                                                    <td className="px-6 py-4 whitespace-nowrap">
-                                                        <div className="text-sm font-medium text-gray-900 dark:text-gray-100">
-                                                            {purchase.supplier_name}
-                                                        </div>
-                                                    </td>
-                                                    <td className="px-6 py-4 whitespace-nowrap">
-                                                        <div className="text-sm font-medium text-gray-900 dark:text-gray-100">
-                                                            {purchase.item_name}
-                                                        </div>
-                                                    </td>
-                                                    <td className="px-6 py-4 whitespace-nowrap">
-                                                        {purchase.item_category ? (
-                                                            <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full capitalize ${purchase.item_category === 'material' ? 'bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200' :
-                                                                purchase.item_category === 'tool' ? 'bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200' :
-                                                                    'bg-indigo-100 dark:bg-indigo-900 text-indigo-800 dark:text-indigo-200'
-                                                                }`}>
-                                                                {purchase.item_category}
-                                                            </span>
-                                                        ) : (
-                                                            <span className="text-sm text-gray-400 dark:text-gray-500">N/A</span>
-                                                        )}
-                                                    </td>
-                                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
-                                                        {purchase.quantity}
-                                                    </td>
-                                                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                                        <div className="flex space-x-2">
-                                                            <button
-                                                                onClick={() => handlePrint(purchase)}
-                                                                className="text-green-600 dark:text-green-400 hover:text-green-900 dark:hover:text-green-300"
-                                                                onMouseEnter={(e) => { const rect = e.currentTarget.getBoundingClientRect(); setTooltip({ show: true, text: 'Print Withdrawal Slip', x: rect.left + rect.width / 2, y: rect.top - 30 }); }}
-                                                                onMouseLeave={() => setTooltip({ show: false, text: '', x: 0, y: 0 })}
-                                                            >
-                                                                <PrinterIcon className="h-5 w-5" />
-                                                            </button>
-                                                            <Link
-                                                                href={route('purchases.show', purchase.id)}
-                                                                className="text-indigo-600 dark:text-indigo-400 hover:text-indigo-900 dark:hover:text-indigo-300"
-                                                                onMouseEnter={(e) => { const rect = e.currentTarget.getBoundingClientRect(); setTooltip({ show: true, text: 'View Details', x: rect.left + rect.width / 2, y: rect.top - 30 }); }}
-                                                                onMouseLeave={() => setTooltip({ show: false, text: '', x: 0, y: 0 })}
-                                                            >
-                                                                <EyeIcon className="h-5 w-5" />
-                                                            </Link>
-                                                            <button
-                                                                onClick={() => deletePurchase(purchase.id)}
-                                                                className="text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-300"
-                                                                onMouseEnter={(e) => { const rect = e.currentTarget.getBoundingClientRect(); setTooltip({ show: true, text: 'Delete Record', x: rect.left + rect.width / 2, y: rect.top - 30 }); }}
-                                                                onMouseLeave={() => setTooltip({ show: false, text: '', x: 0, y: 0 })}
-                                                            >
-                                                                <TrashIcon className="h-5 w-5" />
-                                                            </button>
-                                                        </div>
-                                                    </td>
-                                                </tr>
-                                            ))
-                                        ) : (
+                                        {purchases.data.length > 0 ? (() => {
+                                            // ── Group by supplier_name + purchase_date ──────────
+                                            const groups = [];
+                                            const seen = {};
+                                            purchases.data.forEach((p) => {
+                                                const key = `${p.supplier_name}||${p.purchase_date}`;
+                                                if (seen[key] === undefined) {
+                                                    seen[key] = groups.length;
+                                                    groups.push({ key, rows: [p] });
+                                                } else {
+                                                    groups[seen[key]].rows.push(p);
+                                                }
+                                            });
+
+                                            return groups.map((group) => {
+                                                const first = group.rows[0];
+                                                const isMulti = group.rows.length > 1;
+
+                                                // For print: pass representative purchase + all items
+                                                const printGroup = {
+                                                    ...first,
+                                                    // Override items list for print
+                                                    _groupItems: group.rows.map(r => ({
+                                                        item_name: r.item_name,
+                                                        quantity: r.quantity,
+                                                        description: r.description,
+                                                        item_category: r.item_category,
+                                                    })),
+                                                };
+
+                                                const handleGroupDelete = () => {
+                                                    if (window.confirm(
+                                                        isMulti
+                                                            ? `Delete all ${group.rows.length} items distributed to "${first.supplier_name}"?`
+                                                            : `Delete this distribution record?`
+                                                    )) {
+                                                        group.rows.forEach(r => router.delete(route('purchases.destroy', r.id)));
+                                                    }
+                                                };
+
+                                                return (
+                                                    <tr key={group.key}>
+                                                        {/* Destination */}
+                                                        <td className="px-6 py-4 align-top">
+                                                            <div className="text-sm font-medium text-gray-900 dark:text-gray-100">
+                                                                {first.supplier_name}
+                                                            </div>
+                                                            {first.purchase_date && (
+                                                                <div className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">
+                                                                    {new Date(first.purchase_date).toLocaleDateString()}
+                                                                </div>
+                                                            )}
+                                                        </td>
+
+                                                        {/* Items list */}
+                                                        <td className="px-6 py-4 align-top">
+                                                            <div className="space-y-1">
+                                                                {group.rows.map((r, idx) => (
+                                                                    <div key={idx} className="flex items-center gap-2">
+                                                                        <span className="text-sm font-medium text-gray-900 dark:text-gray-100">
+                                                                            {r.item_name}
+                                                                        </span>
+                                                                        <span className="text-xs text-gray-400 dark:text-gray-500">
+                                                                            ×{r.quantity}
+                                                                        </span>
+                                                                    </div>
+                                                                ))}
+                                                            </div>
+                                                        </td>
+
+                                                        {/* Category badges */}
+                                                        <td className="px-6 py-4 align-top">
+                                                            <div className="space-y-1">
+                                                                {group.rows.map((r, idx) => (
+                                                                    <div key={idx}>
+                                                                        {r.item_category ? (
+                                                                            <span className={`inline-flex px-2 py-0.5 text-xs font-semibold rounded-full capitalize ${r.item_category === 'material'
+                                                                                    ? 'bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200'
+                                                                                    : r.item_category === 'tool'
+                                                                                        ? 'bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200'
+                                                                                        : 'bg-indigo-100 dark:bg-indigo-900 text-indigo-800 dark:text-indigo-200'
+                                                                                }`}>
+                                                                                {r.item_category}
+                                                                            </span>
+                                                                        ) : (
+                                                                            <span className="text-xs text-gray-400 dark:text-gray-500">N/A</span>
+                                                                        )}
+                                                                    </div>
+                                                                ))}
+                                                            </div>
+                                                        </td>
+
+                                                        {/* Quantities */}
+                                                        <td className="px-6 py-4 align-top">
+                                                            <div className="space-y-1">
+                                                                {group.rows.map((r, idx) => (
+                                                                    <div key={idx} className="text-sm text-gray-500 dark:text-gray-400">
+                                                                        {r.quantity}
+                                                                    </div>
+                                                                ))}
+                                                            </div>
+                                                        </td>
+
+                                                        {/* Actions */}
+                                                        <td className="px-6 py-4 align-top text-sm font-medium">
+                                                            <div className="flex items-start gap-2">
+                                                                {/* Print — prints all items in group */}
+                                                                <button
+                                                                    onClick={() => handlePrint(printGroup)}
+                                                                    className="text-green-600 dark:text-green-400 hover:text-green-900 dark:hover:text-green-300 mt-0.5"
+                                                                    onMouseEnter={(e) => { const rect = e.currentTarget.getBoundingClientRect(); setTooltip({ show: true, text: 'Print Withdrawal Slip', x: rect.left + rect.width / 2, y: rect.top - 30 }); }}
+                                                                    onMouseLeave={() => setTooltip({ show: false, text: '', x: 0, y: 0 })}
+                                                                >
+                                                                    <PrinterIcon className="h-5 w-5" />
+                                                                </button>
+
+                                                                {/* View — one link per item */}
+                                                                <div className="flex flex-col gap-1">
+                                                                    {group.rows.map((r, idx) => (
+                                                                        <Link
+                                                                            key={idx}
+                                                                            href={route('purchases.show', r.id)}
+                                                                            className="text-indigo-600 dark:text-indigo-400 hover:text-indigo-900 dark:hover:text-indigo-300"
+                                                                            onMouseEnter={(e) => { const rect = e.currentTarget.getBoundingClientRect(); setTooltip({ show: true, text: `View: ${r.item_name}`, x: rect.left + rect.width / 2, y: rect.top - 30 }); }}
+                                                                            onMouseLeave={() => setTooltip({ show: false, text: '', x: 0, y: 0 })}
+                                                                        >
+                                                                            <EyeIcon className="h-5 w-5" />
+                                                                        </Link>
+                                                                    ))}
+                                                                </div>
+
+                                                                {/* Delete all in group */}
+                                                                <button
+                                                                    onClick={handleGroupDelete}
+                                                                    className="text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-300 mt-0.5"
+                                                                    onMouseEnter={(e) => { const rect = e.currentTarget.getBoundingClientRect(); setTooltip({ show: true, text: isMulti ? 'Delete All Items' : 'Delete Record', x: rect.left + rect.width / 2, y: rect.top - 30 }); }}
+                                                                    onMouseLeave={() => setTooltip({ show: false, text: '', x: 0, y: 0 })}
+                                                                >
+                                                                    <TrashIcon className="h-5 w-5" />
+                                                                </button>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                );
+                                            });
+                                        })() : (
                                             <tr>
-                                                <td colSpan="6" className="px-6 py-12 text-center">
+                                                <td colSpan="5" className="px-6 py-12 text-center">
                                                     <p className="text-gray-500 dark:text-gray-400 text-sm">
                                                         No distributions found
                                                     </p>
@@ -415,22 +505,22 @@ export default function Index({ auth, purchases, status }) {
                                             </tr>
                                         )}
                                     </tbody>
-                                </table>
-                            </div>
+                            </table>
                         </div>
                     </div>
                 </div>
+            </div>
 
-                {/* Custom Tooltip */}
-                {tooltip.show && (
-                    <div
-                        className="fixed z-50 bg-gray-800 dark:bg-gray-900 text-white text-xs px-2 py-1 rounded shadow-lg pointer-events-none transform -translate-x-1/2"
-                        style={{ left: tooltip.x, top: tooltip.y }}
-                    >
-                        {tooltip.text}
-                    </div>
-                )}
-            </AuthenticatedLayout>
+            {/* Custom Tooltip */}
+            {tooltip.show && (
+                <div
+                    className="fixed z-50 bg-gray-800 dark:bg-gray-900 text-white text-xs px-2 py-1 rounded shadow-lg pointer-events-none transform -translate-x-1/2"
+                    style={{ left: tooltip.x, top: tooltip.y }}
+                >
+                    {tooltip.text}
+                </div>
+            )}
+        </AuthenticatedLayout >
         </>
     );
 }
