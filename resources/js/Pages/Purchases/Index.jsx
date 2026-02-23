@@ -276,140 +276,161 @@ export default function Index({ auth, purchases, status }) {
     };
 
     return (
-        <AuthenticatedLayout
-            user={auth.user}
-            header={
-                <div className="flex justify-between items-center">
-                    <h2 className="font-semibold text-xl text-gray-800 leading-tight">
-                        Outgoing Items
-                    </h2>
-                    <Link
-                        href={route('purchases.create')}
-                        className="inline-flex items-center justify-center p-2 bg-indigo-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-indigo-700 focus:bg-indigo-700 active:bg-indigo-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition ease-in-out duration-150"
-                        onMouseEnter={(e) => { const rect = e.currentTarget.getBoundingClientRect(); setTooltip({ show: true, text: 'Add New Distribution', x: rect.left + rect.width / 2, y: rect.bottom + 10 }); }}
-                        onMouseLeave={() => setTooltip({ show: false, text: '', x: 0, y: 0 })}
-                    >
-                        <PlusIcon className="h-5 w-5" />
-                    </Link>
-                </div>
+        <>
+            <style>{`
+            @keyframes electric-flicker {
+                0%   { box-shadow: 0 0 4px 1px #818cf8, 0 0 10px 2px #6366f1; opacity: 1; }
+                10%  { box-shadow: 0 0 2px 1px #818cf8, 0 0 6px 1px #6366f1;  opacity: 0.85; }
+                20%  { box-shadow: 0 0 8px 3px #a5b4fc, 0 0 18px 5px #6366f1; opacity: 1; }
+                30%  { box-shadow: 0 0 3px 1px #818cf8, 0 0 8px 2px #6366f1;  opacity: 0.9; }
+                40%  { box-shadow: 0 0 10px 4px #c7d2fe, 0 0 22px 6px #6366f1;opacity: 1; }
+                50%  { box-shadow: 0 0 2px 1px #818cf8, 0 0 5px 1px #6366f1;  opacity: 0.8; }
+                60%  { box-shadow: 0 0 9px 3px #a5b4fc, 0 0 20px 5px #6366f1; opacity: 1; }
+                70%  { box-shadow: 0 0 3px 1px #818cf8, 0 0 7px 2px #6366f1;  opacity: 0.88; }
+                80%  { box-shadow: 0 0 11px 4px #c7d2fe, 0 0 24px 7px #6366f1;opacity: 1; }
+                90%  { box-shadow: 0 0 2px 1px #818cf8, 0 0 6px 1px #6366f1;  opacity: 0.82; }
+                100% { box-shadow: 0 0 4px 1px #818cf8, 0 0 10px 2px #6366f1; opacity: 1; }
             }
-        >
-            <Head title="Outgoing Items" />
+            .electric-btn-indigo:hover {
+                animation: electric-flicker 0.18s step-end infinite;
+                outline: none;
+            }
+        `}</style>
+            <AuthenticatedLayout
+                user={auth.user}
+                header={
+                    <div className="flex justify-between items-center">
+                        <h2 className="font-semibold text-xl text-gray-800 leading-tight">
+                            Outgoing Items
+                        </h2>
+                        <Link
+                            href={route('purchases.create')}
+                            className="electric-btn-indigo inline-flex items-center justify-center p-2 bg-indigo-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-indigo-700 focus:bg-indigo-700 active:bg-indigo-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition ease-in-out duration-150"
+                            onMouseEnter={(e) => { const rect = e.currentTarget.getBoundingClientRect(); setTooltip({ show: true, text: 'Add New Distribution', x: rect.left + rect.width / 2, y: rect.bottom + 10 }); }}
+                            onMouseLeave={() => setTooltip({ show: false, text: '', x: 0, y: 0 })}
+                        >
+                            <PlusIcon className="h-5 w-5" />
+                        </Link>
+                    </div>
+                }
+            >
+                <Head title="Outgoing Items" />
 
-            <div className="py-12">
-                <div className="max-w-7xl mx-auto sm:px-6 lg:px-8">
-                    {status && (
-                        <div className="mb-4 p-4 bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300 rounded">
-                            {status}
-                        </div>
-                    )}
+                <div className="py-12">
+                    <div className="max-w-7xl mx-auto sm:px-6 lg:px-8">
+                        {status && (
+                            <div className="mb-4 p-4 bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300 rounded">
+                                {status}
+                            </div>
+                        )}
 
-                    <div className="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
-                        <div className="overflow-x-auto">
-                            <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-                                <thead className="bg-gray-50 dark:bg-gray-700">
-                                    <tr>
-                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                                            Destination
-                                        </th>
-                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                                            Item
-                                        </th>
-                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                                            Category
-                                        </th>
-                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                                            Quantity
-                                        </th>
-                                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                                            Actions
-                                        </th>
-                                    </tr>
-                                </thead>
-                                <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
-                                    {purchases.data.length > 0 ? (
-                                        purchases.data.map((purchase, index) => (
-                                            <tr key={index}>
-                                                <td className="px-6 py-4 whitespace-nowrap">
-                                                    <div className="text-sm font-medium text-gray-900 dark:text-gray-100">
-                                                        {purchase.supplier_name}
-                                                    </div>
-                                                </td>
-                                                <td className="px-6 py-4 whitespace-nowrap">
-                                                    <div className="text-sm font-medium text-gray-900 dark:text-gray-100">
-                                                        {purchase.item_name}
-                                                    </div>
-                                                </td>
-                                                <td className="px-6 py-4 whitespace-nowrap">
-                                                    {purchase.item_category ? (
-                                                        <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full capitalize ${purchase.item_category === 'material' ? 'bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200' :
-                                                            purchase.item_category === 'tool' ? 'bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200' :
-                                                                'bg-indigo-100 dark:bg-indigo-900 text-indigo-800 dark:text-indigo-200'
-                                                            }`}>
-                                                            {purchase.item_category}
-                                                        </span>
-                                                    ) : (
-                                                        <span className="text-sm text-gray-400 dark:text-gray-500">N/A</span>
-                                                    )}
-                                                </td>
-                                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
-                                                    {purchase.quantity}
-                                                </td>
-                                                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                                    <div className="flex space-x-2">
-                                                        <button
-                                                            onClick={() => handlePrint(purchase)}
-                                                            className="text-green-600 dark:text-green-400 hover:text-green-900 dark:hover:text-green-300"
-                                                            onMouseEnter={(e) => { const rect = e.currentTarget.getBoundingClientRect(); setTooltip({ show: true, text: 'Print Withdrawal Slip', x: rect.left + rect.width / 2, y: rect.top - 30 }); }}
-                                                            onMouseLeave={() => setTooltip({ show: false, text: '', x: 0, y: 0 })}
-                                                        >
-                                                            <PrinterIcon className="h-5 w-5" />
-                                                        </button>
-                                                        <Link
-                                                            href={route('purchases.show', purchase.id)}
-                                                            className="text-indigo-600 dark:text-indigo-400 hover:text-indigo-900 dark:hover:text-indigo-300"
-                                                            onMouseEnter={(e) => { const rect = e.currentTarget.getBoundingClientRect(); setTooltip({ show: true, text: 'View Details', x: rect.left + rect.width / 2, y: rect.top - 30 }); }}
-                                                            onMouseLeave={() => setTooltip({ show: false, text: '', x: 0, y: 0 })}
-                                                        >
-                                                            <EyeIcon className="h-5 w-5" />
-                                                        </Link>
-                                                        <button
-                                                            onClick={() => deletePurchase(purchase.id)}
-                                                            className="text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-300"
-                                                            onMouseEnter={(e) => { const rect = e.currentTarget.getBoundingClientRect(); setTooltip({ show: true, text: 'Delete Record', x: rect.left + rect.width / 2, y: rect.top - 30 }); }}
-                                                            onMouseLeave={() => setTooltip({ show: false, text: '', x: 0, y: 0 })}
-                                                        >
-                                                            <TrashIcon className="h-5 w-5" />
-                                                        </button>
-                                                    </div>
+                        <div className="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
+                            <div className="overflow-x-auto">
+                                <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                                    <thead className="bg-gray-50 dark:bg-gray-700">
+                                        <tr>
+                                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                                                Destination
+                                            </th>
+                                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                                                Item
+                                            </th>
+                                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                                                Category
+                                            </th>
+                                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                                                Quantity
+                                            </th>
+                                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                                                Actions
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+                                        {purchases.data.length > 0 ? (
+                                            purchases.data.map((purchase, index) => (
+                                                <tr key={index}>
+                                                    <td className="px-6 py-4 whitespace-nowrap">
+                                                        <div className="text-sm font-medium text-gray-900 dark:text-gray-100">
+                                                            {purchase.supplier_name}
+                                                        </div>
+                                                    </td>
+                                                    <td className="px-6 py-4 whitespace-nowrap">
+                                                        <div className="text-sm font-medium text-gray-900 dark:text-gray-100">
+                                                            {purchase.item_name}
+                                                        </div>
+                                                    </td>
+                                                    <td className="px-6 py-4 whitespace-nowrap">
+                                                        {purchase.item_category ? (
+                                                            <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full capitalize ${purchase.item_category === 'material' ? 'bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200' :
+                                                                purchase.item_category === 'tool' ? 'bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200' :
+                                                                    'bg-indigo-100 dark:bg-indigo-900 text-indigo-800 dark:text-indigo-200'
+                                                                }`}>
+                                                                {purchase.item_category}
+                                                            </span>
+                                                        ) : (
+                                                            <span className="text-sm text-gray-400 dark:text-gray-500">N/A</span>
+                                                        )}
+                                                    </td>
+                                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                                                        {purchase.quantity}
+                                                    </td>
+                                                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                                        <div className="flex space-x-2">
+                                                            <button
+                                                                onClick={() => handlePrint(purchase)}
+                                                                className="text-green-600 dark:text-green-400 hover:text-green-900 dark:hover:text-green-300"
+                                                                onMouseEnter={(e) => { const rect = e.currentTarget.getBoundingClientRect(); setTooltip({ show: true, text: 'Print Withdrawal Slip', x: rect.left + rect.width / 2, y: rect.top - 30 }); }}
+                                                                onMouseLeave={() => setTooltip({ show: false, text: '', x: 0, y: 0 })}
+                                                            >
+                                                                <PrinterIcon className="h-5 w-5" />
+                                                            </button>
+                                                            <Link
+                                                                href={route('purchases.show', purchase.id)}
+                                                                className="text-indigo-600 dark:text-indigo-400 hover:text-indigo-900 dark:hover:text-indigo-300"
+                                                                onMouseEnter={(e) => { const rect = e.currentTarget.getBoundingClientRect(); setTooltip({ show: true, text: 'View Details', x: rect.left + rect.width / 2, y: rect.top - 30 }); }}
+                                                                onMouseLeave={() => setTooltip({ show: false, text: '', x: 0, y: 0 })}
+                                                            >
+                                                                <EyeIcon className="h-5 w-5" />
+                                                            </Link>
+                                                            <button
+                                                                onClick={() => deletePurchase(purchase.id)}
+                                                                className="text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-300"
+                                                                onMouseEnter={(e) => { const rect = e.currentTarget.getBoundingClientRect(); setTooltip({ show: true, text: 'Delete Record', x: rect.left + rect.width / 2, y: rect.top - 30 }); }}
+                                                                onMouseLeave={() => setTooltip({ show: false, text: '', x: 0, y: 0 })}
+                                                            >
+                                                                <TrashIcon className="h-5 w-5" />
+                                                            </button>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            ))
+                                        ) : (
+                                            <tr>
+                                                <td colSpan="6" className="px-6 py-12 text-center">
+                                                    <p className="text-gray-500 dark:text-gray-400 text-sm">
+                                                        No distributions found
+                                                    </p>
                                                 </td>
                                             </tr>
-                                        ))
-                                    ) : (
-                                        <tr>
-                                            <td colSpan="6" className="px-6 py-12 text-center">
-                                                <p className="text-gray-500 dark:text-gray-400 text-sm">
-                                                    No distributions found
-                                                </p>
-                                            </td>
-                                        </tr>
-                                    )}
-                                </tbody>
-                            </table>
+                                        )}
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
 
-            {/* Custom Tooltip */}
-            {tooltip.show && (
-                <div
-                    className="fixed z-50 bg-gray-800 dark:bg-gray-900 text-white text-xs px-2 py-1 rounded shadow-lg pointer-events-none transform -translate-x-1/2"
-                    style={{ left: tooltip.x, top: tooltip.y }}
-                >
-                    {tooltip.text}
-                </div>
-            )}
-        </AuthenticatedLayout>
+                {/* Custom Tooltip */}
+                {tooltip.show && (
+                    <div
+                        className="fixed z-50 bg-gray-800 dark:bg-gray-900 text-white text-xs px-2 py-1 rounded shadow-lg pointer-events-none transform -translate-x-1/2"
+                        style={{ left: tooltip.x, top: tooltip.y }}
+                    >
+                        {tooltip.text}
+                    </div>
+                )}
+            </AuthenticatedLayout>
+        </>
     );
 }
