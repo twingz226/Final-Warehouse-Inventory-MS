@@ -2,7 +2,7 @@
 import { Head, Link, router } from '@inertiajs/react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { useState, useEffect } from 'react';
-import { PlusIcon, EyeIcon, TrashIcon, MagnifyingGlassIcon, TableCellsIcon, Squares2X2Icon } from '@heroicons/react/24/outline';
+import { PlusIcon, EyeIcon, TrashIcon, PencilSquareIcon, MagnifyingGlassIcon, TableCellsIcon, Squares2X2Icon } from '@heroicons/react/24/outline';
 
 export default function Index({ auth, items, status }) {
     const [confirmingItemDeletion, setConfirmingItemDeletion] = useState(false);
@@ -438,6 +438,14 @@ export default function Index({ auth, items, status }) {
                                                             >
                                                                 <EyeIcon className="h-5 w-5" />
                                                             </Link>
+                                                            <Link
+                                                                href={route('items.edit', item.id)}
+                                                                className="text-yellow-600 dark:text-yellow-400 hover:text-yellow-900 dark:hover:text-yellow-300"
+                                                                onMouseEnter={(e) => { const rect = e.currentTarget.getBoundingClientRect(); setTooltip({ show: true, text: 'Edit', x: rect.left + rect.width / 2, y: rect.bottom + 10 }); }}
+                                                                onMouseLeave={() => setTooltip({ show: false, text: '', x: 0, y: 0 })}
+                                                            >
+                                                                <PencilSquareIcon className="h-5 w-5" />
+                                                            </Link>
                                                             <button
                                                                 onClick={() => {
                                                                     setItemToDelete(item);
@@ -518,6 +526,13 @@ export default function Index({ auth, items, status }) {
                                                             title="View"
                                                         >
                                                             <EyeIcon className="h-5 w-5" />
+                                                        </Link>
+                                                        <Link
+                                                            href={route('items.edit', item.id)}
+                                                            className="p-2 text-yellow-600 dark:text-yellow-400 hover:text-yellow-900 dark:hover:text-yellow-300 hover:bg-yellow-50 dark:hover:bg-yellow-900/20 rounded-md transition-colors"
+                                                            title="Edit"
+                                                        >
+                                                            <PencilSquareIcon className="h-5 w-5" />
                                                         </Link>
                                                         <button
                                                             onClick={() => {
