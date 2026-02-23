@@ -29,7 +29,7 @@ export default function InventoryIndex({ auth, items, summary, filters }) {
 
     const applyFilters = () => {
         const params = new URLSearchParams();
-        
+
         if (search) params.set('search', search);
         if (category !== 'all') params.set('category', category);
         if (stockLevel !== 'all') params.set('stock_level', stockLevel);
@@ -71,8 +71,8 @@ export default function InventoryIndex({ auth, items, summary, filters }) {
 
 
     const getCategoryIcon = (category) => {
-        return category === 'tool' ? 
-            <WrenchIcon className="h-4 w-4" /> : 
+        return category === 'tool' ?
+            <WrenchIcon className="h-4 w-4" /> :
             <CubeIcon className="h-4 w-4" />;
     };
 
@@ -81,7 +81,7 @@ export default function InventoryIndex({ auth, items, summary, filters }) {
     };
 
     const isLowStock = (availableStock) => {
-        return availableStock <= 5;
+        return availableStock <= 10;
     };
 
     const sortedItems = [...items].sort((a, b) => {
@@ -226,7 +226,7 @@ export default function InventoryIndex({ auth, items, summary, filters }) {
                                     {showFilters ? 'Hide Filters' : 'Show Filters'}
                                 </button>
                             </div>
-                            
+
                             {/* Basic Search */}
                             <div className="flex flex-col gap-3 mb-4">
                                 <div className="flex-1">
@@ -246,7 +246,7 @@ export default function InventoryIndex({ auth, items, summary, filters }) {
                                         />
                                     </div>
                                 </div>
-                                
+
                                 {/* Quick Filter Presets */}
                                 <div className="flex justify-end">
                                     <button
@@ -257,7 +257,7 @@ export default function InventoryIndex({ auth, items, summary, filters }) {
                                     </button>
                                 </div>
                             </div>
-                            
+
                             {/* Advanced Filters */}
                             {showFilters && (
                                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 pt-4 border-t border-gray-200 dark:border-gray-700">
@@ -279,7 +279,7 @@ export default function InventoryIndex({ auth, items, summary, filters }) {
                                             <option value="material">Materials</option>
                                         </select>
                                     </div>
-                                    
+
                                     {/* Stock Level Filter */}
                                     <div>
                                         <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
@@ -300,7 +300,7 @@ export default function InventoryIndex({ auth, items, summary, filters }) {
                                             <option value="high_stock">High Stock (&gt;50)</option>
                                         </select>
                                     </div>
-                                    
+
                                     {/* Date From Filter */}
                                     <div>
                                         <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
@@ -316,7 +316,7 @@ export default function InventoryIndex({ auth, items, summary, filters }) {
                                             className="block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-sm focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500"
                                         />
                                     </div>
-                                    
+
                                     {/* Date To Filter */}
                                     <div>
                                         <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
@@ -367,15 +367,14 @@ export default function InventoryIndex({ auth, items, summary, filters }) {
                             </div>
                         </div>
 
-                                                
+
                         {items.length > 0 ? (
                             <div className="block lg:hidden">
                                 {/* Mobile Card View */}
                                 <div className="space-y-4">
                                     {sortedItems.map((item) => (
-                                        <div key={item.id} className={`bg-white dark:bg-gray-800 rounded-lg shadow p-4 border ${
-                                            isLowStock(item.available_stock) ? 'border-red-200 dark:border-red-800' : 'border-gray-200 dark:border-gray-700'
-                                        }`}>
+                                        <div key={item.id} className={`bg-white dark:bg-gray-800 rounded-lg shadow p-4 border ${isLowStock(item.available_stock) ? 'border-red-200 dark:border-red-800' : 'border-gray-200 dark:border-gray-700'
+                                            }`}>
                                             <div className="flex items-start justify-between mb-3">
                                                 <div>
                                                     <h4 className="text-sm font-medium text-gray-900 dark:text-gray-100">
@@ -387,16 +386,15 @@ export default function InventoryIndex({ auth, items, summary, filters }) {
                                                         </p>
                                                     )}
                                                 </div>
-                                                <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                                                    item.category === 'tool' 
-                                                        ? 'bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200' 
+                                                <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${item.category === 'tool'
+                                                        ? 'bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200'
                                                         : 'bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200'
-                                                }`}>
+                                                    }`}>
                                                     {getCategoryIcon(item.category)}
                                                     <span className="ml-1">{item.category}</span>
                                                 </span>
                                             </div>
-                                            
+
                                             <div className="grid grid-cols-2 gap-4 mb-3">
                                                 <div>
                                                     <p className="text-xs text-gray-500 dark:text-gray-400">Total Stock</p>
@@ -411,15 +409,14 @@ export default function InventoryIndex({ auth, items, summary, filters }) {
                                                     </p>
                                                 </div>
                                             </div>
-                                            
+
                                             <div className="flex items-center justify-between">
                                                 <div className="flex items-center">
                                                     <p className="text-xs text-gray-500 dark:text-gray-400 mr-2">Available:</p>
-                                                    <span className={`text-sm font-medium ${
-                                                        isLowStock(item.available_stock) 
-                                                            ? 'text-red-600 dark:text-red-400' 
+                                                    <span className={`text-sm font-medium ${isLowStock(item.available_stock)
+                                                            ? 'text-red-600 dark:text-red-400'
                                                             : 'text-green-600 dark:text-green-400'
-                                                    }`}>
+                                                        }`}>
                                                         {item.unit === 'Quantity' ? Math.floor(item.available_stock) : item.available_stock} {item.unit === 'Quantity' ? 'pcs.' : item.unit}
                                                     </span>
                                                     {isLowStock(item.available_stock) && (
@@ -428,7 +425,7 @@ export default function InventoryIndex({ auth, items, summary, filters }) {
                                                         </span>
                                                     )}
                                                 </div>
-                                                                                            </div>
+                                            </div>
                                         </div>
                                     ))}
                                 </div>
@@ -441,8 +438,8 @@ export default function InventoryIndex({ auth, items, summary, filters }) {
                                 <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
                                     <thead className="bg-gray-50 dark:bg-gray-700">
                                         <tr>
-                                            <th 
-                                                scope="col" 
+                                            <th
+                                                scope="col"
                                                 className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600"
                                                 onClick={() => toggleSort('name')}
                                             >
@@ -453,8 +450,8 @@ export default function InventoryIndex({ auth, items, summary, filters }) {
                                                     )}
                                                 </div>
                                             </th>
-                                            <th 
-                                                scope="col" 
+                                            <th
+                                                scope="col"
                                                 className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600"
                                                 onClick={() => toggleSort('category')}
                                             >
@@ -465,8 +462,8 @@ export default function InventoryIndex({ auth, items, summary, filters }) {
                                                     )}
                                                 </div>
                                             </th>
-                                            <th 
-                                                scope="col" 
+                                            <th
+                                                scope="col"
                                                 className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600"
                                                 onClick={() => toggleSort('quantity')}
                                             >
@@ -483,12 +480,12 @@ export default function InventoryIndex({ auth, items, summary, filters }) {
                                             <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                                                 Available Stocks
                                             </th>
-                                                                                    </tr>
+                                        </tr>
                                     </thead>
                                     <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
                                         {sortedItems.map((item) => (
-                                            <tr 
-                                                key={item.id} 
+                                            <tr
+                                                key={item.id}
                                                 className={isLowStock(item.available_stock) ? 'bg-red-200 dark:bg-red-900' : ''}
                                             >
                                                 <td className="px-6 py-4 whitespace-nowrap">
@@ -502,11 +499,10 @@ export default function InventoryIndex({ auth, items, summary, filters }) {
                                                     )}
                                                 </td>
                                                 <td className="px-6 py-4 whitespace-nowrap">
-                                                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                                                        item.category === 'tool' 
-                                                            ? 'bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200' 
+                                                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${item.category === 'tool'
+                                                            ? 'bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200'
                                                             : 'bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200'
-                                                    }`}>
+                                                        }`}>
                                                         {getCategoryIcon(item.category)}
                                                         <span className="ml-1">{item.category}</span>
                                                     </span>
@@ -519,11 +515,10 @@ export default function InventoryIndex({ auth, items, summary, filters }) {
                                                 </td>
                                                 <td className="px-6 py-4 whitespace-nowrap">
                                                     <div className="flex items-center">
-                                                        <span className={`text-sm font-medium ${
-                                                            isLowStock(item.available_stock) 
-                                                                ? 'text-red-600 dark:text-red-400' 
+                                                        <span className={`text-sm font-medium ${isLowStock(item.available_stock)
+                                                                ? 'text-red-600 dark:text-red-400'
                                                                 : 'text-green-600 dark:text-green-400'
-                                                        }`}>
+                                                            }`}>
                                                             {item.unit === 'Quantity' ? Math.floor(item.available_stock) : item.available_stock} {item.unit === 'Quantity' ? 'pcs.' : item.unit}
                                                         </span>
                                                         {isLowStock(item.available_stock) && (
@@ -533,7 +528,7 @@ export default function InventoryIndex({ auth, items, summary, filters }) {
                                                         )}
                                                     </div>
                                                 </td>
-                                                                                            </tr>
+                                            </tr>
                                         ))}
                                     </tbody>
                                 </table>
@@ -543,8 +538,8 @@ export default function InventoryIndex({ auth, items, summary, filters }) {
                                 <CubeIcon className="mx-auto h-12 w-12 text-gray-400 dark:text-gray-500" />
                                 <h3 className="mt-2 text-sm font-medium text-gray-900 dark:text-gray-100">No items found</h3>
                                 <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
-                                    {search 
-                                        ? 'Try adjusting your search.' 
+                                    {search
+                                        ? 'Try adjusting your search.'
                                         : 'Get started by adding items to your inventory.'}
                                 </p>
                             </div>

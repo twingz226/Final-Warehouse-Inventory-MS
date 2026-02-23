@@ -75,17 +75,17 @@ const InventoryCharts = ({ items, summary }) => {
     };
 
     // Prepare data for low stock items
-    const lowStockItems = items.filter(item => item.available_stock <= 5);
+    const lowStockItems = items.filter(item => item.available_stock <= 10);
     const lowStockData = {
         labels: lowStockItems.map(item => item.name.length > 15 ? item.name.substring(0, 15) + '...' : item.name),
         datasets: [
             {
                 label: 'Available Stock',
                 data: lowStockItems.map(item => item.available_stock),
-                backgroundColor: lowStockItems.map(item => 
+                backgroundColor: lowStockItems.map(item =>
                     item.available_stock === 0 ? 'rgba(239, 68, 68, 0.8)' : 'rgba(251, 146, 60, 0.8)'
                 ),
-                borderColor: lowStockItems.map(item => 
+                borderColor: lowStockItems.map(item =>
                     item.available_stock === 0 ? 'rgba(239, 68, 68, 1)' : 'rgba(251, 146, 60, 1)'
                 ),
                 borderWidth: 1,
