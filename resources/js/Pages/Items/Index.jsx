@@ -11,8 +11,8 @@ export default function Index({ auth, items, status }) {
     const [searchTimeout, setSearchTimeout] = useState(null);
     const [tooltip, setTooltip] = useState({ show: false, text: '', x: 0, y: 0 });
     const [viewMode, setViewMode] = useState('table'); // 'table' or 'card'
-    const [sortColumn, setSortColumn] = useState('date_time');
-    const [sortDirection, setSortDirection] = useState('desc'); // 'asc' or 'desc'
+    const [sortColumn, setSortColumn] = useState('name');
+    const [sortDirection, setSortDirection] = useState('asc'); // 'asc' or 'desc'
     const [selectedItems, setSelectedItems] = useState([]);
     const [showBulkActions, setShowBulkActions] = useState(false);
     const [date, setDate] = useState('');
@@ -26,8 +26,8 @@ export default function Index({ auth, items, status }) {
     useEffect(() => {
         const urlParams = new URLSearchParams(window.location.search);
         const initialSearch = urlParams.get('search') || '';
-        const initialSort = urlParams.get('sort') || 'date_time';
-        const initialDirection = urlParams.get('direction') || 'desc';
+        const initialSort = urlParams.get('sort') || 'name';
+        const initialDirection = urlParams.get('direction') || 'asc';
         const initialDate = urlParams.get('date') || '';
 
         setSearch(initialSearch);

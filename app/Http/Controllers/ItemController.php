@@ -34,30 +34,30 @@ class ItemController extends Controller
     {
         $search = $request->input('search');
         $date = $request->input('date', now()->toDateString());
-        $sort = $request->input('sort', 'date_time');
-        $direction = $request->input('direction', 'desc');
-        
+        $sort = $request->input('sort', 'name');
+        $direction = $request->input('direction', 'asc');
+
         // Validate sort column and direction for security
         $allowedSorts = ['name', 'quantity', 'date_time', 'created_at'];
-        $sort = in_array($sort, $allowedSorts) ? $sort : 'date_time';
-        $direction = in_array(strtolower($direction), ['asc', 'desc']) ? $direction : 'desc';
-        
+        $sort = in_array($sort, $allowedSorts) ? $sort : 'name';
+        $direction = in_array(strtolower($direction), ['asc', 'desc']) ? $direction : 'asc';
+
         $query = Item::query();
-        
+
         if ($search) {
-            $query->where(function($q) use ($search) {
+            $query->where(function ($q) use ($search) {
                 $q->where('name', 'like', '%' . $search . '%')
-                  ->orWhere('description', 'like', '%' . $search . '%');
+                    ->orWhere('description', 'like', '%' . $search . '%');
             });
         }
-        
+
         if ($date) {
             $query->whereDate('date_time', $date);
         }
-        
+
         // Apply sorting
         $query->orderBy($sort, $direction);
-        
+
         $items = $query->paginate(10)->withQueryString();
 
         return Inertia::render('Items/Index', [
@@ -126,7 +126,7 @@ class ItemController extends Controller
     public function update(Request $request, Item $item)
     {
         $oldValues = $item->toArray();
-        
+
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
@@ -158,9 +158,9 @@ class ItemController extends Controller
         if ($oldValues['unit'] !== $validated['unit']) {
             $changes[] = "unit from '{$oldValues['unit']}' to '{$validated['unit']}'";
         }
-        
+
         $description = count($changes) > 0 ? "Updated " . implode(', ', $changes) : "Updated item";
-        
+
         $this->logHistory($item, 'updated', $oldValues, $validated, $description);
 
         return redirect()
@@ -174,27 +174,27 @@ class ItemController extends Controller
     public function searchItems(Request $request)
     {
         $search = $request->input('search');
-        
+
         $query = Item::query();
-        
+
         if (!empty($search)) {
-            $query->where(function($q) use ($search) {
+            $query->where(function ($q) use ($search) {
                 $q->where('name', 'like', '%' . $search . '%')
-                  ->orWhere('description', 'like', '%' . $search . '%');
+                    ->orWhere('description', 'like', '%' . $search . '%');
             });
         }
-        
+
         $items = $query->get()->map(function ($item) {
             $totalDistributed = Purchase::where('item_name', $item->name)
                 ->where('status', 'received')
                 ->sum('quantity');
-            
+
             $available = $item->quantity - $totalDistributed;
-            
+
             if ($available <= 0) {
                 return null; // Skip items with no available stock
             }
-            
+
             return [
                 'id' => $item->id,
                 'name' => $item->name,
@@ -202,7 +202,7 @@ class ItemController extends Controller
                 'quantity' => $available,
             ];
         })->filter()->take(50)->values();
-                
+
         return response()->json($items);
     }
 
@@ -214,10 +214,10 @@ class ItemController extends Controller
         $oldValues = $item->toArray();
         $itemName = $item->name;
         $itemId = $item->id;
-        
+
         // Log history before deleting
         $this->logHistory($item, 'deleted', $oldValues, null, "Deleted '{$itemName}'");
-        
+
         $item->delete();
 
         return redirect()
