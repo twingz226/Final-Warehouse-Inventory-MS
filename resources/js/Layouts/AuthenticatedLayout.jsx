@@ -166,7 +166,7 @@ export default function AuthenticatedLayout({ header, children }) {
             </div>
 
             {/* Main content */}
-            <div className="md:pl-64 flex flex-col flex-1">
+            <div className="md:pl-64 flex flex-col flex-1 min-w-0 overflow-hidden">
                 {/* Mobile menu button */}
                 <div className="md:hidden bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-4 py-3">
                     <button
