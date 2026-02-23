@@ -23,7 +23,7 @@ export default function Index({ auth, items, status }) {
         const initialSort = urlParams.get('sort') || 'date_time';
         const initialDirection = urlParams.get('direction') || 'desc';
         const initialDate = urlParams.get('date') || '';
-        
+
         setSearch(initialSearch);
         setSortColumn(initialSort);
         setSortDirection(initialDirection);
@@ -36,11 +36,11 @@ export default function Index({ auth, items, status }) {
 
     const handleSearch = (value) => {
         setSearch(value);
-        
+
         if (searchTimeout) {
             clearTimeout(searchTimeout);
         }
-        
+
         const timeout = setTimeout(() => {
             const params = new URLSearchParams(window.location.search);
             if (value) {
@@ -49,19 +49,19 @@ export default function Index({ auth, items, status }) {
                 params.delete('search');
             }
             params.set('page', '1');
-            
+
             router.get(`${window.location.pathname}?${params.toString()}`, {}, {
                 preserveScroll: true,
                 preserveState: true,
             });
         }, 300);
-        
+
         setSearchTimeout(timeout);
     };
 
     const handleDateChange = (value) => {
         setDate(value);
-        
+
         const params = new URLSearchParams(window.location.search);
         if (value) {
             params.set('date', value);
@@ -69,7 +69,7 @@ export default function Index({ auth, items, status }) {
             params.delete('date');
         }
         params.set('page', '1');
-        
+
         router.get(`${window.location.pathname}?${params.toString()}`, {}, {
             preserveScroll: true,
             preserveState: true,
@@ -80,12 +80,12 @@ export default function Index({ auth, items, status }) {
         const newDirection = sortColumn === column && sortDirection === 'asc' ? 'desc' : 'asc';
         setSortColumn(column);
         setSortDirection(newDirection);
-        
+
         const params = new URLSearchParams(window.location.search);
         params.set('sort', column);
         params.set('direction', newDirection);
         params.set('page', '1');
-        
+
         router.get(`${window.location.pathname}?${params.toString()}`, {}, {
             preserveScroll: true,
             preserveState: true,
@@ -108,8 +108,8 @@ export default function Index({ auth, items, status }) {
     };
 
     const handleSelectItem = (itemId) => {
-        setSelectedItems(prev => 
-            prev.includes(itemId) 
+        setSelectedItems(prev =>
+            prev.includes(itemId)
                 ? prev.filter(id => id !== itemId)
                 : [...prev, itemId]
         );
@@ -125,7 +125,7 @@ export default function Index({ auth, items, status }) {
 
     const handleBulkDelete = () => {
         if (selectedItems.length === 0) return;
-        
+
         if (confirm(`Are you sure you want to delete ${selectedItems.length} selected item(s)? This action cannot be undone.`)) {
             // Delete selected items
             selectedItems.forEach(itemId => {
@@ -146,7 +146,7 @@ export default function Index({ auth, items, status }) {
 
     const formatQuantity = (quantity, unit) => {
         const qty = parseFloat(quantity) || 0;
-        
+
         // Format the number based on unit type
         if (unit === 'Quantity') {
             return `${Math.floor(qty)} pcs.`;
@@ -182,22 +182,20 @@ export default function Index({ auth, items, status }) {
                         <div className="hidden sm:flex items-center bg-gray-100 dark:bg-gray-700 rounded-lg p-1">
                             <button
                                 onClick={() => setViewMode('table')}
-                                className={`p-2 rounded-md transition-colors ${
-                                    viewMode === 'table'
-                                        ? 'bg-white dark:bg-gray-600 text-indigo-600 dark:text-indigo-400 shadow-sm'
-                                        : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100'
-                                }`}
+                                className={`p-2 rounded-md transition-colors ${viewMode === 'table'
+                                    ? 'bg-white dark:bg-gray-600 text-indigo-600 dark:text-indigo-400 shadow-sm'
+                                    : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100'
+                                    }`}
                                 title="Table View"
                             >
                                 <TableCellsIcon className="h-5 w-5" />
                             </button>
                             <button
                                 onClick={() => setViewMode('card')}
-                                className={`p-2 rounded-md transition-colors ${
-                                    viewMode === 'card'
-                                        ? 'bg-white dark:bg-gray-600 text-indigo-600 dark:text-indigo-400 shadow-sm'
-                                        : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100'
-                                }`}
+                                className={`p-2 rounded-md transition-colors ${viewMode === 'card'
+                                    ? 'bg-white dark:bg-gray-600 text-indigo-600 dark:text-indigo-400 shadow-sm'
+                                    : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100'
+                                    }`}
                                 title="Card View"
                             >
                                 <Squares2X2Icon className="h-5 w-5" />
@@ -207,22 +205,20 @@ export default function Index({ auth, items, status }) {
                         <div className="sm:hidden flex items-center bg-gray-100 dark:bg-gray-700 rounded-lg p-1">
                             <button
                                 onClick={() => setViewMode('table')}
-                                className={`p-2 rounded-md transition-colors ${
-                                    viewMode === 'table'
-                                        ? 'bg-white dark:bg-gray-600 text-indigo-600 dark:text-indigo-400 shadow-sm'
-                                        : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100'
-                                }`}
+                                className={`p-2 rounded-md transition-colors ${viewMode === 'table'
+                                    ? 'bg-white dark:bg-gray-600 text-indigo-600 dark:text-indigo-400 shadow-sm'
+                                    : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100'
+                                    }`}
                                 title="Table View"
                             >
                                 <TableCellsIcon className="h-5 w-5" />
                             </button>
                             <button
                                 onClick={() => setViewMode('card')}
-                                className={`p-2 rounded-md transition-colors ${
-                                    viewMode === 'card'
-                                        ? 'bg-white dark:bg-gray-600 text-indigo-600 dark:text-indigo-400 shadow-sm'
-                                        : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100'
-                                }`}
+                                className={`p-2 rounded-md transition-colors ${viewMode === 'card'
+                                    ? 'bg-white dark:bg-gray-600 text-indigo-600 dark:text-indigo-400 shadow-sm'
+                                    : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100'
+                                    }`}
                                 title="Card View"
                             >
                                 <Squares2X2Icon className="h-5 w-5" />
@@ -289,6 +285,7 @@ export default function Index({ auth, items, status }) {
                                 <div className="relative">
                                     <input
                                         type="date"
+                                        lang="en-US"
                                         value={date}
                                         onChange={(e) => handleDateChange(e.target.value)}
                                         className="block w-full px-3 py-3 border border-gray-300 dark:border-gray-600 rounded-lg leading-5 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:focus:ring-indigo-400 focus:border-indigo-500 dark:focus:border-indigo-400 sm:text-sm transition duration-150 ease-in-out"
@@ -307,7 +304,7 @@ export default function Index({ auth, items, status }) {
                             </div>
                         </div>
                     </div>
-                    
+
                     {/* Bulk Actions Bar */}
                     {selectedItems.length > 0 && (
                         <div className="mb-4 p-4 bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-200 dark:border-indigo-800 rounded-lg">
@@ -335,7 +332,7 @@ export default function Index({ auth, items, status }) {
                             </div>
                         </div>
                     )}
-                    
+
                     <div className="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
                         {viewMode === 'table' ? (
                             <div className="overflow-x-auto">
@@ -385,63 +382,63 @@ export default function Index({ auth, items, status }) {
                                     <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
                                         {items.data.length > 0 ? (
                                             items.data.map((item) => (
-                                            <tr key={item.id} className={selectedItems.includes(item.id) ? 'bg-indigo-50 dark:bg-indigo-900/20' : ''}>
-                                                <td className="px-6 py-4 whitespace-nowrap">
-                                                    <input
-                                                        type="checkbox"
-                                                        checked={selectedItems.includes(item.id)}
-                                                        onChange={() => handleSelectItem(item.id)}
-                                                        className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
-                                                    />
-                                                </td>
-                                                <td className="px-6 py-4 whitespace-nowrap">
-                                                    <div className="text-sm font-medium text-gray-900 dark:text-gray-100">
-                                                        {item.name}
-                                                    </div>
-                                                    {item.description && (
-                                                        <div className="text-sm text-gray-500 dark:text-gray-400">
-                                                            {item.description.length > 50
-                                                                ? `${item.description.substring(0, 50)}...`
-                                                                : item.description}
+                                                <tr key={item.id} className={selectedItems.includes(item.id) ? 'bg-indigo-50 dark:bg-indigo-900/20' : ''}>
+                                                    <td className="px-6 py-4 whitespace-nowrap">
+                                                        <input
+                                                            type="checkbox"
+                                                            checked={selectedItems.includes(item.id)}
+                                                            onChange={() => handleSelectItem(item.id)}
+                                                            className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
+                                                        />
+                                                    </td>
+                                                    <td className="px-6 py-4 whitespace-nowrap">
+                                                        <div className="text-sm font-medium text-gray-900 dark:text-gray-100">
+                                                            {item.name}
                                                         </div>
-                                                    )}
-                                                </td>
-                                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
-                                                    <div className="flex items-center space-x-2">
-                                                        <span>{formatQuantity(item.quantity, item.unit)}</span>
-                                                        <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${getItemStatus(item.quantity).bgColor} ${getItemStatus(item.quantity).textColor}`}>
-                                                            {getItemStatus(item.quantity).status}
-                                                        </span>
-                                                    </div>
-                                                </td>
-                                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
-                                                    {item.date_time ? new Date(item.date_time).toLocaleString() : 'N/A'}
-                                                </td>
-                                                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                                    <div className="flex space-x-2">
-                                                        <Link
-                                                            href={route('items.show', item.id)}
-                                                            className="text-indigo-600 dark:text-indigo-400 hover:text-indigo-900 dark:hover:text-indigo-300"
-                                                            onMouseEnter={(e) => { const rect = e.currentTarget.getBoundingClientRect(); setTooltip({ show: true, text: 'View', x: rect.left + rect.width / 2, y: rect.bottom + 10 }); }}
-                                                            onMouseLeave={() => setTooltip({ show: false, text: '', x: 0, y: 0 })}
-                                                        >
-                                                            <EyeIcon className="h-5 w-5" />
-                                                        </Link>
-                                                        <button
-                                                            onClick={() => {
-                                                                setItemToDelete(item);
-                                                                setConfirmingItemDeletion(true);
-                                                            }}
-                                                            className="text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-300"
-                                                            onMouseEnter={(e) => { const rect = e.currentTarget.getBoundingClientRect(); setTooltip({ show: true, text: 'Delete', x: rect.left + rect.width / 2, y: rect.bottom + 10 }); }}
-                                                            onMouseLeave={() => setTooltip({ show: false, text: '', x: 0, y: 0 })}
-                                                        >
-                                                            <TrashIcon className="h-5 w-5" />
-                                                        </button>
-                                                    </div>
-                                                </td>
-                                            </tr>
-                                        ))
+                                                        {item.description && (
+                                                            <div className="text-sm text-gray-500 dark:text-gray-400">
+                                                                {item.description.length > 50
+                                                                    ? `${item.description.substring(0, 50)}...`
+                                                                    : item.description}
+                                                            </div>
+                                                        )}
+                                                    </td>
+                                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                                                        <div className="flex items-center space-x-2">
+                                                            <span>{formatQuantity(item.quantity, item.unit)}</span>
+                                                            <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${getItemStatus(item.quantity).bgColor} ${getItemStatus(item.quantity).textColor}`}>
+                                                                {getItemStatus(item.quantity).status}
+                                                            </span>
+                                                        </div>
+                                                    </td>
+                                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                                                        {item.date_time ? new Date(item.date_time).toLocaleString('en-US') : 'N/A'}
+                                                    </td>
+                                                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                                        <div className="flex space-x-2">
+                                                            <Link
+                                                                href={route('items.show', item.id)}
+                                                                className="text-indigo-600 dark:text-indigo-400 hover:text-indigo-900 dark:hover:text-indigo-300"
+                                                                onMouseEnter={(e) => { const rect = e.currentTarget.getBoundingClientRect(); setTooltip({ show: true, text: 'View', x: rect.left + rect.width / 2, y: rect.bottom + 10 }); }}
+                                                                onMouseLeave={() => setTooltip({ show: false, text: '', x: 0, y: 0 })}
+                                                            >
+                                                                <EyeIcon className="h-5 w-5" />
+                                                            </Link>
+                                                            <button
+                                                                onClick={() => {
+                                                                    setItemToDelete(item);
+                                                                    setConfirmingItemDeletion(true);
+                                                                }}
+                                                                className="text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-300"
+                                                                onMouseEnter={(e) => { const rect = e.currentTarget.getBoundingClientRect(); setTooltip({ show: true, text: 'Delete', x: rect.left + rect.width / 2, y: rect.bottom + 10 }); }}
+                                                                onMouseLeave={() => setTooltip({ show: false, text: '', x: 0, y: 0 })}
+                                                            >
+                                                                <TrashIcon className="h-5 w-5" />
+                                                            </button>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            ))
                                         ) : (
                                             <tr>
                                                 <td colSpan="5" className="px-6 py-12 text-center">
@@ -453,7 +450,7 @@ export default function Index({ auth, items, status }) {
                                                             {search ? 'No items found' : 'No tools and materials yet'}
                                                         </h3>
                                                         <p className="text-gray-500 dark:text-gray-400 text-sm mb-6 max-w-sm">
-                                                            {search 
+                                                            {search
                                                                 ? `We couldn't find any items matching "${search}". Try adjusting your search terms or clear the search to see all items.`
                                                                 : 'Get started by adding your first tool or material to the inventory. You can track quantities, manage borrowing, and keep everything organized.'
                                                             }
@@ -535,7 +532,7 @@ export default function Index({ auth, items, status }) {
                                                     <div className="flex justify-between items-center">
                                                         <span className="text-sm font-medium text-gray-500 dark:text-gray-400">Date & Time:</span>
                                                         <span className="text-sm text-gray-600 dark:text-gray-400">
-                                                            {item.date_time ? new Date(item.date_time).toLocaleString() : 'N/A'}
+                                                            {item.date_time ? new Date(item.date_time).toLocaleString('en-US') : 'N/A'}
                                                         </span>
                                                     </div>
                                                 </div>
@@ -551,7 +548,7 @@ export default function Index({ auth, items, status }) {
                                             {search ? 'No items found' : 'No tools and materials yet'}
                                         </h3>
                                         <p className="text-gray-500 dark:text-gray-400 text-base mb-8 max-w-md mx-auto">
-                                            {search 
+                                            {search
                                                 ? `We couldn't find any items matching "${search}". Try adjusting your search terms or clear the search to see all items.`
                                                 : 'Get started by adding your first tool or material to the inventory. You can track quantities, manage borrowing, and keep everything organized in an easy-to-browse card layout.'
                                             }
@@ -591,11 +588,10 @@ export default function Index({ auth, items, status }) {
                                             <Link
                                                 key={index}
                                                 href={link.url || '#'}
-                                                className={`px-3 py-2 text-sm rounded-md ${
-                                                    link.active
-                                                        ? 'bg-indigo-600 text-white'
-                                                        : 'bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-600'
-                                                } ${!link.url ? 'opacity-50 cursor-not-allowed' : ''}`}
+                                                className={`px-3 py-2 text-sm rounded-md ${link.active
+                                                    ? 'bg-indigo-600 text-white'
+                                                    : 'bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-600'
+                                                    } ${!link.url ? 'opacity-50 cursor-not-allowed' : ''}`}
                                                 dangerouslySetInnerHTML={{ __html: link.label }}
                                             />
                                         ))}
