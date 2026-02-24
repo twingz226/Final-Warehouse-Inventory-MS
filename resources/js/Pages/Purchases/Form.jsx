@@ -166,7 +166,7 @@ export default function Form({ auth, purchase, statusOptions }) {
                                             Type of Project
                                         </label>
                                         <input
-                                            type="email"
+                                            type="text"
                                             id="supplier_email"
                                             value={data.supplier_email}
                                             onChange={(e) => setData('supplier_email', e.target.value)}
@@ -363,35 +363,7 @@ export default function Form({ auth, purchase, statusOptions }) {
                                     </button>
                                 )}
 
-                                {/* Project fields */}
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
-                                    <div>
-                                        <label htmlFor="project_name" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                                            Name of Project
-                                        </label>
-                                        <input
-                                            type="text"
-                                            id="project_name"
-                                            value={data.project_name}
-                                            onChange={(e) => setData('project_name', e.target.value)}
-                                            className={inputCls}
-                                        />
-                                        {errors.project_name && <p className="mt-2 text-sm text-red-600 dark:text-red-400">{errors.project_name}</p>}
-                                    </div>
-                                    <div>
-                                        <label htmlFor="project_type" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                                            Type of Project
-                                        </label>
-                                        <input
-                                            type="text"
-                                            id="project_type"
-                                            value={data.project_type}
-                                            onChange={(e) => setData('project_type', e.target.value)}
-                                            className={inputCls}
-                                        />
-                                        {errors.project_type && <p className="mt-2 text-sm text-red-600 dark:text-red-400">{errors.project_type}</p>}
-                                    </div>
-                                </div>
+
                             </div>
 
                             {/* ── Distribution Details ─────────────────────── */}
