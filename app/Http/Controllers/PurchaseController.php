@@ -76,7 +76,6 @@ class PurchaseController extends Controller
     {
         $validated = $request->validate([
             'supplier_name'          => 'required|string|max:255',
-            'supplier_email'         => 'nullable|string|max:255',
             'os'                     => 'nullable|string|max:255',
             'issued_by'              => 'nullable|string|max:255',
             'issued_to'              => 'nullable|string|max:255',
@@ -92,7 +91,6 @@ class PurchaseController extends Controller
 
         $shared = [
             'supplier_name'  => $validated['supplier_name'],
-            'supplier_email' => $validated['supplier_email'] ?? null,
             'os'             => $validated['os'] ?? null,
             'issued_by'      => $validated['issued_by'] ?? null,
             'issued_to'      => $validated['issued_to'] ?? null,
@@ -135,9 +133,16 @@ class PurchaseController extends Controller
     public function show(Purchase $purchase)
     {
         $purchase->load(['creator', 'histories.user']);
+        
+        $groupItems = Purchase::where('purchases.supplier_name', $purchase->supplier_name)
+            ->where('purchases.purchase_date', $purchase->purchase_date)
+            ->leftJoin('items', 'purchases.item_name', '=', 'items.name')
+            ->select('purchases.*', 'items.category as item_category')
+            ->get();
 
         return Inertia::render('Purchases/Show', [
             'purchase' => $purchase,
+            'groupItems' => $groupItems,
         ]);
     }
 
@@ -160,7 +165,6 @@ class PurchaseController extends Controller
         
         $validated = $request->validate([
             'supplier_name' => 'required|string|max:255',
-            'supplier_email' => 'nullable|string|max:255',
             'os' => 'nullable|string|max:255',
             'issued_by' => 'nullable|string|max:255',
             'issued_to' => 'nullable|string|max:255',

@@ -3,7 +3,7 @@ import { Head, Link } from '@inertiajs/react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { PencilIcon, ArrowLeftIcon } from '@heroicons/react/24/outline';
 
-export default function Show({ auth, purchase }) {
+export default function Show({ auth, purchase, groupItems }) {
     const getStatusColor = (status) => {
         switch (status) {
             case 'pending': return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200';
@@ -64,8 +64,8 @@ export default function Show({ auth, purchase }) {
                         <div className="p-6">
                             <div className="flex justify-between items-start mb-6">
                                 <div>
-                                    <h3 className="text-2xl font-bold text-gray-900 dark:text-gray-100">{purchase.item_name}</h3>
-                                    <p className="text-gray-600 dark:text-gray-300 mt-1">Distribution Order #{purchase.id}</p>
+                                    <h3 className="text-2xl font-bold text-gray-900 dark:text-gray-100">{purchase.supplier_name}</h3>
+                                    <p className="text-gray-600 dark:text-gray-300 mt-1">Distribution Date: {new Date(purchase.purchase_date).toLocaleDateString()}</p>
                                 </div>
                                 <span className={`inline-flex px-3 py-1 text-sm font-semibold rounded-full ${getStatusColor(purchase.status)}`}>
                                     {purchase.status.charAt(0).toUpperCase() + purchase.status.slice(1)}
@@ -81,12 +81,7 @@ export default function Show({ auth, purchase }) {
                                             <dt className="text-sm font-medium text-gray-500 dark:text-gray-400">Name</dt>
                                             <dd className="text-sm text-gray-900 dark:text-gray-100">{purchase.supplier_name}</dd>
                                         </div>
-                                        {purchase.supplier_email && (
-                                            <div>
-                                                <dt className="text-sm font-medium text-gray-500 dark:text-gray-400">Email</dt>
-                                                <dd className="text-sm text-gray-900 dark:text-gray-100">{purchase.supplier_email}</dd>
-                                            </div>
-                                        )}
+
                                         {purchase.supplier_phone && (
                                             <div>
                                                 <dt className="text-sm font-medium text-gray-500 dark:text-gray-400">Phone</dt>
@@ -96,28 +91,9 @@ export default function Show({ auth, purchase }) {
                                     </dl>
                                 </div>
 
-                                {/* Item Information */}
-                                <div>
-                                    <h4 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-4">Item Information</h4>
-                                    <dl className="space-y-2">
-                                        <div>
-                                            <dt className="text-sm font-medium text-gray-500 dark:text-gray-400">Item Name</dt>
-                                            <dd className="text-sm text-gray-900 dark:text-gray-100">{purchase.item_name}</dd>
-                                        </div>
-                                        {purchase.description && (
-                                            <div>
-                                                <dt className="text-sm font-medium text-gray-500 dark:text-gray-400">Description</dt>
-                                                <dd className="text-sm text-gray-900 dark:text-gray-100">{purchase.description}</dd>
-                                            </div>
-                                        )}
-                                        <div>
-                                            <dt className="text-sm font-medium text-gray-500 dark:text-gray-400">Quantity</dt>
-                                            <dd className="text-sm text-gray-900 dark:text-gray-100">{purchase.quantity}</dd>
-                                        </div>
-                                    </dl>
-                                </div>
 
-                                {/ * Project Information * /}
+
+                                {/* Project Information */}
                                 {(purchase.project_name || purchase.project_type || purchase.os) && (
                                     <div>
                                         <h4 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-4">Project Information</h4>
@@ -187,6 +163,48 @@ export default function Show({ auth, purchase }) {
                                     ) : (
                                         <p className="text-sm text-gray-500 dark:text-gray-400 italic">No notes provided</p>
                                     )}
+                                </div>
+                            </div>
+
+                            {/* Items Included */}
+                            <div className="mt-8 border-t border-gray-200 dark:border-gray-700 pt-6">
+                                <h4 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-4">Items Included</h4>
+                                <div className="bg-white dark:bg-gray-800 rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700">
+                                    <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                                        <thead className="bg-gray-50 dark:bg-gray-700">
+                                            <tr>
+                                                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Item Name</th>
+                                                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Description</th>
+                                                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Category</th>
+                                                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Quantity</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+                                            {(groupItems || [purchase]).map((item, index) => (
+                                                <tr key={item.id || index}>
+                                                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-gray-100">{item.item_name}</td>
+                                                    <td className="px-6 py-4 text-sm text-gray-500 dark:text-gray-400">{item.description || '-'}</td>
+                                                    <td className="px-6 py-4 align-top">
+                                                        <div className="space-y-1">
+                                                            <div>
+                                                                {item.item_category ? (
+                                                                    <span className={`inline-flex px-2 py-0.5 text-xs font-semibold rounded-full capitalize ${item.item_category === 'material' ? 'bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200' :
+                                                                        item.item_category === 'tool' ? 'bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200' :
+                                                                            'bg-indigo-100 dark:bg-indigo-900 text-indigo-800 dark:text-indigo-200'
+                                                                        }`}>
+                                                                        {item.item_category}
+                                                                    </span>
+                                                                ) : (
+                                                                    <span className="text-xs text-gray-400 dark:text-gray-500">N/A</span>
+                                                                )}
+                                                            </div>
+                                                        </div>
+                                                    </td>
+                                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">{item.quantity}</td>
+                                                </tr>
+                                            ))}
+                                        </tbody>
+                                    </table>
                                 </div>
                             </div>
                         </div>

@@ -333,7 +333,7 @@ export default function Index({ auth, purchases, status }) {
                                     <thead className="bg-gray-50 dark:bg-gray-700">
                                         <tr>
                                             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                                                Destination
+                                                Name of Project
                                             </th>
                                             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                                                 Item
@@ -466,19 +466,16 @@ export default function Index({ auth, purchases, status }) {
                                                                     <PrinterIcon className="h-5 w-5" />
                                                                 </button>
 
-                                                                {/* View — one link per item */}
+                                                                {/* View — one link per group */}
                                                                 <div className="flex flex-col gap-1">
-                                                                    {group.rows.map((r, idx) => (
-                                                                        <Link
-                                                                            key={idx}
-                                                                            href={route('purchases.show', r.id)}
-                                                                            className="text-indigo-600 dark:text-indigo-400 hover:text-indigo-900 dark:hover:text-indigo-300"
-                                                                            onMouseEnter={(e) => { const rect = e.currentTarget.getBoundingClientRect(); setTooltip({ show: true, text: `View: ${r.item_name}`, x: rect.left + rect.width / 2, y: rect.top - 30 }); }}
-                                                                            onMouseLeave={() => setTooltip({ show: false, text: '', x: 0, y: 0 })}
-                                                                        >
-                                                                            <EyeIcon className="h-5 w-5" />
-                                                                        </Link>
-                                                                    ))}
+                                                                    <Link
+                                                                        href={route('purchases.show', first.id)}
+                                                                        className="text-indigo-600 dark:text-indigo-400 hover:text-indigo-900 dark:hover:text-indigo-300 mt-0.5"
+                                                                        onMouseEnter={(e) => { const rect = e.currentTarget.getBoundingClientRect(); setTooltip({ show: true, text: 'View Details', x: rect.left + rect.width / 2, y: rect.top - 30 }); }}
+                                                                        onMouseLeave={() => setTooltip({ show: false, text: '', x: 0, y: 0 })}
+                                                                    >
+                                                                        <EyeIcon className="h-5 w-5" />
+                                                                    </Link>
                                                                 </div>
 
                                                                 {/* Delete all in group */}

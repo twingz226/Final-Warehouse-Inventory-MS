@@ -17,7 +17,6 @@ export default function Form({ auth, purchase, statusOptions }) {
     // ── Shared form data (Inertia) ─────────────────────────────────────────────
     const { data, setData, post, put, processing, errors, reset } = useForm({
         supplier_name: purchase?.supplier_name || '',
-        supplier_email: purchase?.supplier_email || '',
         supplier_phone: purchase?.supplier_phone || '',
         purchase_date: purchase?.purchase_date || new Date().toISOString().split('T')[0],
         notes: purchase?.notes || '',
@@ -162,17 +161,17 @@ export default function Form({ auth, purchase, statusOptions }) {
                                         {errors.supplier_name && <p className="mt-2 text-sm text-red-600 dark:text-red-400">{errors.supplier_name}</p>}
                                     </div>
                                     <div>
-                                        <label htmlFor="supplier_email" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                                        <label htmlFor="project_type" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
                                             Type of Project
                                         </label>
                                         <input
                                             type="text"
-                                            id="supplier_email"
-                                            value={data.supplier_email}
-                                            onChange={(e) => setData('supplier_email', e.target.value)}
+                                            id="project_type"
+                                            value={data.project_type}
+                                            onChange={(e) => setData('project_type', e.target.value)}
                                             className={inputCls}
                                         />
-                                        {errors.supplier_email && <p className="mt-2 text-sm text-red-600 dark:text-red-400">{errors.supplier_email}</p>}
+                                        {errors.project_type && <p className="mt-2 text-sm text-red-600 dark:text-red-400">{errors.project_type}</p>}
                                     </div>
                                     <div>
                                         <label htmlFor="os" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
