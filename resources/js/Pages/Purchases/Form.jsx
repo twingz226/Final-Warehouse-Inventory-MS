@@ -23,6 +23,9 @@ export default function Form({ auth, purchase, statusOptions }) {
         notes: purchase?.notes || '',
         project_type: purchase?.project_type || '',
         project_name: purchase?.project_name || '',
+        os: purchase?.os || '',
+        issued_by: purchase?.issued_by || '',
+        issued_to: purchase?.issued_to || '',
         // For CREATE: array of rows. For EDIT: single item kept flat.
         items: purchase
             ? [{ item_name: purchase.item_name, quantity: purchase.quantity, description: purchase.description || '', available_quantity: null }]
@@ -146,7 +149,7 @@ export default function Form({ auth, purchase, statusOptions }) {
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                     <div>
                                         <label htmlFor="supplier_name" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                                            Destination Name *
+                                            Name of Project *
                                         </label>
                                         <input
                                             type="text"
@@ -160,7 +163,7 @@ export default function Form({ auth, purchase, statusOptions }) {
                                     </div>
                                     <div>
                                         <label htmlFor="supplier_email" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                                            Destination Email
+                                            Type of Project
                                         </label>
                                         <input
                                             type="email"
@@ -172,17 +175,43 @@ export default function Form({ auth, purchase, statusOptions }) {
                                         {errors.supplier_email && <p className="mt-2 text-sm text-red-600 dark:text-red-400">{errors.supplier_email}</p>}
                                     </div>
                                     <div>
-                                        <label htmlFor="supplier_phone" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                                            Destination Phone
+                                        <label htmlFor="os" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                                            O.S
                                         </label>
                                         <input
-                                            type="tel"
-                                            id="supplier_phone"
-                                            value={data.supplier_phone}
-                                            onChange={(e) => setData('supplier_phone', e.target.value)}
+                                            type="text"
+                                            id="os"
+                                            value={data.os}
+                                            onChange={(e) => setData('os', e.target.value)}
                                             className={inputCls}
                                         />
-                                        {errors.supplier_phone && <p className="mt-2 text-sm text-red-600 dark:text-red-400">{errors.supplier_phone}</p>}
+                                        {errors.os && <p className="mt-2 text-sm text-red-600 dark:text-red-400">{errors.os}</p>}
+                                    </div>
+                                    <div>
+                                        <label htmlFor="issued_by" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                                            Issued By:
+                                        </label>
+                                        <input
+                                            type="text"
+                                            id="issued_by"
+                                            value={data.issued_by}
+                                            onChange={(e) => setData('issued_by', e.target.value)}
+                                            className={inputCls}
+                                        />
+                                        {errors.issued_by && <p className="mt-2 text-sm text-red-600 dark:text-red-400">{errors.issued_by}</p>}
+                                    </div>
+                                    <div>
+                                        <label htmlFor="issued_to" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                                            Issued To:
+                                        </label>
+                                        <input
+                                            type="text"
+                                            id="issued_to"
+                                            value={data.issued_to}
+                                            onChange={(e) => setData('issued_to', e.target.value)}
+                                            className={inputCls}
+                                        />
+                                        {errors.issued_to && <p className="mt-2 text-sm text-red-600 dark:text-red-400">{errors.issued_to}</p>}
                                     </div>
                                 </div>
                             </div>
