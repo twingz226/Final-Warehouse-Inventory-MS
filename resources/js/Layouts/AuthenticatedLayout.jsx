@@ -66,8 +66,8 @@ export default function AuthenticatedLayout({ header, children }) {
                         </SidebarNavLink>
 
                         <SidebarNavLink
-                            href="#"
-                            active={false}
+                            href={route('projects.index')}
+                            active={route().current('projects.index')}
                         >
                             <svg className="mr-3 h-5 w-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
@@ -260,8 +260,8 @@ export default function AuthenticatedLayout({ header, children }) {
                                         Activity Log
                                     </ResponsiveNavLink>
                                     <ResponsiveNavLink
-                                        href="#"
-                                        active={false}
+                                        href={route('projects.index')}
+                                        active={route().current('projects.index')}
                                     >
                                         Project
                                     </ResponsiveNavLink>

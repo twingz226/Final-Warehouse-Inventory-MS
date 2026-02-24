@@ -123,6 +123,9 @@ Route::middleware('auth')->group(function () {
     
     // Additional routes for items if needed
     // Route::get('items/export', [ItemController::class, 'export'])->name('items.export');
+
+    // Projects (aggregated received purchases/distributions)
+    Route::get('/projects', [\App\Http\Controllers\ProjectController::class, 'index'])->name('projects.index');
 });
 
 require __DIR__.'/auth.php';
