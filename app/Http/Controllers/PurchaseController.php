@@ -76,8 +76,10 @@ class PurchaseController extends Controller
     {
         $validated = $request->validate([
             'supplier_name'          => 'required|string|max:255',
-            'supplier_email'         => 'nullable|email|max:255',
-            'supplier_phone'         => 'nullable|string|max:20',
+            'supplier_email'         => 'nullable|string|max:255',
+            'os'                     => 'nullable|string|max:255',
+            'issued_by'              => 'nullable|string|max:255',
+            'issued_to'              => 'nullable|string|max:255',
             'purchase_date'          => 'required|date',
             'notes'                  => 'nullable|string',
             'project_type'           => 'nullable|string|max:255',
@@ -91,7 +93,9 @@ class PurchaseController extends Controller
         $shared = [
             'supplier_name'  => $validated['supplier_name'],
             'supplier_email' => $validated['supplier_email'] ?? null,
-            'supplier_phone' => $validated['supplier_phone'] ?? null,
+            'os'             => $validated['os'] ?? null,
+            'issued_by'      => $validated['issued_by'] ?? null,
+            'issued_to'      => $validated['issued_to'] ?? null,
             'purchase_date'  => $validated['purchase_date'],
             'notes'          => $validated['notes'] ?? null,
             'project_type'   => $validated['project_type'] ?? null,
@@ -156,8 +160,10 @@ class PurchaseController extends Controller
         
         $validated = $request->validate([
             'supplier_name' => 'required|string|max:255',
-            'supplier_email' => 'nullable|email|max:255',
-            'supplier_phone' => 'nullable|string|max:20',
+            'supplier_email' => 'nullable|string|max:255',
+            'os' => 'nullable|string|max:255',
+            'issued_by' => 'nullable|string|max:255',
+            'issued_to' => 'nullable|string|max:255',
             'item_name' => 'required|string|max:255',
             'description' => 'nullable|string',
             'quantity' => 'required|integer|min:1',

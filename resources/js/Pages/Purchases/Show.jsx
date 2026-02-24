@@ -117,8 +117,8 @@ export default function Show({ auth, purchase }) {
                                     </dl>
                                 </div>
 
-                                {/* Project Information */}
-                                {(purchase.project_name || purchase.project_type) && (
+                                {/ * Project Information * /}
+                                {(purchase.project_name || purchase.project_type || purchase.os) && (
                                     <div>
                                         <h4 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-4">Project Information</h4>
                                         <dl className="space-y-2">
@@ -134,6 +134,12 @@ export default function Show({ auth, purchase }) {
                                                     <dd className="text-sm text-gray-900 dark:text-gray-100">{purchase.project_type}</dd>
                                                 </div>
                                             )}
+                                            {purchase.os && (
+                                                <div>
+                                                    <dt className="text-sm font-medium text-gray-500 dark:text-gray-400">O.S</dt>
+                                                    <dd className="text-sm text-gray-900 dark:text-gray-100">{purchase.os}</dd>
+                                                </div>
+                                            )}
                                         </dl>
                                     </div>
                                 )}
@@ -146,6 +152,18 @@ export default function Show({ auth, purchase }) {
                                             <dt className="text-sm font-medium text-gray-500 dark:text-gray-400">Distribution Date</dt>
                                             <dd className="text-sm text-gray-900 dark:text-gray-100">{new Date(purchase.purchase_date).toLocaleDateString()}</dd>
                                         </div>
+                                        {purchase.issued_by && (
+                                            <div>
+                                                <dt className="text-sm font-medium text-gray-500 dark:text-gray-400">Issued By</dt>
+                                                <dd className="text-sm text-gray-900 dark:text-gray-100">{purchase.issued_by}</dd>
+                                            </div>
+                                        )}
+                                        {purchase.issued_to && (
+                                            <div>
+                                                <dt className="text-sm font-medium text-gray-500 dark:text-gray-400">Issued To</dt>
+                                                <dd className="text-sm text-gray-900 dark:text-gray-100">{purchase.issued_to}</dd>
+                                            </div>
+                                        )}
                                         <div>
                                             <dt className="text-sm font-medium text-gray-500 dark:text-gray-400">Status</dt>
                                             <dd className="text-sm text-gray-900 dark:text-gray-100">{purchase.status.charAt(0).toUpperCase() + purchase.status.slice(1)}</dd>

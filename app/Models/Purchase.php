@@ -13,7 +13,9 @@ class Purchase extends Model
     protected $fillable = [
         'supplier_name',
         'supplier_email',
-        'supplier_phone',
+        'os',
+        'issued_by',
+        'issued_to',
         'item_name',
         'description',
         'quantity',
@@ -37,8 +39,10 @@ class Purchase extends Model
      */
     public static $rules = [
         'supplier_name' => 'required|string|max:255',
-        'supplier_email' => 'nullable|email|max:255',
-        'supplier_phone' => 'nullable|string|max:20',
+        'supplier_email' => 'nullable|string|max:255',
+        'os' => 'nullable|string|max:255',
+        'issued_by' => 'nullable|string|max:255',
+        'issued_to' => 'nullable|string|max:255',
         'item_name' => 'required|string|max:255',
         'description' => 'nullable|string',
         'quantity' => 'required|integer|min:1',

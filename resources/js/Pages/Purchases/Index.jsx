@@ -222,7 +222,7 @@ export default function Index({ auth, purchases, status }) {
                         </thead>
                         <tbody>
                             ${(purchase._groupItems || [{ item_name: purchase.item_name, quantity: purchase.quantity, description: purchase.description }])
-                                .map(item => `
+                .map(item => `
                                 <tr>
                                     <td class="qty-col">${item.quantity}</td>
                                     <td class="description-col">${item.item_name}${item.description ? ' - ' + item.description : ''}</td>
@@ -233,19 +233,19 @@ export default function Index({ auth, purchases, status }) {
                     
                     <!-- Purpose Section -->
                     <div class="purpose-section">
-                        <div class="purpose-label">Purpose:</div>
-                        <div class="purpose-field">${purchase.notes || 'For distribution to ' + purchase.supplier_name}</div>
+                        <div class="purpose-label">Purpose/O.S:</div>
+                        <div class="purpose-field">${purchase.os || purchase.notes || ''}</div>
                     </div>
                     
                     <!-- Signature Section -->
                     <div class="signature-section">
                         <div class="signature-field">
                             <div class="signature-label">Issued By:</div>
-                            <div class="signature-line"></div>
+                            <div class="signature-line" style="text-align: center; line-height: 20px;">${purchase.issued_by || ''}</div>
                         </div>
                         <div class="signature-field">
                             <div class="signature-label">Issued To:</div>
-                            <div class="signature-line"></div>
+                            <div class="signature-line" style="text-align: center; line-height: 20px;">${purchase.issued_to || ''}</div>
                         </div>
                         <div class="signature-field">
                             <div class="signature-label">Noted By:</div>
@@ -427,10 +427,10 @@ export default function Index({ auth, purchases, status }) {
                                                                     <div key={idx}>
                                                                         {r.item_category ? (
                                                                             <span className={`inline-flex px-2 py-0.5 text-xs font-semibold rounded-full capitalize ${r.item_category === 'material'
-                                                                                    ? 'bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200'
-                                                                                    : r.item_category === 'tool'
-                                                                                        ? 'bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200'
-                                                                                        : 'bg-indigo-100 dark:bg-indigo-900 text-indigo-800 dark:text-indigo-200'
+                                                                                ? 'bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200'
+                                                                                : r.item_category === 'tool'
+                                                                                    ? 'bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200'
+                                                                                    : 'bg-indigo-100 dark:bg-indigo-900 text-indigo-800 dark:text-indigo-200'
                                                                                 }`}>
                                                                                 {r.item_category}
                                                                             </span>
@@ -505,22 +505,22 @@ export default function Index({ auth, purchases, status }) {
                                             </tr>
                                         )}
                                     </tbody>
-                            </table>
+                                </table>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
 
-            {/* Custom Tooltip */}
-            {tooltip.show && (
-                <div
-                    className="fixed z-50 bg-gray-800 dark:bg-gray-900 text-white text-xs px-2 py-1 rounded shadow-lg pointer-events-none transform -translate-x-1/2"
-                    style={{ left: tooltip.x, top: tooltip.y }}
-                >
-                    {tooltip.text}
-                </div>
-            )}
-        </AuthenticatedLayout >
+                {/* Custom Tooltip */}
+                {tooltip.show && (
+                    <div
+                        className="fixed z-50 bg-gray-800 dark:bg-gray-900 text-white text-xs px-2 py-1 rounded shadow-lg pointer-events-none transform -translate-x-1/2"
+                        style={{ left: tooltip.x, top: tooltip.y }}
+                    >
+                        {tooltip.text}
+                    </div>
+                )}
+            </AuthenticatedLayout >
         </>
     );
 }
