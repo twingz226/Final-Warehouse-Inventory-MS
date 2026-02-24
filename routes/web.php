@@ -126,6 +126,9 @@ Route::middleware('auth')->group(function () {
 
     // Projects (aggregated received purchases/distributions)
     Route::get('/projects', [\App\Http\Controllers\ProjectController::class, 'index'])->name('projects.index');
+
+    // Daily Stock Rollover
+    Route::post('/inventory/rollover', [\App\Http\Controllers\RolloverController::class, 'store'])->name('stock.rollover');
 });
 
 require __DIR__.'/auth.php';

@@ -1,4 +1,4 @@
-import { Head, Link, router } from '@inertiajs/react';
+import { Head, Link, router, useForm } from '@inertiajs/react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { useState } from 'react';
 import { MagnifyingGlassIcon, CubeIcon, WrenchIcon, TruckIcon, ChartBarIcon, FunnelIcon, ChevronUpDownIcon } from '@heroicons/react/24/outline';
@@ -86,13 +86,30 @@ export default function InventoryIndex({ auth, items, low_stock_items, summary, 
 
     const lowStockItems = low_stock_items || [];
 
+    const { post, processing } = useForm();
+
+    const handleRollover = () => {
+        if (confirm("Are you sure you want to finalize today's stock and start a new day? This will update the primary stock values and lock today's distributions.")) {
+            post(route('stock.rollover'));
+        }
+    };
+
     return (
         <AuthenticatedLayout
             user={auth.user}
             header={
-                <h2 className="font-semibold text-xl text-gray-800 leading-tight">
-                    Inventory Management
-                </h2>
+                <div className="flex justify-between items-center">
+                    <h2 className="font-semibold text-xl text-gray-800 leading-tight">
+                        Inventory Management
+                    </h2>
+                    <button
+                        onClick={handleRollover}
+                        disabled={processing}
+                        className="inline-flex items-center px-4 py-2 bg-indigo-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-indigo-700 focus:bg-indigo-700 active:bg-indigo-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition ease-in-out duration-150 shadow-sm"
+                    >
+                        {processing ? 'Processing...' : 'Run End-of-Day Rollover'}
+                    </button>
+                </div>
             }
         >
             <Head title="Inventory Management" />

@@ -336,6 +336,9 @@ export default function Index({ auth, purchases, status }) {
                                                 Name of Project
                                             </th>
                                             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                                                Type of Project
+                                            </th>
+                                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                                                 Item
                                             </th>
                                             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
@@ -402,6 +405,19 @@ export default function Index({ auth, purchases, status }) {
                                                                     {new Date(first.purchase_date).toLocaleDateString()}
                                                                 </div>
                                                             )}
+                                                        </td>
+
+                                                        {/* Type of Project */}
+                                                        <td className="px-6 py-4 align-top">
+                                                            <div className="text-sm font-medium text-gray-900 dark:text-gray-100">
+                                                                {first.project_type ? (
+                                                                    <span className="inline-flex px-2 py-0.5 text-xs font-semibold rounded-full capitalize bg-indigo-100 dark:bg-indigo-900 text-indigo-800 dark:text-indigo-200">
+                                                                        {first.project_type}
+                                                                    </span>
+                                                                ) : (
+                                                                    <span className="text-xs text-gray-400 dark:text-gray-500">N/A</span>
+                                                                )}
+                                                            </div>
                                                         </td>
 
                                                         {/* Items list */}
@@ -494,7 +510,7 @@ export default function Index({ auth, purchases, status }) {
                                             });
                                         })() : (
                                             <tr>
-                                                <td colSpan="5" className="px-6 py-12 text-center">
+                                                <td colSpan="6" className="px-6 py-12 text-center">
                                                     <p className="text-gray-500 dark:text-gray-400 text-sm">
                                                         No distributions found
                                                     </p>

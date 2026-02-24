@@ -17,7 +17,7 @@ export default function AuthenticatedLayout({ header, children }) {
         <div className="min-h-screen bg-gray-100 dark:bg-gray-900 flex">
             {/* Sidebar - Hidden on mobile, visible on desktop */}
             <div className="hidden md:flex md:w-64 md:flex-col md:fixed md:inset-y-0">
-                <div className="flex flex-col flex-grow pt-5 bg-gradient-to-b from-indigo-600 via-purple-600 to-pink-600 dark:from-indigo-800 dark:via-purple-800 dark:to-pink-800 overflow-y-auto shadow-2xl">
+                <div className="flex flex-col flex-grow pt-5 bg-blue-600/70 dark:bg-blue-900/80 backdrop-blur-sm border-r border-white/10 dark:border-white/5 overflow-y-auto [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-white/20 hover:[&::-webkit-scrollbar-thumb]:bg-white/40 [&::-webkit-scrollbar-thumb]:rounded-full shadow-2xl">
                     <div className="flex items-center justify-center flex-shrink-0 px-4 border-b border-white/20 pb-4">
                         <Link href="/">
                             <ApplicationLogo className="block h-12 w-auto filter drop-shadow-lg" />
@@ -31,7 +31,7 @@ export default function AuthenticatedLayout({ header, children }) {
 
                     <nav className="mt-5 flex-1 px-3 flex flex-col gap-1">
                         {/* ── MAIN section ── */}
-                        <p className="px-3 pt-2 pb-1 text-[10px] font-semibold uppercase tracking-widest text-white/65 select-none">
+                        <p className="px-3 pt-2 pb-1 text-xs font-bold uppercase tracking-widest text-white/65 select-none">
                             Main
                         </p>
 
@@ -39,7 +39,7 @@ export default function AuthenticatedLayout({ header, children }) {
                             href={route('dashboard')}
                             active={route().current('dashboard')}
                         >
-                            <svg className="mr-3 h-5 w-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <svg className="mr-3 h-5 w-5 flex-shrink-0 text-blue-300 group-hover:text-blue-200 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
                             </svg>
                             Dashboard
@@ -49,7 +49,7 @@ export default function AuthenticatedLayout({ header, children }) {
                             href={route('inventory.index')}
                             active={route().current('inventory.index')}
                         >
-                            <svg className="mr-3 h-5 w-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <svg className="mr-3 h-5 w-5 flex-shrink-0 text-emerald-300 group-hover:text-emerald-200 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
                             </svg>
                             Inventory
@@ -59,7 +59,7 @@ export default function AuthenticatedLayout({ header, children }) {
                             href={route('activity-history.index')}
                             active={route().current('activity-history.index')}
                         >
-                            <svg className="mr-3 h-5 w-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <svg className="mr-3 h-5 w-5 flex-shrink-0 text-amber-300 group-hover:text-amber-200 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                             </svg>
                             Activity Log
@@ -69,7 +69,7 @@ export default function AuthenticatedLayout({ header, children }) {
                             href={route('projects.index')}
                             active={route().current('projects.index')}
                         >
-                            <svg className="mr-3 h-5 w-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <svg className="mr-3 h-5 w-5 flex-shrink-0 text-violet-300 group-hover:text-violet-200 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
                             </svg>
                             Project
@@ -77,7 +77,7 @@ export default function AuthenticatedLayout({ header, children }) {
 
                         {/* ── TRANSACTIONS section ── */}
                         <div className="mt-4">
-                            <p className="px-3 pb-1 text-[10px] font-semibold uppercase tracking-widest text-white/65 select-none">
+                            <p className="px-3 pb-1 text-xs font-bold uppercase tracking-widest text-white/65 select-none">
                                 Transactions
                             </p>
 
@@ -87,13 +87,13 @@ export default function AuthenticatedLayout({ header, children }) {
                                 active={route().current('arrival.index')}
                             >
                                 <span className="mr-3 flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-lg bg-white/10 group-hover:bg-white/20 transition-colors duration-200">
-                                    <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <svg className="h-4 w-4 text-cyan-300 group-hover:text-cyan-200 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4" />
                                     </svg>
                                 </span>
                                 <span className="flex-1">
-                                    <span className="block text-sm font-medium leading-tight">Incoming Items</span>
-                                    <span className="block text-xs text-white/75 group-hover:text-white/90 transition-colors">Manage incoming items</span>
+                                    <span className="block text-base font-medium leading-tight">Incoming Items</span>
+                                    <span className="block text-sm text-white/75 group-hover:text-white/90 transition-colors">Manage incoming items</span>
                                 </span>
                             </SidebarNavLink>
 
@@ -103,13 +103,13 @@ export default function AuthenticatedLayout({ header, children }) {
                                 active={route().current('purchase.index')}
                             >
                                 <span className="mr-3 flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-lg bg-white/10 group-hover:bg-white/20 transition-colors duration-200">
-                                    <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <svg className="h-4 w-4 text-orange-300 group-hover:text-orange-200 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
                                     </svg>
                                 </span>
                                 <span className="flex-1">
-                                    <span className="block text-sm font-medium leading-tight">Outgoing Items</span>
-                                    <span className="block text-xs text-white/75 group-hover:text-white/90 transition-colors">Manage distribution orders</span>
+                                    <span className="block text-base font-medium leading-tight">Outgoing Items</span>
+                                    <span className="block text-sm text-white/75 group-hover:text-white/90 transition-colors">Manage distribution orders</span>
                                 </span>
                             </SidebarNavLink>
 
@@ -119,13 +119,13 @@ export default function AuthenticatedLayout({ header, children }) {
                                 active={route().current('borrowings.index')}
                             >
                                 <span className="mr-3 flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-lg bg-white/10 group-hover:bg-white/20 transition-colors duration-200">
-                                    <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <svg className="h-4 w-4 text-rose-300 group-hover:text-rose-200 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
                                     </svg>
                                 </span>
                                 <span className="flex-1">
-                                    <span className="block text-sm font-medium leading-tight">Borrowed Items</span>
-                                    <span className="block text-xs text-white/75 group-hover:text-white/90 transition-colors">Track borrowed items</span>
+                                    <span className="block text-base font-medium leading-tight">Borrowed Items</span>
+                                    <span className="block text-sm text-white/75 group-hover:text-white/90 transition-colors">Track borrowed items</span>
                                 </span>
                             </SidebarNavLink>
                         </div>
@@ -143,10 +143,10 @@ export default function AuthenticatedLayout({ header, children }) {
                                 <div className="absolute -bottom-1 -right-1 h-4 w-4 bg-green-400 rounded-full border-2 border-white animate-pulse"></div>
                             </div>
                             <div className="flex-1 min-w-0">
-                                <div className="text-sm font-bold text-white truncate">
+                                <div className="text-base font-bold text-white truncate">
                                     {user.name}
                                 </div>
-                                <div className="text-xs text-white/80 truncate">
+                                <div className="text-sm text-white/80 truncate">
                                     {user.email}
                                 </div>
                             </div>
@@ -154,18 +154,18 @@ export default function AuthenticatedLayout({ header, children }) {
                         <div className="mt-4 space-y-2">
                             <ResponsiveNavLink
                                 href={route('profile.edit')}
-                                className="group flex items-center px-3 py-2.5 text-sm font-medium rounded-lg text-white/90 hover:bg-white/20 hover:text-white transition-all duration-200 ease-in-out"
+                                className="group flex items-center px-3 py-2.5 text-base font-medium rounded-lg text-white/90 hover:bg-white/20 hover:text-white transition-all duration-200 ease-in-out"
                             >
-                                <svg className="mr-3 h-4 w-4 text-white/70 group-hover:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <svg className="mr-3 h-4 w-4 text-slate-300 group-hover:text-white transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                                 </svg>
                                 Account Settings
                             </ResponsiveNavLink>
                             <button
                                 onClick={() => setShowLogoutDialog(true)}
-                                className="group flex items-center w-full px-3 py-2.5 text-sm font-medium rounded-lg text-white/90 hover:bg-red-500/30 hover:text-white transition-all duration-200 ease-in-out"
+                                className="group flex items-center w-full px-3 py-2.5 text-base font-medium rounded-lg text-white/90 hover:bg-red-500/30 hover:text-white transition-all duration-200 ease-in-out"
                             >
-                                <svg className="mr-3 h-4 w-4 text-white/70 group-hover:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <svg className="mr-3 h-4 w-4 text-slate-300 group-hover:text-white transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
                                 </svg>
                                 Sign Out
@@ -176,7 +176,7 @@ export default function AuthenticatedLayout({ header, children }) {
             </div>
 
             {/* Main content */}
-            <div className="md:pl-64 flex flex-col flex-1 min-w-0 h-screen overflow-y-auto">
+            <div className="md:pl-64 flex flex-col flex-1 min-w-0 h-screen overflow-y-auto [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-track]:bg-gray-100 dark:[&::-webkit-scrollbar-track]:bg-gray-800 [&::-webkit-scrollbar-thumb]:bg-gray-300 dark:[&::-webkit-scrollbar-thumb]:bg-gray-600 hover:[&::-webkit-scrollbar-thumb]:bg-gray-400 dark:hover:[&::-webkit-scrollbar-thumb]:bg-gray-500 [&::-webkit-scrollbar-thumb]:rounded-full">
                 {/* Mobile menu button */}
                 <div className="md:hidden bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-4 py-3">
                     <button
@@ -234,13 +234,13 @@ export default function AuthenticatedLayout({ header, children }) {
                                     </svg>
                                 </button>
                             </div>
-                            <div className="flex-1 h-0 pt-5 pb-4 overflow-y-auto">
+                            <div className="flex-1 h-0 pt-5 pb-4 overflow-y-auto [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-gray-300 dark:[&::-webkit-scrollbar-thumb]:bg-gray-600 [&::-webkit-scrollbar-thumb]:rounded-full">
                                 <div className="flex-shrink-0 flex items-center justify-center px-4">
                                     <ApplicationLogo className="block h-8 w-auto fill-current text-gray-800" />
                                 </div>
                                 <nav className="mt-5 px-2 flex flex-col gap-1">
                                     {/* MAIN */}
-                                    <p className="px-3 pt-1 pb-1 text-[10px] font-semibold uppercase tracking-widest text-gray-400 select-none">Main</p>
+                                    <p className="px-3 pt-1 pb-1 text-xs font-bold uppercase tracking-widest text-gray-400 select-none">Main</p>
                                     <ResponsiveNavLink
                                         href={route('dashboard')}
                                         active={route().current('dashboard')}
@@ -266,7 +266,7 @@ export default function AuthenticatedLayout({ header, children }) {
                                         Project
                                     </ResponsiveNavLink>
                                     {/* TRANSACTIONS */}
-                                    <p className="px-3 pt-3 pb-1 text-[10px] font-semibold uppercase tracking-widest text-gray-400 select-none">Transactions</p>
+                                    <p className="px-3 pt-3 pb-1 text-xs font-bold uppercase tracking-widest text-gray-400 select-none">Transactions</p>
                                     <ResponsiveNavLink
                                         href={route('arrival.index')}
                                         active={route().current('arrival.index')}
@@ -298,10 +298,10 @@ export default function AuthenticatedLayout({ header, children }) {
                                         <div className="absolute -bottom-1 -right-1 h-3 w-3 bg-green-400 rounded-full border-2 border-white"></div>
                                     </div>
                                     <div className="flex-1 min-w-0">
-                                        <div className="text-base font-semibold text-gray-900 truncate">
+                                        <div className="text-lg font-semibold text-gray-900 truncate">
                                             {user.name}
                                         </div>
-                                        <div className="text-sm text-gray-500 truncate">
+                                        <div className="text-base text-gray-500 truncate">
                                             {user.email}
                                         </div>
                                     </div>
@@ -309,7 +309,7 @@ export default function AuthenticatedLayout({ header, children }) {
                                 <div className="mt-4 space-y-1">
                                     <ResponsiveNavLink
                                         href={route('profile.edit')}
-                                        className="group flex items-center px-3 py-2.5 text-sm font-medium rounded-lg text-gray-700 hover:bg-gradient-to-r hover:from-indigo-50 hover:to-purple-50 hover:text-indigo-700 transition-all duration-200 ease-in-out"
+                                        className="group flex items-center px-3 py-2.5 text-base font-medium rounded-lg text-gray-700 hover:bg-gradient-to-r hover:from-indigo-50 hover:to-purple-50 hover:text-indigo-700 transition-all duration-200 ease-in-out"
                                     >
                                         <svg className="mr-3 h-4 w-4 text-gray-400 group-hover:text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
@@ -318,7 +318,7 @@ export default function AuthenticatedLayout({ header, children }) {
                                     </ResponsiveNavLink>
                                     <button
                                         onClick={() => setShowLogoutDialog(true)}
-                                        className="group flex items-center w-full px-3 py-2.5 text-sm font-medium rounded-lg text-gray-700 hover:bg-gradient-to-r hover:from-red-50 hover:to-pink-50 hover:text-red-700 transition-all duration-200 ease-in-out"
+                                        className="group flex items-center w-full px-3 py-2.5 text-base font-medium rounded-lg text-gray-700 hover:bg-gradient-to-r hover:from-red-50 hover:to-pink-50 hover:text-red-700 transition-all duration-200 ease-in-out"
                                     >
                                         <svg className="mr-3 h-4 w-4 text-gray-400 group-hover:text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
@@ -351,7 +351,7 @@ export default function AuthenticatedLayout({ header, children }) {
 
             {/* Logout Confirmation Dialog */}
             {showLogoutDialog && (
-                <div className="fixed inset-0 z-50 overflow-y-auto">
+                <div className="fixed inset-0 z-50 overflow-y-auto [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-black/20 dark:[&::-webkit-scrollbar-thumb]:bg-white/20 [&::-webkit-scrollbar-thumb]:rounded-full">
                     <div className="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
                         <div
                             className="fixed inset-0 bg-gray-500 bg-opacity-75 dark:bg-gray-900 dark:bg-opacity-75 transition-opacity"

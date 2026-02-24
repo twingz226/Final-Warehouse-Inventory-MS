@@ -26,6 +26,9 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
+        // Schedule new rollover command at end of day
+        $schedule->command('stock:rollover')->dailyAt('23:59');
+        
         $schedule->command('stock:update-daily')->daily();
         
         // Use configurable frequency for overdue status updates
