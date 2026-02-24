@@ -23,31 +23,26 @@ putenv('APP_STORAGE=/tmp/storage');
 // Ensure log driver uses stdout/stderr on Vercel
 // putenv('LOG_CHANNEL=stderr');
 
+// Force debug mode to see the actual error on Vercel
+putenv('APP_DEBUG=true');
+putenv('APP_ENV=local');
+$_ENV['APP_DEBUG'] = 'true';
+$_SERVER['APP_DEBUG'] = 'true';
+
 try {
     require __DIR__ . '/../public/index.php';
-} catch (\Exception $e) {
-    if (str_contains($e->getMessage(), '[view] does not exist')) {
-        echo "<h1>Debug View Binding Error</h1>";
-        echo "<pre>";
-        echo "APP_STORAGE: " . getenv('APP_STORAGE') . "\n";
-        echo "Storage Path: " . app()->storagePath() . "\n";
-        
-        // Print available bindings
-        echo "Total Bindings: " . count(app()->getBindings()) . "\n";
-        echo "Is view bound? " . (app()->bound('view') ? 'Yes' : 'No') . "\n";
-        
-        // Check core service providers loaded
-        $providers = app()->getLoadedProviders();
-        echo "Total Providers Loaded: " . count($providers) . "\n";
-        echo "Illuminate\\View\\ViewServiceProvider Loaded? " . (isset($providers['Illuminate\\View\\ViewServiceProvider']) ? 'Yes' : 'No') . "\n";
-        
-        $files = scandir(app()->bootstrapPath('cache'));
-        echo "Boostrap Cache Files:\n";
-        print_r($files);
-        
-        echo "\nException Trace:\n" . $e->getTraceAsString();
-        echo "</pre>";
-        exit;
-    }
-    throw $e;
+} catch (\Throwable $e) {
+    // If it crashes before Laravel's Kernel can catch it, we dump it here
+    echo "<h1>Debug Full Boot Error</h1>";
+    echo "<pre>";
+    echo "Error: " . $e->getMessage() . "\n";
+    echo "File: " . $e->getFile() . " on line " . $e->getLine() . "\n";
+    
+    $files = scandir(__DIR__ . '/../bootstrap/cache');
+    echo "\nBoostrap Cache Files:\n";
+    print_r($files);
+    
+    echo "\nException Trace:\n" . $e->getTraceAsString();
+    echo "</pre>";
+    exit;
 }
