@@ -18,11 +18,6 @@ foreach ($tmpDirs as $dir) {
 
 // Override Laravel caching paths to use /tmp
 putenv('VIEW_COMPILED_PATH=/tmp/storage/framework/views');
-putenv('APP_SERVICES_CACHE=/tmp/storage/bootstrap/cache/services.php');
-putenv('APP_PACKAGES_CACHE=/tmp/storage/bootstrap/cache/packages.php');
-putenv('APP_CONFIG_CACHE=/tmp/storage/bootstrap/cache/config.php');
-putenv('APP_ROUTES_CACHE=/tmp/storage/bootstrap/cache/routes-v7.php');
-putenv('APP_EVENTS_CACHE=/tmp/storage/bootstrap/cache/events.php');
 putenv('APP_STORAGE=/tmp/storage');
 
 // Ensure log driver uses stdout/stderr on Vercel
