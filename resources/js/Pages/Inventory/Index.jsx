@@ -1,7 +1,12 @@
 import { Head, Link, router, useForm } from '@inertiajs/react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { useState } from 'react';
-import { MagnifyingGlassIcon, CubeIcon, WrenchIcon, TruckIcon, ChartBarIcon, FunnelIcon, ChevronUpDownIcon } from '@heroicons/react/24/outline';
+import { MagnifyingGlassIcon, CubeIcon, WrenchIcon, TruckIcon, ChartBarIcon, FunnelIcon, ChevronUpDownIcon, ArrowPathIcon, ExclamationTriangleIcon } from '@heroicons/react/24/outline';
+
+import Modal from '@/Components/Modal';
+import PrimaryButton from '@/Components/PrimaryButton';
+import SecondaryButton from '@/Components/SecondaryButton';
+import DangerButton from '@/Components/DangerButton';
 
 export default function InventoryIndex({ auth, items, low_stock_items, summary, filters }) {
     const [search, setSearch] = useState(filters.search || '');
@@ -13,6 +18,8 @@ export default function InventoryIndex({ auth, items, low_stock_items, summary, 
     const [sortOrder, setSortOrder] = useState(filters.sort_order || 'asc');
     const [showFilters, setShowFilters] = useState(false);
     const [searchTimeout, setSearchTimeout] = useState(null);
+    const [tooltip, setTooltip] = useState({ show: false, text: '', x: 0, y: 0 });
+    const [confirmingRollover, setConfirmingRollover] = useState(false);
 
     const performSearch = () => {
         if (searchTimeout) {
@@ -89,12 +96,34 @@ export default function InventoryIndex({ auth, items, low_stock_items, summary, 
     const { post, processing } = useForm();
 
     const handleRollover = () => {
-        if (confirm("Are you sure you want to finalize today's stock and start a new day? This will update the primary stock values and lock today's distributions.")) {
-            post(route('stock.rollover'));
-        }
+        setConfirmingRollover(true);
+    };
+
+    const performRollover = () => {
+        post(route('stock.rollover'), {
+            onSuccess: () => setConfirmingRollover(false),
+        });
+    };
+
+    const closeModal = () => {
+        setConfirmingRollover(false);
     };
 
     return (
+        <>
+            <style>{`
+            @keyframes electric-flicker-rollover {
+                0%   { box-shadow: 0 0 4px 1px #6366f1, 0 0 10px 2px #4f46e5; opacity: 1; }
+                10%  { box-shadow: 0 0 2px 1px #6366f1, 0 0 5px 1px #4f46e5;  opacity: 0.82; }
+                25%  { box-shadow: 0 0 8px 3px #a5b4fc, 0 0 18px 5px #4f46e5; opacity: 1; }
+                40%  { box-shadow: 0 0 2px 1px #6366f1, 0 0 4px 1px #4f46e5;  opacity: 0.78; }
+                55%  { box-shadow: 0 0 10px 4px #c7d2fe, 0 0 22px 6px #4f46e5;opacity: 1; }
+                70%  { box-shadow: 0 0 2px 1px #6366f1, 0 0 5px 1px #4f46e5;  opacity: 0.85; }
+                85%  { box-shadow: 0 0 7px 3px #a5b4fc, 0 0 16px 4px #4f46e5; opacity: 1; }
+                100% { box-shadow: 0 0 4px 1px #6366f1, 0 0 10px 2px #4f46e5; opacity: 1; }
+            }
+            .electric-rollover:hover { animation: electric-flicker-rollover 0.2s step-end infinite; }
+        `}</style>
         <AuthenticatedLayout
             user={auth.user}
             header={
@@ -105,9 +134,13 @@ export default function InventoryIndex({ auth, items, low_stock_items, summary, 
                     <button
                         onClick={handleRollover}
                         disabled={processing}
-                        className="inline-flex items-center px-4 py-2 bg-indigo-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-indigo-700 focus:bg-indigo-700 active:bg-indigo-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition ease-in-out duration-150 shadow-sm"
+                        onMouseEnter={(e) => { const rect = e.currentTarget.getBoundingClientRect(); setTooltip({ show: true, text: 'Run End-of-Day Rollover', x: rect.left + rect.width / 2, y: rect.bottom + 10 }); }}
+                        onMouseLeave={() => setTooltip({ show: false, text: '', x: 0, y: 0 })}
+                        className="electric-rollover inline-flex items-center px-4 py-2 bg-indigo-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-indigo-700 focus:bg-indigo-700 active:bg-indigo-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition ease-in-out duration-150 shadow-sm"
                     >
-                        {processing ? 'Processing...' : 'Run End-of-Day Rollover'}
+                        {processing ? <ArrowPathIcon className="h-4 w-4 animate-spin" /> : <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4" />
+                        </svg>}
                     </button>
                 </div>
             }
@@ -579,5 +612,34 @@ export default function InventoryIndex({ auth, items, low_stock_items, summary, 
                 </div>
             </div>
         </AuthenticatedLayout>
-    );
+        {tooltip.show && (
+            <div
+                className="fixed z-50 bg-gray-900 text-white text-sm px-2 py-1 rounded shadow-lg pointer-events-none"
+                style={{ left: tooltip.x - 50, top: tooltip.y }}
+            >
+                {tooltip.text}
+            </div>
+        )}
+        <Modal show={confirmingRollover} onClose={closeModal}>
+            <div className="p-6 bg-red-50 dark:bg-red-950">
+                <div className="flex items-center mb-4">
+                    <ExclamationTriangleIcon className="h-6 w-6 text-red-600 dark:text-red-400 mr-3" />
+                    <h2 className="text-lg font-medium text-red-800 dark:text-red-200">
+                        Finalize Today's Stock?
+                    </h2>
+                </div>
+                <p className="text-sm text-red-700 dark:text-red-300 mb-6">
+                    Are you sure you want to finalize today's stock and start a new day? This will update the primary stock values and lock today's distributions.
+                </p>
+                <div className="flex justify-end">
+                    <SecondaryButton onClick={closeModal}>
+                        Cancel
+                    </SecondaryButton>
+                    <DangerButton className="ms-3" onClick={performRollover} disabled={processing}>
+                        {processing ? 'Finalizing...' : 'Finalize'}
+                    </DangerButton>
+                </div>
+            </div>
+        </Modal>
+    </>);
 }
