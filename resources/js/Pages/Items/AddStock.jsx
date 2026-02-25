@@ -6,6 +6,8 @@ import TextInput from '@/Components/TextInput';
 import InputLabel from '@/Components/InputLabel';
 import PrimaryButton from '@/Components/PrimaryButton';
 import { useEffect, useState } from 'react';
+import { Listbox } from '@headlessui/react';
+import { ChevronUpDownIcon, CheckIcon } from '@heroicons/react/24/outline';
 
 export default function AddStock({ auth, items }) {
     const [selectedItem, setSelectedItem] = useState(null);
@@ -14,6 +16,10 @@ export default function AddStock({ auth, items }) {
         item_id: '',
         quantity: '',
     });
+
+    const isLowStock = (availableStock) => availableStock <= 10;
+
+    const formatItemDisplay = (item) => `${item.name} - Current: ${item.available_stock} ${item.unit === 'Quantity' ? 'pcs' : item.unit}`;
 
     const handleItemChange = (e) => {
         const itemId = e.target.value;
@@ -45,21 +51,49 @@ export default function AddStock({ auth, items }) {
                             <form onSubmit={submit} className="space-y-6">
                                 <div>
                                     <InputLabel htmlFor="item_id" value="Select Item" />
-                                    <select
-                                        id="item_id"
-                                        className="mt-1 block w-full border-gray-300 dark:border-gray-600 focus:border-indigo-500 dark:focus:border-indigo-400 focus:ring-indigo-500 dark:focus:ring-indigo-400 rounded-md shadow-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+                                    <Listbox
                                         value={data.item_id}
-                                        onChange={handleItemChange}
-                                        required
-                                        autoFocus
+                                        onChange={(value) => {
+                                            setData('item_id', value);
+                                            const item = items.find(item => item.id == value);
+                                            setSelectedItem(item);
+                                        }}
                                     >
-                                        <option value="">Choose an item...</option>
-                                        {items.map((item) => (
-                                            <option key={item.id} value={item.id}>
-                                                {item.name} - Current: {item.quantity} {item.unit}
-                                            </option>
-                                        ))}
-                                    </select>
+                                        <div className="relative mt-1">
+                                            <Listbox.Button className="relative w-full cursor-default rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 py-2 pl-3 pr-10 text-left shadow-sm focus:border-indigo-500 dark:focus:border-indigo-400 focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:focus:ring-indigo-400 sm:text-sm text-gray-900 dark:text-gray-100">
+                                                <span className="block truncate">{selectedItem ? formatItemDisplay(selectedItem) : 'Choose an item...'}</span>
+                                                <span className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
+                                                    <ChevronUpDownIcon className="h-5 w-5 text-gray-400" aria-hidden="true" />
+                                                </span>
+                                            </Listbox.Button>
+                                            <Listbox.Options className="absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-md bg-white dark:bg-gray-700 py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm">
+                                                {items.map((item) => (
+                                                    <Listbox.Option
+                                                        key={item.id}
+                                                        value={item.id}
+                                                        className={({ active }) =>
+                                                            `relative cursor-default select-none py-2 pl-3 pr-9 ${
+                                                                active ? 'bg-indigo-600 text-white' : isLowStock(item.quantity) ? 'text-red-600' : 'text-gray-900 dark:text-gray-100'
+                                                            }`
+                                                        }
+                                                    >
+                                                        {({ selected }) => (
+                                                            <>
+                                                                <span className={`block truncate ${selected ? 'font-medium' : 'font-normal'}`}>
+                                                                    {formatItemDisplay(item)}
+                                                                </span>
+                                                                {selected && (
+                                                                    <span className="absolute inset-y-0 right-0 flex items-center pr-4 text-indigo-600">
+                                                                        <CheckIcon className="h-5 w-5" aria-hidden="true" />
+                                                                    </span>
+                                                                )}
+                                                            </>
+                                                        )}
+                                                    </Listbox.Option>
+                                                ))}
+                                            </Listbox.Options>
+                                        </div>
+                                    </Listbox>
                                     <InputError message={errors.item_id} className="mt-2" />
                                 </div>
 
@@ -76,7 +110,7 @@ export default function AddStock({ auth, items }) {
                                             <div>
                                                 <span className="font-medium text-gray-500 dark:text-gray-400">Current Quantity:</span>
                                                 <span className="ml-2 text-gray-900 dark:text-gray-100">
-                                                    {selectedItem.quantity} {selectedItem.unit}
+                                                    {selectedItem.available_stock} {selectedItem.unit === 'Quantity' ? 'pcs' : selectedItem.unit}
                                                 </span>
                                             </div>
                                             {selectedItem.description && (

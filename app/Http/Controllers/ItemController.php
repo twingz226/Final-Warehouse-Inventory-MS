@@ -252,7 +252,13 @@ class ItemController extends Controller
     public function addStock()
     {
         return Inertia::render('Items/AddStock', [
-            'items' => Item::select('id', 'name', 'description', 'quantity', 'unit')->get(),
+            'items' => Item::select('id', 'name', 'description', 'quantity', 'unit')->where('quantity', '>=', 0)->orderBy('name')->get()->map(function ($item) {
+                $totalDistributed = Purchase::where('item_name', $item->name)
+                    ->where('status', 'received')
+                    ->sum('quantity');
+                $item->available_stock = $item->quantity - $totalDistributed;
+                return $item;
+            }),
         ]);
     }
 

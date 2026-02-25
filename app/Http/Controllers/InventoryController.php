@@ -109,12 +109,14 @@ class InventoryController extends Controller
         
         // Calculate summary metrics
         $allItems = Item::all();
+        $totalDistributed = Purchase::where('status', 'received')->sum('quantity');
+        $totalAvailable = $allItems->sum('quantity') - $totalDistributed;
         $summary = [
             'total_items' => $allItems->count(),
             'total_tools' => $allItems->where('category', 'tool')->count(),
             'total_materials' => $allItems->where('category', 'material')->count(),
-            'total_distributed' => Purchase::where('status', 'received')->sum('quantity'),
-            'total_available_stock' => $items->sum('available_stock'),
+            'total_distributed' => $totalDistributed,
+            'total_available_stock' => $totalAvailable,
         ];
         
         return inertia('Inventory/Index', [
