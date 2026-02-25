@@ -33,15 +33,15 @@ export default function Index({ auth, purchases, status }) {
                     }
                     .withdrawal-slip { 
                         font-family: Arial, sans-serif; 
-                        padding: 20px; 
+                        padding: 10px; 
                         max-width: 800px; 
                         margin: 0 auto; 
                     }
                     .company-header { 
                         text-align: center; 
-                        margin-bottom: 30px; 
+                        margin-bottom: 15px; 
                         border-bottom: 2px solid #333; 
-                        padding-bottom: 15px; 
+                        padding-bottom: 10px; 
                     }
                     .company-name { 
                         font-size: 20px; 
@@ -54,13 +54,13 @@ export default function Index({ auth, purchases, status }) {
                         color: #666; 
                     }
                     .slip-title { 
-                        font-size: 24px; 
+                        font-size: 16px; 
                         font-weight: bold; 
-                        margin: 15px 0 0 0; 
+                        margin: 10px 0 0 0; 
                         text-transform: uppercase; 
                     }
                     .info-section { 
-                        margin-bottom: 25px; 
+                        margin-bottom: 15px; 
                         display: flex; 
                         flex-wrap: wrap; 
                         gap: 20px; 
@@ -81,7 +81,7 @@ export default function Index({ auth, purchases, status }) {
                         min-height: 18px; 
                     }
                     .category-section { 
-                        margin: 20px 0; 
+                        margin: 10px 0; 
                     }
                     .category-title { 
                         font-weight: bold; 
@@ -106,7 +106,7 @@ export default function Index({ auth, purchases, status }) {
                     .items-table { 
                         width: 100%; 
                         border-collapse: collapse; 
-                        margin: 20px 0; 
+                        margin: 10px 0; 
                     }
                     .items-table th { 
                         border: 1px solid #333; 
@@ -129,7 +129,7 @@ export default function Index({ auth, purchases, status }) {
                         text-align: left; 
                     }
                     .purpose-section { 
-                        margin: 25px 0; 
+                        margin: 15px 0; 
                     }
                     .purpose-label { 
                         font-weight: bold; 
@@ -143,7 +143,7 @@ export default function Index({ auth, purchases, status }) {
                         font-size: 12px; 
                     }
                     .signature-section { 
-                        margin-top: 40px; 
+                        margin-top: 20px; 
                         display: flex; 
                         justify-content: space-between; 
                     }
@@ -170,6 +170,7 @@ export default function Index({ auth, purchases, status }) {
                     <div class="company-header">
                         <div class="company-name">Warlen Industrial Sales Corporation</div>
                         <div class="company-address">Deka Sales Bldg., Lacson Ext., Alijis Rd., Bacolod City</div>
+                        <img src="/images/warlen.png" alt="Warlen Logo" style="max-width: 80px; height: auto; display: block; margin: 0 auto 5px;" />
                         <div class="slip-title">Withdrawal Slip</div>
                     </div>
                     
