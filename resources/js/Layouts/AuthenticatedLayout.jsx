@@ -72,7 +72,7 @@ export default function AuthenticatedLayout({ header, children }) {
                             <svg className="mr-3 h-5 w-5 flex-shrink-0 text-violet-300 group-hover:text-violet-200 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
                             </svg>
-                            Project
+                            Projects
                         </SidebarNavLink>
 
                         {/* ── TRANSACTIONS section ── */}
@@ -126,6 +126,22 @@ export default function AuthenticatedLayout({ header, children }) {
                                 <span className="flex-1">
                                     <span className="block text-base font-medium leading-tight">Borrowed Items</span>
                                     <span className="block text-sm text-white/75 group-hover:text-white/90 transition-colors">Track borrowed items</span>
+                                </span>
+                            </SidebarNavLink>
+
+                            {/* Shipment Approval */}
+                            <SidebarNavLink
+                                href={route('shipment-approvals.index')}
+                                active={route().current('shipment-approvals.index')}
+                            >
+                                <span className="mr-3 flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-lg bg-white/10 group-hover:bg-white/20 transition-colors duration-200">
+                                    <svg className="h-4 w-4 text-purple-300 group-hover:text-purple-200 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+                                    </svg>
+                                </span>
+                                <span className="flex-1">
+                                    <span className="block text-base font-medium leading-tight">Shipment Approval</span>
+                                    <span className="block text-sm text-white/75 group-hover:text-white/90 transition-colors">Manage shipment approvals</span>
                                 </span>
                             </SidebarNavLink>
                         </div>
@@ -263,7 +279,7 @@ export default function AuthenticatedLayout({ header, children }) {
                                         href={route('projects.index')}
                                         active={route().current('projects.index')}
                                     >
-                                        Project
+                                        Projects
                                     </ResponsiveNavLink>
                                     {/* TRANSACTIONS */}
                                     <p className="px-3 pt-3 pb-1 text-xs font-bold uppercase tracking-widest text-gray-400 select-none">Transactions</p>
@@ -284,6 +300,12 @@ export default function AuthenticatedLayout({ header, children }) {
                                         active={route().current('borrowings.index')}
                                     >
                                         Borrowed Items
+                                    </ResponsiveNavLink>
+                                    <ResponsiveNavLink
+                                        href={route('shipment-approvals.index')}
+                                        active={route().current('shipment-approvals.index')}
+                                    >
+                                        Shipment Approval
                                     </ResponsiveNavLink>
                                 </nav>
                             </div>

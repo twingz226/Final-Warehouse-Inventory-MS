@@ -10,6 +10,9 @@ use Inertia\Inertia;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Imports\ItemsImport;
+use App\Models\ActivityHistory;
 
 class ItemController extends Controller
 {
@@ -297,5 +300,39 @@ class ItemController extends Controller
         return redirect()
             ->route('items.index')
             ->with('status', "Stock added successfully. {$item->name} now has {$item->quantity} {$item->unit}.");
+    }
+
+    /**
+     * Import items from Excel file.
+     */
+    public function import(Request $request)
+    {
+        $request->validate([
+            'file' => 'required|file|mimes:xlsx,xls|max:2048',
+        ]);
+
+        try {
+            DB::transaction(function () use ($request) {
+                Excel::import(new ItemsImport, $request->file('file'));
+            });
+
+            // Log activity
+            ActivityHistory::create([
+                'user_id' => Auth::id(),
+                'action' => 'import',
+                'description' => 'Imported items from Excel file',
+            ]);
+
+            return redirect()->route('items.index')->with('status', 'Items imported successfully.');
+        } catch (\Maatwebsite\Excel\Validators\ValidationException $e) {
+            $failures = $e->failures();
+            $errors = [];
+            foreach ($failures as $failure) {
+                $errors[] = "Row {$failure->row()}: " . implode(', ', $failure->errors());
+            }
+            return redirect()->back()->withErrors(['import' => implode('; ', $errors)]);
+        } catch (\Exception $e) {
+            return redirect()->back()->withErrors(['import' => 'Import failed: ' . $e->getMessage()]);
+        }
     }
 }

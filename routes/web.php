@@ -94,6 +94,9 @@ Route::middleware('auth')->group(function () {
         'index', 'create', 'store', 'show', 'edit', 'update', 'destroy'
     ]);
     
+    // Import route
+    Route::post('items/import', [\App\Http\Controllers\ItemController::class, 'import'])->name('items.import');
+    
     // Item History routes
     Route::get('items/{item}/history', [\App\Http\Controllers\ItemHistoryController::class, 'index'])->name('items.history');
     
@@ -126,6 +129,13 @@ Route::middleware('auth')->group(function () {
 
     // Projects (aggregated received purchases/distributions)
     Route::get('/projects', [\App\Http\Controllers\ProjectController::class, 'index'])->name('projects.index');
+
+    // Shipment Approval routes
+    Route::get('shipment-approvals/project-data/{projectName}', [\App\Http\Controllers\ShipmentApprovalController::class, 'getProjectData'])
+        ->name('shipment-approvals.project-data');
+    Route::resource('shipment-approvals', \App\Http\Controllers\ShipmentApprovalController::class)->only([
+        'index', 'create', 'store'
+    ]);
 
     // Daily Stock Rollover
     Route::post('/inventory/rollover', [\App\Http\Controllers\RolloverController::class, 'store'])->name('stock.rollover');

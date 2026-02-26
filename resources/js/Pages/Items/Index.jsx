@@ -2,7 +2,8 @@
 import { Head, Link, router } from '@inertiajs/react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { useState, useEffect } from 'react';
-import { PlusIcon, EyeIcon, TrashIcon, PencilSquareIcon, MagnifyingGlassIcon, TableCellsIcon, Squares2X2Icon } from '@heroicons/react/24/outline';
+import { PlusIcon, EyeIcon, TrashIcon, PencilSquareIcon, MagnifyingGlassIcon, TableCellsIcon, Squares2X2Icon, DocumentArrowUpIcon } from '@heroicons/react/24/outline';
+import ImportModal from '@/Components/ImportModal';
 
 export default function Index({ auth, items, status }) {
     const [confirmingItemDeletion, setConfirmingItemDeletion] = useState(false);
@@ -16,6 +17,7 @@ export default function Index({ auth, items, status }) {
     const [selectedItems, setSelectedItems] = useState([]);
     const [showBulkActions, setShowBulkActions] = useState(false);
     const [date, setDate] = useState('');
+    const [showImportModal, setShowImportModal] = useState(false);
 
     const formatDateDisplay = (dateStr) => {
         if (!dateStr) return '';
@@ -298,6 +300,14 @@ export default function Index({ auth, items, status }) {
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
                                 </svg>
                             </Link>
+                            <button
+                                onClick={() => setShowImportModal(true)}
+                                className="electric-btn-indigo inline-flex items-center justify-center p-2 bg-purple-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-purple-700 focus:bg-purple-700 active:bg-purple-900 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 transition ease-in-out duration-150"
+                                onMouseEnter={(e) => { const rect = e.currentTarget.getBoundingClientRect(); setTooltip({ show: true, text: 'Import from Excel', x: rect.left + rect.width / 2, y: rect.bottom + 10 }); }}
+                                onMouseLeave={() => setTooltip({ show: false, text: '', x: 0, y: 0 })}
+                            >
+                                <DocumentArrowUpIcon className="h-5 w-5" />
+                            </button>
                         </div>
                     </div>
                 }
@@ -719,6 +729,7 @@ export default function Index({ auth, items, status }) {
                         {tooltip.text}
                     </div>
                 )}
+                <ImportModal show={showImportModal} onClose={() => setShowImportModal(false)} />
             </AuthenticatedLayout>
         </>
     );
