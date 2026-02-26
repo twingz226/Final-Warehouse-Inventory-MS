@@ -225,28 +225,28 @@ export default function Index({ auth, borrowings, status, statusOptions }) {
                                                     <div className="flex items-center gap-2">
                                                         <Link
                                                             href={route('borrowings.show', borrowing.id)}
-                                                            className="inline-flex items-center p-2 border border-gray-300 dark:border-gray-600 shadow-sm rounded-md text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-600 hover:bg-gray-50 dark:hover:bg-gray-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                                                            className="text-indigo-600 dark:text-indigo-400 hover:text-indigo-900 dark:hover:text-indigo-300 transition-colors duration-200"
                                                             onMouseEnter={(e) => { const rect = e.currentTarget.getBoundingClientRect(); setTooltip({ show: true, text: 'View', x: rect.left + rect.width / 2, y: rect.top - 30 }); }}
                                                             onMouseLeave={() => setTooltip({ show: false, text: '', x: 0, y: 0 })}
                                                         >
-                                                            <EyeIcon className="w-4 h-4" />
+                                                            <EyeIcon className="h-5 w-5" />
                                                         </Link>
                                                         <Link
                                                             href={route('borrowings.edit', borrowing.id)}
-                                                            className="inline-flex items-center p-2 border border-gray-300 dark:border-gray-600 shadow-sm rounded-md text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-600 hover:bg-gray-50 dark:hover:bg-gray-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                                                            className="text-yellow-600 dark:text-yellow-400 hover:text-yellow-900 dark:hover:text-yellow-300 transition-colors duration-200"
                                                             onMouseEnter={(e) => { const rect = e.currentTarget.getBoundingClientRect(); setTooltip({ show: true, text: 'Edit', x: rect.left + rect.width / 2, y: rect.top - 30 }); }}
                                                             onMouseLeave={() => setTooltip({ show: false, text: '', x: 0, y: 0 })}
                                                         >
-                                                            <PencilIcon className="w-4 h-4" />
+                                                            <PencilIcon className="h-5 w-5" />
                                                         </Link>
                                                         {borrowing.status === 'borrowed' && (
                                                             <button
                                                                 onClick={() => returnItem(borrowing.id, borrowing.item_name)}
-                                                                className="inline-flex items-center p-2 border border-green-300 dark:border-green-600 shadow-sm rounded-md text-green-700 dark:text-green-400 bg-white dark:bg-gray-700 hover:bg-green-50 dark:hover:bg-green-900 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
+                                                                className="text-green-600 dark:text-green-400 hover:text-green-900 dark:hover:text-green-300 transition-colors duration-200"
                                                                 onMouseEnter={(e) => { const rect = e.currentTarget.getBoundingClientRect(); setTooltip({ show: true, text: 'Return Item', x: rect.left + rect.width / 2, y: rect.top - 30 }); }}
                                                                 onMouseLeave={() => setTooltip({ show: false, text: '', x: 0, y: 0 })}
                                                             >
-                                                                <CheckIcon className="w-4 h-4" />
+                                                                <CheckIcon className="h-5 w-5" />
                                                             </button>
                                                         )}
                                                     </div>

@@ -145,16 +145,16 @@ export default function Show({ auth, borrowing }) {
                                         <dl className="space-y-2">
                                             <div>
                                                 <dt className="text-sm font-medium text-gray-500 dark:text-gray-400">Borrow Date</dt>
-                                                <dd className="text-sm text-gray-900 dark:text-gray-100">{borrowing.borrow_date}</dd>
+                                                <dd className="text-sm text-gray-900 dark:text-gray-100">{new Date(borrowing.borrow_date).toLocaleString()}</dd>
                                             </div>
                                             <div>
                                                 <dt className="text-sm font-medium text-gray-500 dark:text-gray-400">Expected Return Date</dt>
-                                                <dd className="text-sm text-gray-900 dark:text-gray-100">{borrowing.expected_return_date}</dd>
+                                                <dd className="text-sm text-gray-900 dark:text-gray-100">{new Date(borrowing.expected_return_date).toLocaleString()}</dd>
                                             </div>
                                             {borrowing.actual_return_date && (
                                                 <div>
                                                     <dt className="text-sm font-medium text-gray-500 dark:text-gray-400">Actual Return Date</dt>
-                                                    <dd className="text-sm text-gray-900 dark:text-gray-100">{borrowing.actual_return_date}</dd>
+                                                    <dd className="text-sm text-gray-900 dark:text-gray-100">{new Date(borrowing.actual_return_date).toLocaleString()}</dd>
                                                 </div>
                                             )}
                                         </dl>
