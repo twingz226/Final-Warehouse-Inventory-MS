@@ -20,7 +20,7 @@ class ProjectController extends Controller
             ->whereIn('purchases.status', ['received', 'completed'])
             ->orderBy('purchases.supplier_name', 'asc')
             ->orderBy('purchases.purchase_date', 'asc')
-            ->get();
+            ->paginate(20)->withQueryString();
 
         return Inertia::render('Projects/Index', [
             'purchases' => $purchases,

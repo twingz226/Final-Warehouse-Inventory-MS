@@ -221,7 +221,7 @@ class ItemController extends Controller
             });
         }
 
-        $items = $query->get()->map(function ($item) {
+        $items = $query->take(50)->get()->map(function ($item) {
             $totalDistributed = Purchase::where('item_name', $item->name)
                 ->where('status', 'received')
                 ->sum('quantity');
@@ -238,7 +238,7 @@ class ItemController extends Controller
                 'description' => $item->description,
                 'quantity' => $available,
             ];
-        })->filter()->take(50)->values();
+        })->filter()->values();
 
         return response()->json($items);
     }
@@ -285,13 +285,9 @@ class ItemController extends Controller
     public function addStock()
     {
         return Inertia::render('Items/AddStock', [
-            'items' => Item::select('id', 'name', 'description', 'quantity', 'unit')->where('quantity', '>=', 0)->orderBy('name')->get()->map(function ($item) {
-                $totalDistributed = Purchase::where('item_name', $item->name)
-                    ->where('status', 'received')
-                    ->sum('quantity');
-                $item->available_stock = $item->quantity - $totalDistributed;
-                return $item;
-            }),
+            // Don't pass all items at once to avoid memory crash. 
+            // We pass an empty array because we'll shift the combobox to an async search endpoint.
+            'items' => [],
         ]);
     }
 

@@ -93,30 +93,41 @@ class InventoryController extends Controller
             ];
         });
 
-        // Fetch ALL low-stock items across all pages for the alert banner
-        $allLowStockItems = Item::all()->map(function ($item) {
-            $totalDistributed = Purchase::where('item_name', $item->name)
-                ->where('status', 'received')
-                ->sum('quantity');
-            $availableStock = $item->quantity - $totalDistributed;
-            return [
-                'id' => $item->id,
-                'name' => $item->name,
-                'unit' => $item->unit,
-                'available_stock' => $availableStock,
-            ];
-        })->filter(fn($item) => $item['available_stock'] <= 10)->values();
+        // Fetch ALL low-stock items across all pages for the alert banner efficiently using DB
+        $allLowStockItems = Item::select('id', 'name', 'unit', 'quantity')
+            ->get()
+            ->map(function ($item) {
+                // Calculate total distributed using raw SQL
+                $totalDistributed = Purchase::where('item_name', $item->name)
+                    ->where('status', 'received')
+                    ->sum('quantity');
+
+                $availableStock = $item->quantity - $totalDistributed;
+
+                if ($availableStock <= 10) {
+                    return [
+                        'id' => $item->id,
+                        'name' => $item->name,
+                        'unit' => $item->unit,
+                        'available_stock' => $availableStock,
+                    ];
+                }
+                return null;
+            })->filter()->values();
         
-        // Calculate summary metrics
-        $allItems = Item::all();
+        // Calculate summary metrics efficiently directly inside the database
+        $totalItems = Item::count();
+        $totalTools = Item::where('category', 'tool')->count();
+        $totalMaterials = Item::where('category', 'material')->count();
+        $totalQuantitySum = Item::sum('quantity');
         $totalDistributed = Purchase::where('status', 'received')->sum('quantity');
-        $totalAvailable = $allItems->sum('quantity') - $totalDistributed;
+        
         $summary = [
-            'total_items' => $allItems->count(),
-            'total_tools' => $allItems->where('category', 'tool')->count(),
-            'total_materials' => $allItems->where('category', 'material')->count(),
+            'total_items' => $totalItems,
+            'total_tools' => $totalTools,
+            'total_materials' => $totalMaterials,
             'total_distributed' => $totalDistributed,
-            'total_available_stock' => $totalAvailable,
+            'total_available_stock' => $totalQuantitySum - $totalDistributed,
         ];
         
         return inertia('Inventory/Index', [

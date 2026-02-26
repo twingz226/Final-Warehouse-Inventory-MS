@@ -9,9 +9,11 @@ import { useEffect, useState, useRef } from 'react';
 import { Combobox } from '@headlessui/react';
 import { ChevronUpDownIcon, CheckIcon } from '@heroicons/react/24/outline';
 
-export default function AddStock({ auth, items }) {
+export default function AddStock({ auth }) {
     const [selectedItem, setSelectedItem] = useState(null);
     const [query, setQuery] = useState('');
+    const [items, setItems] = useState([]);
+    const [isLoading, setIsLoading] = useState(false);
     const buttonRef = useRef(null);
 
     const { data, setData, post, processing, errors, reset } = useForm({
@@ -23,15 +25,33 @@ export default function AddStock({ auth, items }) {
 
     const formatItemDisplay = (item) => `${item.name} - Current: ${item.available_stock} ${item.unit === 'Quantity' ? 'pcs' : item.unit}`;
 
-    const filteredItems =
-        query === ''
-            ? items
-            : items.filter((item) => {
-                return (
-                    item.name.toLowerCase().includes(query.toLowerCase()) ||
-                    (item.description && item.description.toLowerCase().includes(query.toLowerCase()))
-                );
-            });
+    useEffect(() => {
+        const fetchItems = async () => {
+            if (query === '') {
+                setItems([]);
+                return;
+            }
+
+            setIsLoading(true);
+            try {
+                // Ensure we have axios installed and imported (handled below with a dynamic import fallback or assuming it's available globally via window.axios in Laravel, but better to import)
+                const response = await window.axios.get(route('items.search'), {
+                    params: { search: query }
+                });
+                setItems(response.data);
+            } catch (error) {
+                console.error("Error fetching items:", error);
+            } finally {
+                setIsLoading(false);
+            }
+        };
+
+        const timeoutId = setTimeout(() => {
+            fetchItems();
+        }, 300); // 300ms debounce
+
+        return () => clearTimeout(timeoutId);
+    }, [query]);
 
     const handleItemChange = (e) => {
         const itemId = e.target.value;
@@ -90,12 +110,16 @@ export default function AddStock({ auth, items }) {
                                                     <ChevronUpDownIcon className="h-5 w-5 text-gray-400" aria-hidden="true" />
                                                 </Combobox.Button>
                                                 <Combobox.Options className="absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-md bg-white dark:bg-gray-700 py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm">
-                                                    {filteredItems.length === 0 && query !== '' ? (
+                                                    {isLoading ? (
+                                                        <div className="relative cursor-default select-none py-2 px-4 text-gray-700 dark:text-gray-300">
+                                                            Loading...
+                                                        </div>
+                                                    ) : items.length === 0 && query !== '' ? (
                                                         <div className="relative cursor-default select-none py-2 px-4 text-gray-700 dark:text-gray-300">
                                                             Nothing found.
                                                         </div>
                                                     ) : (
-                                                        filteredItems.map((item) => (
+                                                        items.map((item) => (
                                                             <Combobox.Option
                                                                 key={item.id}
                                                                 value={item}
