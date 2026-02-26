@@ -78,12 +78,15 @@ class ShipmentApprovalController extends Controller
             'sa_number' => 'required|string|max:255',
             'tools_id' => 'nullable|string|max:255',
             'description' => 'nullable|string',
-            'picture' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'picture' => 'nullable|array',
+            'picture.*' => 'image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
 
-        $picturePath = null;
+        $picturePaths = [];
         if ($request->hasFile('picture')) {
-            $picturePath = $request->file('picture')->store('shipment-approvals', 'public');
+            foreach ($request->file('picture') as $file) {
+                $picturePaths[] = $file->store('shipment-approvals', 'public');
+            }
         }
 
         ShipmentApproval::create([
@@ -91,7 +94,7 @@ class ShipmentApprovalController extends Controller
             'sa_number' => $validated['sa_number'],
             'tools_id' => $validated['tools_id'],
             'description' => $validated['description'],
-            'picture' => $picturePath,
+            'picture' => empty($picturePaths) ? null : $picturePaths,
             'created_by' => Auth::id(),
         ]);
 

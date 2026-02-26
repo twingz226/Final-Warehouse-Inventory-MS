@@ -60,7 +60,7 @@ class BorrowingController extends Controller
         return Inertia::render('Borrowed/Index', [
             'borrowings' => $borrowings,
             'status' => session('status'),
-            'statusOptions' => ['' => 'All Statuses'] + Borrowing::getStatusOptions(),
+            'statusOptions' => ['' => 'All Status'] + Borrowing::getStatusOptions(),
         ]);
     }
 
@@ -83,9 +83,10 @@ class BorrowingController extends Controller
             'borrower_name' => 'required|string|max:255',
             'borrower_email' => 'nullable|email|max:255',
             'borrower_phone' => 'nullable|string|max:20',
-            'item_name' => 'required|string|max:255',
-            'description' => 'nullable|string',
-            'quantity' => 'required|integer|min:1',
+            'items' => 'required|array|min:1',
+            'items.*.item_name' => 'required|string|max:255',
+            'items.*.description' => 'nullable|string',
+            'items.*.quantity' => 'required|integer|min:1',
             'borrow_date' => 'required|date',
             'expected_return_date' => 'required|date|after_or_equal:borrow_date',
             'status' => 'required|in:borrowed,returned,overdue',
@@ -96,9 +97,17 @@ class BorrowingController extends Controller
 
         $validated['created_by'] = Auth::id();
 
-        $borrowing = Borrowing::create($validated);
+        foreach ($validated['items'] as $itemData) {
+            $borrowingData = array_merge(
+                // Remove the items array from the base array
+                collect($validated)->except('items')->toArray(),
+                $itemData
+            );
 
-        $this->logHistory($borrowing, 'created', null, $validated, "Created borrowing record for '{$borrowing->item_name}' by {$borrowing->borrower_name}");
+            $borrowing = Borrowing::create($borrowingData);
+
+            $this->logHistory($borrowing, 'created', null, $borrowingData, "Created borrowing record for '{$borrowing->item_name}' by {$borrowing->borrower_name}");
+        }
 
         return redirect()
             ->route('borrowings.index')
@@ -139,9 +148,10 @@ class BorrowingController extends Controller
             'borrower_name' => 'required|string|max:255',
             'borrower_email' => 'nullable|email|max:255',
             'borrower_phone' => 'nullable|string|max:20',
-            'item_name' => 'required|string|max:255',
-            'description' => 'nullable|string',
-            'quantity' => 'required|integer|min:1',
+            'items' => 'required|array|min:1',
+            'items.*.item_name' => 'required|string|max:255',
+            'items.*.description' => 'nullable|string',
+            'items.*.quantity' => 'required|integer|min:1',
             'borrow_date' => 'required|date',
             'expected_return_date' => 'required|date|after_or_equal:borrow_date',
             'actual_return_date' => 'nullable|date|after_or_equal:borrow_date',
@@ -152,24 +162,27 @@ class BorrowingController extends Controller
         ]);
 
         $oldStatus = $borrowing->status;
-        $borrowing->update($validated);
+        $updateData = collect($validated)->except('items')->toArray();
+        // For updates, since the form passes the single array, we merge that item 0
+        $updateData = array_merge($updateData, $validated['items'][0]);
+        $borrowing->update($updateData);
 
         // Generate description based on what changed
         $changes = [];
-        if ($oldValues['borrower_name'] !== $validated['borrower_name']) {
-            $changes[] = "borrower from '{$oldValues['borrower_name']}' to '{$validated['borrower_name']}'";
+        if ($oldValues['borrower_name'] !== $updateData['borrower_name']) {
+            $changes[] = "borrower from '{$oldValues['borrower_name']}' to '{$updateData['borrower_name']}'";
         }
-        if ($oldValues['item_name'] !== $validated['item_name']) {
-            $changes[] = "item from '{$oldValues['item_name']}' to '{$validated['item_name']}'";
+        if ($oldValues['item_name'] !== $updateData['item_name']) {
+            $changes[] = "item from '{$oldValues['item_name']}' to '{$updateData['item_name']}'";
         }
-        if ($oldStatus !== $validated['status']) {
-            $changes[] = "status from {$oldStatus} to {$validated['status']}";
+        if ($oldStatus !== $updateData['status']) {
+            $changes[] = "status from {$oldStatus} to {$updateData['status']}";
         }
 
-        $action = $oldStatus !== $validated['status'] ? 'status_changed' : 'updated';
+        $action = $oldStatus !== $updateData['status'] ? 'status_changed' : 'updated';
         $description = count($changes) > 0 ? ucfirst($action) . " " . implode(', ', $changes) : ucfirst($action) . " borrowing record";
 
-        $this->logHistory($borrowing, $action, $oldValues, $validated, $description);
+        $this->logHistory($borrowing, $action, $oldValues, $updateData, $description);
 
         return redirect()
             ->route('borrowings.index')

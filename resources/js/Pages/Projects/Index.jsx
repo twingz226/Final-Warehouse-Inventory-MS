@@ -1,10 +1,11 @@
 import { Head } from '@inertiajs/react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { useState } from 'react';
-import { ChevronDownIcon, ChevronUpIcon, BuildingOfficeIcon } from '@heroicons/react/24/outline';
+import { ChevronDownIcon, ChevronUpIcon, BuildingOfficeIcon, MagnifyingGlassIcon } from '@heroicons/react/24/outline';
 
 export default function Index({ auth, purchases }) {
     const [expandedGroups, setExpandedGroups] = useState({});
+    const [searchQuery, setSearchQuery] = useState('');
 
     const toggleGroup = (key) => {
         setExpandedGroups(prev => ({
@@ -32,6 +33,11 @@ export default function Index({ auth, purchases }) {
 
     const groups = Object.values(groupedData);
 
+    const filteredGroups = groups.filter(group =>
+        group.destinationName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        (group.projectName && group.projectName.toLowerCase().includes(searchQuery.toLowerCase()))
+    );
+
     return (
         <AuthenticatedLayout
             header={
@@ -44,12 +50,28 @@ export default function Index({ auth, purchases }) {
 
             <div className="py-12">
                 <div className="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-6">
-                    {groups.length === 0 ? (
+                    {/* Modern Search Bar */}
+                    <div className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
+                        <div className="relative">
+                            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <MagnifyingGlassIcon className="h-5 w-5 text-gray-400 dark:text-gray-500" />
+                            </div>
+                            <input
+                                type="text"
+                                value={searchQuery}
+                                onChange={(e) => setSearchQuery(e.target.value)}
+                                placeholder="Search by destination or project name..."
+                                className="block w-full pl-10 pr-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg leading-5 bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm transition duration-150 ease-in-out"
+                            />
+                        </div>
+                    </div>
+
+                    {filteredGroups.length === 0 ? (
                         <div className="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg p-6 text-center text-gray-500 dark:text-gray-400">
                             No active projects or distributions found.
                         </div>
                     ) : (
-                        groups.map((group, index) => {
+                        filteredGroups.map((group, index) => {
                             const isExpanded = expandedGroups[group.destinationName] || false;
 
                             // Get unique dates for this destination to show as a summary
@@ -92,7 +114,7 @@ export default function Index({ auth, purchases }) {
                                     {/* Expanded Details - Table of Items */}
                                     {isExpanded && (
                                         <div className="border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 p-6">
-                                            <div className="overflow-x-auto">
+                                            <div className="overflow-x-auto pb-2 [&::-webkit-scrollbar]:h-2 [&::-webkit-scrollbar-track]:bg-gray-100 dark:[&::-webkit-scrollbar-track]:bg-gray-800 [&::-webkit-scrollbar-thumb]:bg-gray-300 dark:[&::-webkit-scrollbar-thumb]:bg-gray-600 hover:[&::-webkit-scrollbar-thumb]:bg-gray-400 dark:hover:[&::-webkit-scrollbar-thumb]:bg-gray-500 [&::-webkit-scrollbar-thumb]:rounded-full">
                                                 <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
                                                     <thead className="bg-gray-100 dark:bg-gray-700">
                                                         <tr>

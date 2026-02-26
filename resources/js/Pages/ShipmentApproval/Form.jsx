@@ -16,7 +16,7 @@ export default function Form({ auth, projectSiteNames = [] }) {
         sa_number: '',
         tools_id: '',
         description: '',
-        picture: null,
+        picture: [],
     });
 
     const submit = (e) => {
@@ -202,10 +202,16 @@ export default function Form({ auth, projectSiteNames = [] }) {
                                         type="file"
                                         name="picture"
                                         accept="image/*"
+                                        multiple
                                         className="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
-                                        onChange={(e) => setData('picture', e.target.files[0])}
+                                        onChange={(e) => setData('picture', Array.from(e.target.files))}
                                     />
                                     <InputError message={errors.picture} className="mt-2" />
+                                    {data.picture && data.picture.length > 0 && (
+                                        <div className="mt-2 text-sm text-gray-500">
+                                            {data.picture.length} file(s) selected
+                                        </div>
+                                    )}
                                 </div>
 
                                 <div className="flex items-center justify-end mt-6">

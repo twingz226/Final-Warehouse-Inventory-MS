@@ -126,11 +126,11 @@ export default function Form({ auth, item = null }) {
                                         id="name"
                                         type="text"
                                         className={`mt-1 block w-full ${nameExists
-                                                ? 'border-amber-400 focus:border-amber-500 focus:ring-amber-500'
-                                                : ''
+                                            ? 'border-amber-400 focus:border-amber-500 focus:ring-amber-500'
+                                            : ''
                                             }`}
                                         value={data.name}
-                                        onChange={(e) => setData('name', e.target.value)}
+                                        onChange={(e) => setData('name', e.target.value.charAt(0).toUpperCase() + e.target.value.slice(1))}
                                         required
                                         autoFocus
                                     />

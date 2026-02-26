@@ -95,13 +95,19 @@ export default function Index({ auth, shipmentApprovals, status }) {
                                                     <td className="px-6 py-4 text-sm text-gray-900 dark:text-gray-100">
                                                         {approval.description || '-'}
                                                     </td>
-                                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
-                                                        {approval.picture ? (
-                                                            <img
-                                                                src={`/storage/${approval.picture}`}
-                                                                alt="Shipment"
-                                                                className="h-20 w-20 object-cover rounded shadow-sm border border-gray-200 dark:border-gray-600 cursor-pointer hover:opacity-90 transition-opacity"
-                                                            />
+                                                    <td className="px-6 py-4 text-sm text-gray-900 dark:text-gray-100">
+                                                        {approval.picture && Array.isArray(approval.picture) && approval.picture.length > 0 ? (
+                                                            <div className="flex -space-x-2 overflow-hidden hover:space-x-1 transition-all duration-200">
+                                                                {approval.picture.map((pic, idx) => (
+                                                                    <img
+                                                                        key={idx}
+                                                                        src={`/storage/${pic}`}
+                                                                        alt={`Shipment ${idx + 1}`}
+                                                                        className="inline-block h-12 w-12 rounded-full border-2 border-white dark:border-gray-800 object-cover shadow-sm bg-gray-100 dark:bg-gray-700"
+                                                                        title={`Image ${idx + 1}`}
+                                                                    />
+                                                                ))}
+                                                            </div>
                                                         ) : (
                                                             '-'
                                                         )}

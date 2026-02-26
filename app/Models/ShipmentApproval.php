@@ -15,6 +15,10 @@ class ShipmentApproval extends Model
         'created_by',
     ];
 
+    protected $casts = [
+        'picture' => 'array',
+    ];
+
     public function creator()
     {
         return $this->belongsTo(User::class, 'created_by');

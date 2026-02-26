@@ -1,7 +1,7 @@
 // resources/js/Pages/ActivityHistory.jsx
 import { Head, Link, router } from '@inertiajs/react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import {
     ArrowPathIcon,
     MagnifyingGlassIcon,
@@ -21,6 +21,7 @@ export default function ActivityHistory({ auth, history, items, distributions, f
     const [activityType, setActivityType] = useState(filters.activity_type || '');
     const [date, setDate] = useState(filters.date || '');
     const [searchTimeout, setSearchTimeout] = useState(null);
+    const isFirstRender = useRef(true);
 
     useEffect(() => {
         const urlParams = new URLSearchParams(window.location.search);
@@ -67,6 +68,10 @@ export default function ActivityHistory({ auth, history, items, distributions, f
     };
 
     useEffect(() => {
+        if (isFirstRender.current) {
+            isFirstRender.current = false;
+            return;
+        }
         performSearch();
     }, [search, activityType, date]);
 
