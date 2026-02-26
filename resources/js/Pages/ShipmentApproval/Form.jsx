@@ -207,6 +207,11 @@ export default function Form({ auth, projectSiteNames = [] }) {
                                         onChange={(e) => setData('picture', Array.from(e.target.files))}
                                     />
                                     <InputError message={errors.picture} className="mt-2" />
+                                    {Object.keys(errors)
+                                        .filter(key => key.startsWith('picture.'))
+                                        .map(key => (
+                                            <InputError key={key} message={errors[key]} className="mt-2" />
+                                        ))}
                                     {data.picture && data.picture.length > 0 && (
                                         <div className="mt-2 text-sm text-gray-500">
                                             {data.picture.length} file(s) selected

@@ -21,10 +21,10 @@ class ShipmentApprovalController extends Controller
         $query = ShipmentApproval::with('creator')->latest();
 
         if ($search) {
-            $query->where(function($q) use ($search) {
+            $query->where(function ($q) use ($search) {
                 $q->where('project_site_name', 'like', '%' . $search . '%')
-                  ->orWhere('sa_number', 'like', '%' . $search . '%')
-                  ->orWhere('description', 'like', '%' . $search . '%');
+                    ->orWhere('sa_number', 'like', '%' . $search . '%')
+                    ->orWhere('description', 'like', '%' . $search . '%');
             });
         }
 
@@ -60,10 +60,10 @@ class ShipmentApprovalController extends Controller
             ->leftJoin('items', 'purchases.item_name', '=', 'items.name')
             ->latest('purchases.purchase_date')
             ->get([
-                'purchases.id', 
-                'purchases.item_name', 
-                'purchases.quantity', 
-                'purchases.purchase_date', 
+                'purchases.id',
+                'purchases.item_name',
+                'purchases.quantity',
+                'purchases.purchase_date',
                 'purchases.created_at',
                 'items.unit'
             ]);
@@ -79,7 +79,11 @@ class ShipmentApprovalController extends Controller
             'tools_id' => 'nullable|string|max:255',
             'description' => 'nullable|string',
             'picture' => 'nullable|array',
-            'picture.*' => 'image|mimes:jpeg,png,jpg,gif|max:2048',
+            'picture.*' => 'image|mimes:jpeg,png,jpg,gif|max:20480',
+        ], [
+            'picture.*.max' => 'Each picture must not be greater than 20MB.',
+            'picture.*.image' => 'Each file must be an image.',
+            'picture.*.mimes' => 'Each picture must be a file of type: jpeg, png, jpg, gif.',
         ]);
 
         $picturePaths = [];
