@@ -381,6 +381,7 @@ export default function Index({ auth, purchases, status }) {
                                                         quantity: r.quantity,
                                                         description: r.description,
                                                         item_category: r.item_category,
+                                                        item_unit: r.item_unit,
                                                     })),
                                                 };
 
@@ -430,7 +431,7 @@ export default function Index({ auth, purchases, status }) {
                                                                             {r.item_name}
                                                                         </span>
                                                                         <span className="text-xs text-gray-400 dark:text-gray-500">
-                                                                            ×{r.quantity}
+                                                                            ×{r.quantity} {r.item_unit === 'Quantity' ? 'pcs' : (r.item_unit ? r.item_unit.toLowerCase() : '')}
                                                                         </span>
                                                                     </div>
                                                                 ))}
@@ -464,7 +465,7 @@ export default function Index({ auth, purchases, status }) {
                                                             <div className="space-y-1">
                                                                 {group.rows.map((r, idx) => (
                                                                     <div key={idx} className="text-sm text-gray-500 dark:text-gray-400">
-                                                                        {r.quantity}
+                                                                        {r.quantity} {r.item_unit === 'Quantity' ? 'pcs' : (r.item_unit ? r.item_unit.toLowerCase() : '')}
                                                                     </div>
                                                                 ))}
                                                             </div>

@@ -37,7 +37,7 @@ class PurchaseController extends Controller
         
         $query = Purchase::with('creator')
             ->leftJoin('items', 'purchases.item_name', '=', 'items.name')
-            ->select('purchases.*', 'items.category as item_category')
+            ->select('purchases.*', 'items.category as item_category', 'items.unit as item_unit')
             ->latest();
         
         if ($search) {
@@ -137,7 +137,7 @@ class PurchaseController extends Controller
         $groupItems = Purchase::where('purchases.supplier_name', $purchase->supplier_name)
             ->where('purchases.purchase_date', $purchase->purchase_date)
             ->leftJoin('items', 'purchases.item_name', '=', 'items.name')
-            ->select('purchases.*', 'items.category as item_category')
+            ->select('purchases.*', 'items.category as item_category', 'items.unit as item_unit')
             ->get();
 
         return Inertia::render('Purchases/Show', [

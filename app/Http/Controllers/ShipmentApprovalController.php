@@ -28,10 +28,6 @@ class ShipmentApprovalController extends Controller
             });
         }
 
-        if ($date) {
-            $query->whereDate('date', $date);
-        }
-
         $shipmentApprovals = $query->paginate(10)->withQueryString();
 
         return Inertia::render('ShipmentApproval/Index', [
@@ -60,16 +56,19 @@ class ShipmentApprovalController extends Controller
      */
     public function getProjectData($projectName)
     {
-        $purchase = \App\Models\Purchase::where('supplier_name', $projectName)->latest('purchase_date')->first();
+        $purchases = \App\Models\Purchase::where('supplier_name', $projectName)
+            ->leftJoin('items', 'purchases.item_name', '=', 'items.name')
+            ->latest('purchases.purchase_date')
+            ->get([
+                'purchases.id', 
+                'purchases.item_name', 
+                'purchases.quantity', 
+                'purchases.purchase_date', 
+                'purchases.created_at',
+                'items.unit'
+            ]);
 
-        if (!$purchase) {
-            return response()->json(null);
-        }
-
-        return response()->json([
-            'quantity' => $purchase->quantity,
-            'description' => $purchase->description,
-        ]);
+        return response()->json($purchases);
     }
 
     public function store(Request $request)
@@ -77,12 +76,9 @@ class ShipmentApprovalController extends Controller
         $validated = $request->validate([
             'project_site_name' => 'required|string|max:255',
             'sa_number' => 'required|string|max:255',
-            'quantity' => 'required|integer|min:1',
-            'unit' => 'required|in:pcs,kg',
             'tools_id' => 'nullable|string|max:255',
             'description' => 'nullable|string',
             'picture' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-            'date' => 'required|date',
         ]);
 
         $picturePath = null;
@@ -93,12 +89,9 @@ class ShipmentApprovalController extends Controller
         ShipmentApproval::create([
             'project_site_name' => $validated['project_site_name'],
             'sa_number' => $validated['sa_number'],
-            'quantity' => $validated['quantity'],
-            'unit' => $validated['unit'],
             'tools_id' => $validated['tools_id'],
             'description' => $validated['description'],
             'picture' => $picturePath,
-            'date' => $validated['date'],
             'created_by' => Auth::id(),
         ]);
 

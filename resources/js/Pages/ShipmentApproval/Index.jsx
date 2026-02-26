@@ -67,12 +67,6 @@ export default function Index({ auth, shipmentApprovals, status }) {
                                                     SA#
                                                 </th>
                                                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                                                    Quantity
-                                                </th>
-                                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                                                    Unit
-                                                </th>
-                                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                                                     Tools ID
                                                 </th>
                                                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
@@ -80,9 +74,6 @@ export default function Index({ auth, shipmentApprovals, status }) {
                                                 </th>
                                                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                                                     Picture
-                                                </th>
-                                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                                                    Date
                                                 </th>
                                                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                                                     Actions
@@ -99,12 +90,6 @@ export default function Index({ auth, shipmentApprovals, status }) {
                                                         {approval.sa_number}
                                                     </td>
                                                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
-                                                        {approval.quantity}
-                                                    </td>
-                                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
-                                                        {approval.unit}
-                                                    </td>
-                                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
                                                         {approval.tools_id || '-'}
                                                     </td>
                                                     <td className="px-6 py-4 text-sm text-gray-900 dark:text-gray-100">
@@ -115,14 +100,11 @@ export default function Index({ auth, shipmentApprovals, status }) {
                                                             <img
                                                                 src={`/storage/${approval.picture}`}
                                                                 alt="Shipment"
-                                                                className="h-10 w-10 object-cover rounded"
+                                                                className="h-20 w-20 object-cover rounded shadow-sm border border-gray-200 dark:border-gray-600 cursor-pointer hover:opacity-90 transition-opacity"
                                                             />
                                                         ) : (
                                                             '-'
                                                         )}
-                                                    </td>
-                                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
-                                                        {new Date(approval.date).toLocaleDateString()}
                                                     </td>
                                                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                                                         {/* Actions - Add back when routes are implemented */}

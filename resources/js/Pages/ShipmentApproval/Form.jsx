@@ -6,17 +6,16 @@ import PrimaryButton from '@/Components/PrimaryButton';
 import TextInput from '@/Components/TextInput';
 import { ArrowLeftIcon } from '@heroicons/react/24/outline';
 import axios from 'axios';
+import { useState } from 'react';
 
 export default function Form({ auth, projectSiteNames = [] }) {
+    const [projectItems, setProjectItems] = useState([]);
     const { data, setData, post, processing, errors, reset } = useForm({
         project_site_name: '',
         sa_number: '',
-        quantity: '',
-        unit: 'pcs',
         tools_id: '',
         description: '',
         picture: null,
-        date: new Date().toISOString().split('T')[0],
     });
 
     const submit = (e) => {
@@ -48,6 +47,35 @@ export default function Form({ auth, projectSiteNames = [] }) {
                     <div className="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
                         <div className="p-6 text-gray-900 dark:text-gray-100">
                             <form onSubmit={submit} encType="multipart/form-data">
+                                {projectItems.length > 0 && (
+                                    <div className="mb-8">
+                                        <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-4">Items Distributed to Selected Project</h3>
+                                        <div className="overflow-x-auto bg-gray-50 dark:bg-gray-700/50 border border-gray-200 dark:border-gray-600 shadow-sm rounded-lg p-0">
+                                            <table className="w-full text-left text-sm text-gray-500 dark:text-gray-400">
+                                                <thead className="text-xs text-gray-700 uppercase bg-gray-100 dark:bg-gray-800 dark:text-gray-300 border-b border-gray-200 dark:border-gray-600">
+                                                    <tr>
+                                                        <th className="px-4 py-3">Item/Tool Name</th>
+                                                        <th className="px-4 py-3">Quantity</th>
+                                                        <th className="px-4 py-3">Date Distributed</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    {projectItems.map((item, index) => (
+                                                        <tr key={item.id || index} className="bg-white dark:bg-gray-800 border-b dark:border-gray-700 last:border-0 hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors">
+                                                            <td className="px-4 py-3 font-medium text-gray-900 dark:text-gray-100">{item.item_name}</td>
+                                                            <td className="px-4 py-3 text-gray-900 dark:text-gray-100">
+                                                                {item.quantity} {item.unit === 'Quantity' ? 'pcs' : (item.unit ? item.unit.toLowerCase() : '')}
+                                                            </td>
+                                                            <td className="px-4 py-3 text-gray-900 dark:text-gray-100">
+                                                                {new Date(item.purchase_date || item.created_at).toLocaleDateString()}
+                                                            </td>
+                                                        </tr>
+                                                    ))}
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                )}
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                     <div>
                                         <InputLabel htmlFor="project_site_name" value="Project Site Name" />
@@ -63,16 +91,20 @@ export default function Form({ auth, projectSiteNames = [] }) {
                                                 if (value) {
                                                     axios.get(route('shipment-approvals.project-data', value))
                                                         .then(res => {
-                                                            if (res.data) {
-                                                                setData(data => ({
-                                                                    ...data,
+                                                            if (Array.isArray(res.data)) {
+                                                                setProjectItems(res.data);
+                                                                const itemNames = res.data.map(item => item.item_name).filter(Boolean).join(', ');
+                                                                setData(prevData => ({
+                                                                    ...prevData,
                                                                     project_site_name: value,
-                                                                    quantity: res.data.quantity || '',
-                                                                    description: res.data.description || '',
+                                                                    description: itemNames
                                                                 }));
                                                             }
                                                         })
                                                         .catch(err => console.error('Error fetching project data:', err));
+                                                } else {
+                                                    setProjectItems([]);
+                                                    setData('description', '');
                                                 }
                                             }}
                                             required
@@ -100,37 +132,6 @@ export default function Form({ auth, projectSiteNames = [] }) {
                                     </div>
 
                                     <div>
-                                        <InputLabel htmlFor="quantity" value="Quantity" />
-                                        <TextInput
-                                            id="quantity"
-                                            type="number"
-                                            name="quantity"
-                                            value={data.quantity}
-                                            className="mt-1 block w-full"
-                                            onChange={(e) => setData('quantity', e.target.value)}
-                                            min="1"
-                                            required
-                                        />
-                                        <InputError message={errors.quantity} className="mt-2" />
-                                    </div>
-
-                                    <div>
-                                        <InputLabel htmlFor="unit" value="Unit" />
-                                        <select
-                                            id="unit"
-                                            name="unit"
-                                            value={data.unit}
-                                            className="mt-1 block w-full border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-indigo-500 dark:focus:border-indigo-600 focus:ring-indigo-500 dark:focus:ring-indigo-600 rounded-md shadow-sm"
-                                            onChange={(e) => setData('unit', e.target.value)}
-                                            required
-                                        >
-                                            <option value="pcs">pcs</option>
-                                            <option value="kg">kg</option>
-                                        </select>
-                                        <InputError message={errors.unit} className="mt-2" />
-                                    </div>
-
-                                    <div>
                                         <InputLabel htmlFor="tools_id" value="Tools ID" />
                                         <TextInput
                                             id="tools_id"
@@ -141,20 +142,6 @@ export default function Form({ auth, projectSiteNames = [] }) {
                                             onChange={(e) => setData('tools_id', e.target.value)}
                                         />
                                         <InputError message={errors.tools_id} className="mt-2" />
-                                    </div>
-
-                                    <div>
-                                        <InputLabel htmlFor="date" value="Date" />
-                                        <TextInput
-                                            id="date"
-                                            type="date"
-                                            name="date"
-                                            value={data.date}
-                                            className="mt-1 block w-full"
-                                            onChange={(e) => setData('date', e.target.value)}
-                                            required
-                                        />
-                                        <InputError message={errors.date} className="mt-2" />
                                     </div>
                                 </div>
 

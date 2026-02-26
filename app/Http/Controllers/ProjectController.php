@@ -17,7 +17,7 @@ class ProjectController extends Controller
         // We will group them visually on the frontend. We load items' categories as before.
         $purchases = Purchase::leftJoin('items', 'purchases.item_name', '=', 'items.name')
             ->select('purchases.*', 'items.category as item_category')
-            ->where('purchases.status', 'received')
+            ->whereIn('purchases.status', ['received', 'completed'])
             ->orderBy('purchases.supplier_name', 'asc')
             ->orderBy('purchases.purchase_date', 'desc')
             ->get();

@@ -208,7 +208,7 @@ export default function Show({ auth, purchase, groupItems }) {
                                                                 </div>
                                                             </div>
                                                         </td>
-                                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">{item.quantity}</td>
+                                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">{item.quantity} {item.item_unit === 'Quantity' ? 'pcs' : (item.item_unit ? item.item_unit.toLowerCase() : '')}</td>
                                                     </tr>
                                                 ))}
                                             </tbody>
