@@ -6,10 +6,11 @@ import PrimaryButton from '@/Components/PrimaryButton';
 import TextInput from '@/Components/TextInput';
 import { ArrowLeftIcon } from '@heroicons/react/24/outline';
 import axios from 'axios';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 export default function Form({ auth, projectSiteNames = [] }) {
     const [projectItems, setProjectItems] = useState([]);
+    const [dateFilter, setDateFilter] = useState('');
     const { data, setData, post, processing, errors, reset } = useForm({
         project_site_name: '',
         sa_number: '',
@@ -22,6 +23,24 @@ export default function Form({ auth, projectSiteNames = [] }) {
         e.preventDefault();
         post(route('shipment-approvals.store'));
     };
+
+    const filteredProjectItems = dateFilter
+        ? projectItems.filter(item => {
+            const d = new Date(item.purchase_date || item.created_at);
+            const yyyy = d.getFullYear();
+            const mm = String(d.getMonth() + 1).padStart(2, '0');
+            const dd = String(d.getDate()).padStart(2, '0');
+            const localDateStr = `${yyyy}-${mm}-${dd}`;
+            return localDateStr === dateFilter;
+        })
+        : projectItems;
+
+    useEffect(() => {
+        if (data.project_site_name || projectItems.length > 0) {
+            const itemNames = filteredProjectItems.map(item => item.item_name).filter(Boolean).join(', ');
+            setData('description', itemNames);
+        }
+    }, [dateFilter, projectItems]);
 
     return (
         <AuthenticatedLayout
@@ -56,21 +75,39 @@ export default function Form({ auth, projectSiteNames = [] }) {
                                                     <tr>
                                                         <th className="px-4 py-3">Item/Tool Name</th>
                                                         <th className="px-4 py-3">Quantity</th>
-                                                        <th className="px-4 py-3">Date Distributed</th>
+                                                        <th className="px-4 py-3">
+                                                            <div className="flex items-center space-x-2">
+                                                                <span>Date Distributed</span>
+                                                                <input
+                                                                    type="date"
+                                                                    className="text-xs border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500 font-normal py-1 px-2 cursor-pointer [&::-webkit-calendar-picker-indicator]:cursor-pointer"
+                                                                    value={dateFilter}
+                                                                    onChange={(e) => setDateFilter(e.target.value)}
+                                                                />
+                                                            </div>
+                                                        </th>
                                                     </tr>
                                                 </thead>
                                                 <tbody>
-                                                    {projectItems.map((item, index) => (
-                                                        <tr key={item.id || index} className="bg-white dark:bg-gray-800 border-b dark:border-gray-700 last:border-0 hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors">
-                                                            <td className="px-4 py-3 font-medium text-gray-900 dark:text-gray-100">{item.item_name}</td>
-                                                            <td className="px-4 py-3 text-gray-900 dark:text-gray-100">
-                                                                {item.quantity} {item.unit === 'Quantity' ? 'pcs' : (item.unit ? item.unit.toLowerCase() : '')}
-                                                            </td>
-                                                            <td className="px-4 py-3 text-gray-900 dark:text-gray-100">
-                                                                {new Date(item.purchase_date || item.created_at).toLocaleDateString()}
+                                                    {filteredProjectItems.length > 0 ? (
+                                                        filteredProjectItems.map((item, index) => (
+                                                            <tr key={item.id || index} className="bg-white dark:bg-gray-800 border-b dark:border-gray-700 last:border-0 hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors">
+                                                                <td className="px-4 py-3 font-medium text-gray-900 dark:text-gray-100">{item.item_name}</td>
+                                                                <td className="px-4 py-3 text-gray-900 dark:text-gray-100">
+                                                                    {item.quantity} {item.unit === 'Quantity' ? 'pcs' : (item.unit ? item.unit.toLowerCase() : '')}
+                                                                </td>
+                                                                <td className="px-4 py-3 text-gray-900 dark:text-gray-100">
+                                                                    {new Date(item.purchase_date || item.created_at).toLocaleDateString()}
+                                                                </td>
+                                                            </tr>
+                                                        ))
+                                                    ) : (
+                                                        <tr>
+                                                            <td colSpan="3" className="px-4 py-4 text-center text-sm text-gray-500 dark:text-gray-400">
+                                                                No items found for the selected date.
                                                             </td>
                                                         </tr>
-                                                    ))}
+                                                    )}
                                                 </tbody>
                                             </table>
                                         </div>
@@ -93,17 +130,17 @@ export default function Form({ auth, projectSiteNames = [] }) {
                                                         .then(res => {
                                                             if (Array.isArray(res.data)) {
                                                                 setProjectItems(res.data);
-                                                                const itemNames = res.data.map(item => item.item_name).filter(Boolean).join(', ');
+                                                                setDateFilter('');
                                                                 setData(prevData => ({
                                                                     ...prevData,
-                                                                    project_site_name: value,
-                                                                    description: itemNames
+                                                                    project_site_name: value
                                                                 }));
                                                             }
                                                         })
                                                         .catch(err => console.error('Error fetching project data:', err));
                                                 } else {
                                                     setProjectItems([]);
+                                                    setDateFilter('');
                                                     setData('description', '');
                                                 }
                                             }}

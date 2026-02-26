@@ -5,12 +5,14 @@ import InputError from '@/Components/InputError';
 import TextInput from '@/Components/TextInput';
 import InputLabel from '@/Components/InputLabel';
 import PrimaryButton from '@/Components/PrimaryButton';
-import { useEffect, useState } from 'react';
-import { Listbox } from '@headlessui/react';
+import { useEffect, useState, useRef } from 'react';
+import { Combobox } from '@headlessui/react';
 import { ChevronUpDownIcon, CheckIcon } from '@heroicons/react/24/outline';
 
 export default function AddStock({ auth, items }) {
     const [selectedItem, setSelectedItem] = useState(null);
+    const [query, setQuery] = useState('');
+    const buttonRef = useRef(null);
 
     const { data, setData, post, processing, errors, reset } = useForm({
         item_id: '',
@@ -20,6 +22,16 @@ export default function AddStock({ auth, items }) {
     const isLowStock = (availableStock) => availableStock <= 10;
 
     const formatItemDisplay = (item) => `${item.name} - Current: ${item.available_stock} ${item.unit === 'Quantity' ? 'pcs' : item.unit}`;
+
+    const filteredItems =
+        query === ''
+            ? items
+            : items.filter((item) => {
+                return (
+                    item.name.toLowerCase().includes(query.toLowerCase()) ||
+                    (item.description && item.description.toLowerCase().includes(query.toLowerCase()))
+                );
+            });
 
     const handleItemChange = (e) => {
         const itemId = e.target.value;
@@ -51,49 +63,66 @@ export default function AddStock({ auth, items }) {
                             <form onSubmit={submit} className="space-y-6">
                                 <div>
                                     <InputLabel htmlFor="item_id" value="Select Item" />
-                                    <Listbox
-                                        value={data.item_id}
-                                        onChange={(value) => {
-                                            setData('item_id', value);
-                                            const item = items.find(item => item.id == value);
-                                            setSelectedItem(item);
+                                    <Combobox
+                                        value={selectedItem}
+                                        onChange={(item) => {
+                                            if (item) {
+                                                setData('item_id', item.id);
+                                                setSelectedItem(item);
+                                            }
                                         }}
                                     >
-                                        <div className="relative mt-1">
-                                            <Listbox.Button className="relative w-full cursor-default rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 py-2 pl-3 pr-10 text-left shadow-sm focus:border-indigo-500 dark:focus:border-indigo-400 focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:focus:ring-indigo-400 sm:text-sm text-gray-900 dark:text-gray-100">
-                                                <span className="block truncate">{selectedItem ? formatItemDisplay(selectedItem) : 'Choose an item...'}</span>
-                                                <span className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
-                                                    <ChevronUpDownIcon className="h-5 w-5 text-gray-400" aria-hidden="true" />
-                                                </span>
-                                            </Listbox.Button>
-                                            <Listbox.Options className="absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-md bg-white dark:bg-gray-700 py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm">
-                                                {items.map((item) => (
-                                                    <Listbox.Option
-                                                        key={item.id}
-                                                        value={item.id}
-                                                        className={({ active }) =>
-                                                            `relative cursor-default select-none py-2 pl-3 pr-9 ${
-                                                                active ? 'bg-indigo-600 text-white' : isLowStock(item.quantity) ? 'text-red-600' : 'text-gray-900 dark:text-gray-100'
-                                                            }`
+                                        {({ open }) => (
+                                            <div className="relative mt-1">
+                                                <Combobox.Input
+                                                    id="item_id"
+                                                    className="w-full rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 py-2 pl-3 pr-10 text-left shadow-sm focus:border-indigo-500 dark:focus:border-indigo-400 focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:focus:ring-indigo-400 sm:text-sm text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500"
+                                                    displayValue={(item) => item ? formatItemDisplay(item) : ''}
+                                                    onChange={(event) => setQuery(event.target.value)}
+                                                    onClick={() => {
+                                                        if (!open) {
+                                                            buttonRef.current?.click();
                                                         }
-                                                    >
-                                                        {({ selected }) => (
-                                                            <>
-                                                                <span className={`block truncate ${selected ? 'font-medium' : 'font-normal'}`}>
-                                                                    {formatItemDisplay(item)}
-                                                                </span>
-                                                                {selected && (
-                                                                    <span className="absolute inset-y-0 right-0 flex items-center pr-4 text-indigo-600">
-                                                                        <CheckIcon className="h-5 w-5" aria-hidden="true" />
-                                                                    </span>
+                                                    }}
+                                                    placeholder="Choose an item..."
+                                                />
+                                                <Combobox.Button ref={buttonRef} className="absolute inset-y-0 right-0 flex items-center pr-2">
+                                                    <ChevronUpDownIcon className="h-5 w-5 text-gray-400" aria-hidden="true" />
+                                                </Combobox.Button>
+                                                <Combobox.Options className="absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-md bg-white dark:bg-gray-700 py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm">
+                                                    {filteredItems.length === 0 && query !== '' ? (
+                                                        <div className="relative cursor-default select-none py-2 px-4 text-gray-700 dark:text-gray-300">
+                                                            Nothing found.
+                                                        </div>
+                                                    ) : (
+                                                        filteredItems.map((item) => (
+                                                            <Combobox.Option
+                                                                key={item.id}
+                                                                value={item}
+                                                                className={({ active }) =>
+                                                                    `relative cursor-default select-none py-2 pl-3 pr-9 ${active ? 'bg-indigo-600 text-white' : isLowStock(item.quantity) ? 'text-red-600' : 'text-gray-900 dark:text-gray-100'
+                                                                    }`
+                                                                }
+                                                            >
+                                                                {({ selected, active }) => (
+                                                                    <>
+                                                                        <span className={`block truncate ${selected ? 'font-medium' : 'font-normal'}`}>
+                                                                            {formatItemDisplay(item)}
+                                                                        </span>
+                                                                        {selected && (
+                                                                            <span className={`absolute inset-y-0 right-0 flex items-center pr-4 ${active ? 'text-white' : 'text-indigo-600'}`}>
+                                                                                <CheckIcon className="h-5 w-5" aria-hidden="true" />
+                                                                            </span>
+                                                                        )}
+                                                                    </>
                                                                 )}
-                                                            </>
-                                                        )}
-                                                    </Listbox.Option>
-                                                ))}
-                                            </Listbox.Options>
-                                        </div>
-                                    </Listbox>
+                                                            </Combobox.Option>
+                                                        ))
+                                                    )}
+                                                </Combobox.Options>
+                                            </div>
+                                        )}
+                                    </Combobox>
                                     <InputError message={errors.item_id} className="mt-2" />
                                 </div>
 
