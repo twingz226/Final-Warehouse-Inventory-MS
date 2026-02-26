@@ -55,13 +55,43 @@ class ItemController extends Controller
         }
 
         if ($date) {
-            $query->whereDate('date_time', $date);
+            $query->where(function ($q) use ($date) {
+                $q->whereDate('date_time', $date)
+                  ->orWhereHas('history', function ($q2) use ($date) {
+                      $q2->whereIn('action', ['created', 'stock_added'])
+                         ->whereDate('created_at', $date);
+                  });
+            });
+            $query->with(['history' => function ($historyQuery) use ($date) {
+                $historyQuery->whereIn('action', ['created', 'stock_added'])
+                             ->whereDate('created_at', $date)
+                             ->latest();
+            }]);
         }
 
         // Apply sorting
         $query->orderBy($sort, $direction);
 
         $items = $query->paginate(10)->withQueryString();
+
+        if ($date) {
+            $items->getCollection()->transform(function ($item) use ($date) {
+                if (!$item->date_time || $item->date_time->format('Y-m-d') !== $date) {
+                    // Use eager-loaded history
+                    $matchingHistory = $item->history->first();
+                    if ($matchingHistory) {
+                        $item->date_time = $matchingHistory->created_at;
+                        // For 'stock_added', calculate the difference. For 'created', use 'new_values.quantity'
+                        if ($matchingHistory->action === 'stock_added' && isset($matchingHistory->new_values['quantity'], $matchingHistory->old_values['quantity'])) {
+                            $item->quantity = $matchingHistory->new_values['quantity'] - $matchingHistory->old_values['quantity'];
+                        } elseif ($matchingHistory->action === 'created' && isset($matchingHistory->new_values['quantity'])) {
+                            $item->quantity = $matchingHistory->new_values['quantity'];
+                        }
+                    }
+                }
+                return $item;
+            });
+        }
 
         return Inertia::render('Items/Index', [
             'items' => $items,

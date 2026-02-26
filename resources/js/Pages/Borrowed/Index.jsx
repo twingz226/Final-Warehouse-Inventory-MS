@@ -193,7 +193,7 @@ export default function Index({ auth, borrowings, status, statusOptions }) {
                                 ) : (
                                     <div className="space-y-4">
                                         {borrowings.data.map((borrowing, index) => (
-                                            <div key={`borrowing-${index}`} className="bg-white dark:bg-gray-700 rounded-lg shadow-sm border border-gray-200 dark:border-gray-600 p-6">
+                                            <div key={`borrowing-${index}`} className={`rounded-lg shadow-sm border p-6 transition-colors duration-200 ${index % 2 === 1 ? 'bg-gray-200 dark:bg-gray-700' : 'bg-white dark:bg-gray-800'} hover:bg-blue-200 dark:hover:bg-gray-600 border-gray-300 dark:border-gray-600`}>
                                                 <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                                                     <div className="flex-1">
                                                         <div className="flex items-center gap-3 mb-2">
@@ -265,8 +265,8 @@ export default function Index({ auth, borrowings, status, statusOptions }) {
                                                     key={`${link.label}-${index}`}
                                                     href={link.url}
                                                     className={`inline-flex items-center px-4 py-2 text-sm font-medium rounded-md mx-1 ${link.active
-                                                            ? 'bg-blue-600 text-white dark:bg-blue-700'
-                                                            : 'bg-white text-gray-700 hover:bg-gray-50 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600'
+                                                        ? 'bg-blue-600 text-white dark:bg-blue-700'
+                                                        : 'bg-white text-gray-700 hover:bg-gray-50 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600'
                                                         } border border-gray-300 dark:border-gray-600`}
                                                     preserveScroll
                                                     preserveState

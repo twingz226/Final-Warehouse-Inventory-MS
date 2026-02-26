@@ -164,7 +164,7 @@ export default function ActivityHistory({ auth, history, items, distributions, f
             user={auth.user}
             header={
                 <div className="flex justify-between items-center">
-                    <h2 className="font-semibold text-xl text-gray-800 leading-tight">
+                    <h2 className="font-semibold text-xl text-gray-800 dark:text-white leading-tight">
                         Activity Log
                     </h2>
                 </div>
@@ -278,7 +278,10 @@ export default function ActivityHistory({ auth, history, items, distributions, f
 
                                                 {/* Content */}
                                                 <div className="ml-4 sm:ml-6 flex-1 min-w-0">
-                                                    <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-3 sm:p-4 border border-gray-200 dark:border-gray-600">
+                                                    <div className={`rounded-lg p-3 sm:p-4 border transition-colors duration-200 border-gray-300 dark:border-gray-600 hover:bg-blue-200 dark:hover:bg-gray-600 ${index % 2 === 1
+                                                        ? 'bg-gray-200 dark:bg-gray-700'
+                                                        : 'bg-white dark:bg-gray-800'
+                                                        }`}>
                                                         <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between mb-2 space-y-2 sm:space-y-0">
                                                             <div className="flex flex-col sm:flex-row sm:items-center space-y-1 sm:space-y-0 sm:space-x-3">
                                                                 <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getActionColor(record.action)}`}>

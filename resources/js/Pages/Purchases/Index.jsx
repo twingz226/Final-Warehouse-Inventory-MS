@@ -304,7 +304,7 @@ export default function Index({ auth, purchases, status }) {
                 user={auth.user}
                 header={
                     <div className="flex justify-between items-center">
-                        <h2 className="font-semibold text-xl text-gray-800 leading-tight">
+                        <h2 className="font-semibold text-xl text-gray-800 dark:text-white leading-tight">
                             Outgoing Items
                         </h2>
                         <Link
@@ -396,7 +396,7 @@ export default function Index({ auth, purchases, status }) {
                                                 };
 
                                                 return (
-                                                    <tr key={group.key}>
+                                                    <tr key={group.key} className="odd:bg-white even:bg-gray-200 dark:odd:bg-gray-800 dark:even:bg-gray-700 hover:bg-blue-200 dark:hover:bg-gray-600 border-b border-gray-300 dark:border-gray-600 transition-colors duration-200">
                                                         {/* Destination */}
                                                         <td className="px-6 py-4 align-top">
                                                             <div className="text-sm font-medium text-gray-900 dark:text-gray-100">
@@ -429,9 +429,6 @@ export default function Index({ auth, purchases, status }) {
                                                                     <div key={idx} className="flex items-center gap-2">
                                                                         <span className="text-sm font-medium text-gray-900 dark:text-gray-100">
                                                                             {r.item_name}
-                                                                        </span>
-                                                                        <span className="text-xs text-gray-400 dark:text-gray-500">
-                                                                            ×{r.quantity} {r.item_unit === 'Quantity' ? 'pcs' : (r.item_unit ? r.item_unit.toLowerCase() : '')}
                                                                         </span>
                                                                     </div>
                                                                 ))}

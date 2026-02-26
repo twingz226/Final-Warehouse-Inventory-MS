@@ -82,7 +82,7 @@ export default function Index({ auth, shipmentApprovals, status }) {
                                         </thead>
                                         <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
                                             {shipmentApprovals.data.map((approval) => (
-                                                <tr key={approval.id} className="hover:bg-gray-50 dark:hover:bg-gray-700">
+                                                <tr key={approval.id} className="odd:bg-white even:bg-gray-200 dark:odd:bg-gray-800 dark:even:bg-gray-700 hover:bg-blue-200 dark:hover:bg-gray-600 border-b border-gray-300 dark:border-gray-600 transition-colors duration-200">
                                                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
                                                         {approval.project_site_name}
                                                     </td>
@@ -97,7 +97,7 @@ export default function Index({ auth, shipmentApprovals, status }) {
                                                     </td>
                                                     <td className="px-6 py-4 text-sm text-gray-900 dark:text-gray-100">
                                                         {approval.picture && Array.isArray(approval.picture) && approval.picture.length > 0 ? (
-                                                            <div className="flex -space-x-2 overflow-hidden hover:space-x-1 transition-all duration-200">
+                                                            <div className="flex flex-wrap gap-2">
                                                                 {approval.picture.map((pic, idx) => (
                                                                     <a key={idx} href={`/storage/${pic}`} target="_blank" rel="noopener noreferrer">
                                                                         <img

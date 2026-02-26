@@ -232,7 +232,7 @@ export default function Index({ auth, items, status }) {
                 user={auth.user}
                 header={
                     <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-                        <h2 className="font-semibold text-xl text-gray-800 leading-tight">
+                        <h2 className="font-semibold text-xl text-gray-800 dark:text-white leading-tight">
                             Incoming Items
                         </h2>
                         <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 w-full sm:w-auto">
@@ -456,7 +456,7 @@ export default function Index({ auth, items, status }) {
                                         <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
                                             {items.data.length > 0 ? (
                                                 items.data.map((item) => (
-                                                    <tr key={item.id} className={selectedItems.includes(item.id) ? 'bg-indigo-50 dark:bg-indigo-900/20' : ''}>
+                                                    <tr key={item.id} className={`${selectedItems.includes(item.id) ? 'bg-indigo-50 dark:bg-indigo-900/20' : 'odd:bg-white even:bg-gray-200 dark:odd:bg-gray-800 dark:even:bg-gray-700'} hover:bg-blue-200 dark:hover:bg-gray-600 border-b border-gray-300 dark:border-gray-600 transition-colors duration-200`}>
                                                         <td className="px-6 py-4 whitespace-nowrap">
                                                             <input
                                                                 type="checkbox"
