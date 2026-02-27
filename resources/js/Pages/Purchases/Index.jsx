@@ -478,7 +478,7 @@ export default function Index({ auth, purchases, status }) {
                                                         <td className="px-6 py-4 align-top">
                                                             <div className="space-y-1">
                                                                 {group.rows.map((r, idx) => (
-                                                                    <div key={idx} className="flex items-center gap-2">
+                                                                    <div key={idx} className="flex items-center gap-2 min-h-[32px]">
                                                                         <span className="text-sm font-medium text-gray-900 dark:text-gray-100">
                                                                             {r.item_name}
                                                                         </span>
@@ -491,7 +491,7 @@ export default function Index({ auth, purchases, status }) {
                                                         <td className="px-6 py-4 align-top">
                                                             <div className="space-y-1">
                                                                 {group.rows.map((r, idx) => (
-                                                                    <div key={idx}>
+                                                                    <div key={idx} className="flex items-center min-h-[32px]">
                                                                         {r.item_category ? (
                                                                             <span className={`inline-flex px-2 py-0.5 text-xs font-semibold rounded-full capitalize ${r.item_category === 'material'
                                                                                 ? 'bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200'
@@ -513,7 +513,7 @@ export default function Index({ auth, purchases, status }) {
                                                         <td className="px-6 py-4 align-top">
                                                             <div className="space-y-1">
                                                                 {group.rows.map((r, idx) => (
-                                                                    <div key={idx} className="text-sm text-gray-500 dark:text-gray-400">
+                                                                    <div key={idx} className="flex items-center text-sm text-gray-500 dark:text-gray-400 min-h-[32px]">
                                                                         {r.quantity} {r.item_unit === 'Quantity' ? 'pcs' : (r.item_unit ? r.item_unit.toLowerCase() : '')}
                                                                     </div>
                                                                 ))}

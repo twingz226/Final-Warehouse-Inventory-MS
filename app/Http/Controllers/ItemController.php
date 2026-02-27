@@ -117,7 +117,7 @@ class ItemController extends Controller
             'description' => 'nullable|string',
             'category' => 'required|in:tool,material',
             'quantity' => 'required|numeric|min:0',
-            'unit' => 'required|in:Quantity,Kg',
+            'unit' => 'required|in:Quantity,Kg,pcs',
             'date_time' => 'nullable|string',
         ]);
 
@@ -126,7 +126,7 @@ class ItemController extends Controller
 
         $item = Item::create($validated);
 
-        $unit = $item->unit === 'Kg' ? 'kg' : 'pcs';
+        $unit = in_array($item->unit, ['Quantity', 'pcs']) ? 'pcs' : 'kg';
         $this->logHistory($item, 'created', null, $validated, "New item '{$item->name}' added — {$item->quantity} {$unit} in stock.");
 
         return redirect()
@@ -166,7 +166,7 @@ class ItemController extends Controller
             'description' => 'nullable|string',
             'category' => 'required|in:tool,material',
             'quantity' => 'required|numeric|min:0',
-            'unit' => 'required|in:Quantity,Kg',
+            'unit' => 'required|in:Quantity,Kg,pcs',
             'date_time' => 'nullable|string',
         ]);
 
@@ -181,7 +181,7 @@ class ItemController extends Controller
             $changes[] = "• Name: \"{$oldValues['name']}\" → \"{$validated['name']}\"";
         }
         if ($oldValues['quantity'] != $validated['quantity']) {
-            $unit = $validated['unit'] === 'Kg' ? 'kg' : 'pcs';
+            $unit = in_array($validated['unit'], ['Quantity', 'pcs']) ? 'pcs' : 'kg';
             $changes[] = "• Quantity: {$oldValues['quantity']} → {$validated['quantity']} {$unit}";
         }
         if ($oldValues['description'] !== $validated['description']) {

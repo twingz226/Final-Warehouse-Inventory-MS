@@ -9,6 +9,7 @@ use Inertia\Inertia;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
+use Illuminate\Pagination\LengthAwarePaginator;
 
 class PurchaseController extends Controller
 {
@@ -35,13 +36,14 @@ class PurchaseController extends Controller
         $search = $request->input('search');
         $date = $request->input('date');
         
-        $query = Purchase::with('creator')
-            ->leftJoin('items', 'purchases.item_name', '=', 'items.name')
-            ->select('purchases.*', 'items.category as item_category', 'items.unit as item_unit')
-            ->latest();
+        // 1. First, paginate the distinct project groups
+        $groupQuery = Purchase::select('purchases.supplier_name', 'purchases.purchase_date')
+            ->groupBy('purchases.supplier_name', 'purchases.purchase_date')
+            ->orderBy('purchases.purchase_date', 'desc')
+            ->orderBy('purchases.supplier_name', 'asc');
         
         if ($search) {
-            $query->where(function($q) use ($search) {
+            $groupQuery->where(function($q) use ($search) {
                 $q->where('purchases.supplier_name', 'like', '%' . $search . '%')
                   ->orWhere('purchases.item_name', 'like', '%' . $search . '%')
                   ->orWhere('purchases.description', 'like', '%' . $search . '%');
@@ -49,10 +51,41 @@ class PurchaseController extends Controller
         }
         
         if ($date) {
-            $query->whereDate('purchases.purchase_date', $date);
+            $groupQuery->whereDate('purchases.purchase_date', $date);
         }
         
-        $purchases = $query->paginate(10)->withQueryString();
+        $paginatedGroups = $groupQuery->paginate(10);
+        $groups = $paginatedGroups->items();
+
+        // 2. Fetch all items matching the groups on this specific page
+        $purchasesForGroups = collect();
+        if (count($groups) > 0) {
+            $itemQuery = Purchase::with('creator')
+                ->leftJoin('items', 'purchases.item_name', '=', 'items.name')
+                ->select('purchases.*', 'items.category as item_category', 'items.unit as item_unit')
+                ->where(function($q) use ($groups) {
+                    foreach ($groups as $group) {
+                        $q->orWhere(function($sq) use ($group) {
+                            $sq->where('purchases.supplier_name', $group->supplier_name)
+                               ->where('purchases.purchase_date', $group->purchase_date);
+                        });
+                    }
+                })
+                ->orderBy('purchases.purchase_date', 'desc')
+                ->orderBy('purchases.supplier_name', 'asc');
+            
+            $purchasesForGroups = $itemQuery->get();
+        }
+
+        // 3. Instead of returning individuals, wrap the items into a paginator 
+        // that preserves the total page values from the distinct group paginator
+        $purchases = new LengthAwarePaginator(
+            $purchasesForGroups,
+            $paginatedGroups->total(),
+            $paginatedGroups->perPage(),
+            $paginatedGroups->currentPage(),
+            ['path' => LengthAwarePaginator::resolveCurrentPath(), 'query' => $request->query()]
+        );
 
         return Inertia::render('Purchases/Index', [
             'purchases' => $purchases,

@@ -231,7 +231,7 @@ export default function Index({ auth, shipmentApprovals, status }) {
                                     </div>
                                 )}
 
-                                <div className="overflow-auto max-h-[65vh] [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar]:h-2 [&::-webkit-scrollbar-track]:bg-gray-100 dark:[&::-webkit-scrollbar-track]:bg-gray-800 [&::-webkit-scrollbar-thumb]:bg-gray-300 dark:[&::-webkit-scrollbar-thumb]:bg-gray-600 hover:[&::-webkit-scrollbar-thumb]:bg-gray-400 dark:hover:[&::-webkit-scrollbar-thumb]:bg-gray-500 [&::-webkit-scrollbar-thumb]:rounded-full">
+                                <div className="overflow-x-auto">
                                     <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
                                         <thead className="bg-blue-600/70 dark:bg-blue-900/80">
                                             <tr>

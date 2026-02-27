@@ -52,7 +52,7 @@ export default function ImportModal({ show, onClose }) {
                 </h2>
 
                 <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">
-                    Upload an Excel file (.xlsx or .xls) with columns: Name, Description, Category, Quantity, Unit, Date & Time
+                    Upload an Excel file (.xlsx or .xls). The system maps <strong>DESCRIPTION</strong> to Item Name, <strong>IN</strong> to Quantity, and <strong>DATE</strong> to Date &amp; Time.
                 </p>
 
                 <div className="mt-6">
