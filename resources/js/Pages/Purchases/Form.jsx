@@ -4,6 +4,12 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 
+// ── Helper for capitalizing first letter of each word ──────────────────────
+const capitalizeWords = (str) => {
+    if (!str) return str;
+    return str.split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
+};
+
 // ── Per-row search state factory ──────────────────────────────────────────────
 const emptyRowSearch = () => ({
     query: '',
@@ -74,7 +80,12 @@ export default function Form({ auth, purchase, statusOptions }) {
         const timeout = setTimeout(async () => {
             try {
                 const response = await axios.get(route('items.search'), { params: { search: value } });
-                updateRowSearch(index, { results: response.data, isSearching: false });
+
+                // Filter out items already selected in other rows
+                const selectedNames = data.items.map((item, i) => i !== index ? item.item_name : null).filter(Boolean);
+                const filteredResults = response.data.filter(item => !selectedNames.includes(item.name));
+
+                updateRowSearch(index, { results: filteredResults, isSearching: false });
             } catch {
                 updateRowSearch(index, { results: [], isSearching: false });
             }
@@ -154,7 +165,7 @@ export default function Form({ auth, purchase, statusOptions }) {
                                             type="text"
                                             id="supplier_name"
                                             value={data.supplier_name}
-                                            onChange={(e) => setData('supplier_name', e.target.value)}
+                                            onChange={(e) => setData('supplier_name', capitalizeWords(e.target.value))}
                                             className={inputCls}
                                             required
                                         />
@@ -168,7 +179,7 @@ export default function Form({ auth, purchase, statusOptions }) {
                                             type="text"
                                             id="project_type"
                                             value={data.project_type}
-                                            onChange={(e) => setData('project_type', e.target.value)}
+                                            onChange={(e) => setData('project_type', capitalizeWords(e.target.value))}
                                             className={inputCls}
                                         />
                                         {errors.project_type && <p className="mt-2 text-sm text-red-600 dark:text-red-400">{errors.project_type}</p>}
@@ -194,7 +205,7 @@ export default function Form({ auth, purchase, statusOptions }) {
                                             type="text"
                                             id="issued_by"
                                             value={data.issued_by}
-                                            onChange={(e) => setData('issued_by', e.target.value)}
+                                            onChange={(e) => setData('issued_by', capitalizeWords(e.target.value))}
                                             className={inputCls}
                                         />
                                         {errors.issued_by && <p className="mt-2 text-sm text-red-600 dark:text-red-400">{errors.issued_by}</p>}
@@ -207,7 +218,7 @@ export default function Form({ auth, purchase, statusOptions }) {
                                             type="text"
                                             id="issued_to"
                                             value={data.issued_to}
-                                            onChange={(e) => setData('issued_to', e.target.value)}
+                                            onChange={(e) => setData('issued_to', capitalizeWords(e.target.value))}
                                             className={inputCls}
                                         />
                                         {errors.issued_to && <p className="mt-2 text-sm text-red-600 dark:text-red-400">{errors.issued_to}</p>}
@@ -337,7 +348,7 @@ export default function Form({ auth, purchase, statusOptions }) {
                                                         <input
                                                             type="text"
                                                             value={item.description}
-                                                            onChange={(e) => updateItem(index, { description: e.target.value })}
+                                                            onChange={(e) => updateItem(index, { description: capitalizeWords(e.target.value) })}
                                                             className={inputCls}
                                                             placeholder="Enter item description or specifications..."
                                                         />

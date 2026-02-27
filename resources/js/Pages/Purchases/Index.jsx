@@ -1,10 +1,38 @@
 import { Head, Link, router } from '@inertiajs/react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { PlusIcon, EyeIcon, TrashIcon, PrinterIcon } from '@heroicons/react/24/outline';
 
 export default function Index({ auth, purchases, status }) {
     const [tooltip, setTooltip] = useState({ show: false, text: '', x: 0, y: 0 });
+    const [dateFilter, setDateFilter] = useState('');
+
+    useEffect(() => {
+        const params = new URLSearchParams(window.location.search);
+        if (params.get('date')) {
+            setDateFilter(params.get('date'));
+        }
+    }, []);
+
+    const handleDateChange = (e) => {
+        const newDate = e.target.value;
+        setDateFilter(newDate);
+
+        const params = new URLSearchParams(window.location.search);
+        if (newDate) {
+            params.set('date', newDate);
+        } else {
+            params.delete('date');
+        }
+        params.delete('page');
+
+        const queryStr = params.toString();
+        router.visit(route('purchases.index') + (queryStr ? `?${queryStr}` : ''), {
+            preserveState: true,
+            preserveScroll: true,
+        });
+    };
+
     const deletePurchase = (id) => {
         router.delete(route('purchases.destroy', id));
     };
@@ -327,6 +355,30 @@ export default function Index({ auth, purchases, status }) {
                                 {status}
                             </div>
                         )}
+
+                        {/* Date Filter */}
+                        <div className="mb-6 flex justify-end">
+                            <div className="flex items-center gap-2">
+                                <label htmlFor="date-filter" className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                                    Filter by Date:
+                                </label>
+                                <input
+                                    id="date-filter"
+                                    type="date"
+                                    value={dateFilter}
+                                    onChange={handleDateChange}
+                                    className="border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-indigo-500 dark:focus:border-indigo-600 focus:ring-indigo-500 dark:focus:ring-indigo-600 rounded-md shadow-sm sm:text-sm"
+                                />
+                                {dateFilter && (
+                                    <button
+                                        onClick={() => handleDateChange({ target: { value: '' } })}
+                                        className="text-sm text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300 ml-2 py-1 px-3 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800"
+                                    >
+                                        Clear Filter
+                                    </button>
+                                )}
+                            </div>
+                        </div>
 
                         <div className="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
                             <div className="overflow-x-auto">

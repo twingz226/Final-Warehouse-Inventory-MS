@@ -14,20 +14,21 @@ const capitalizeWords = (str) => {
     return str.split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
 };
 
-export default function Form({ auth, projectSiteNames = [] }) {
+export default function Edit({ auth, projectSiteNames = [], shipmentApproval }) {
     const [projectItems, setProjectItems] = useState([]);
     const [dateFilter, setDateFilter] = useState('');
-    const { data, setData, post, processing, errors, reset } = useForm({
-        project_site_name: '',
-        sa_number: '',
-        tools_id: '',
-        description: '',
+    const { data, setData, post, processing, errors } = useForm({
+        _method: 'put',
+        project_site_name: shipmentApproval?.project_site_name || '',
+        sa_number: shipmentApproval?.sa_number || '',
+        tools_id: shipmentApproval?.tools_id || '',
+        description: shipmentApproval?.description || '',
         picture: [],
     });
 
     const submit = (e) => {
         e.preventDefault();
-        post(route('shipment-approvals.store'));
+        post(route('shipment-approvals.update', shipmentApproval.id));
     };
 
     const filteredProjectItems = dateFilter
@@ -48,6 +49,19 @@ export default function Form({ auth, projectSiteNames = [] }) {
         }
     }, [dateFilter, projectItems]);
 
+    // Fetch existing project data based on the current project_site_name when component mounts
+    useEffect(() => {
+        if (shipmentApproval?.project_site_name) {
+            axios.get(route('shipment-approvals.project-data', shipmentApproval.project_site_name))
+                .then(res => {
+                    if (Array.isArray(res.data)) {
+                        setProjectItems(res.data);
+                    }
+                })
+                .catch(err => console.error('Error fetching project data:', err));
+        }
+    }, [shipmentApproval]);
+
     return (
         <AuthenticatedLayout
             header={
@@ -60,12 +74,12 @@ export default function Form({ auth, projectSiteNames = [] }) {
                         Back
                     </a>
                     <h2 className="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
-                        Create Shipment Approval
+                        Edit Shipment Approval
                     </h2>
                 </div>
             }
         >
-            <Head title="Create Shipment Approval" />
+            <Head title="Edit Shipment Approval" />
 
             <div className="py-12">
                 <div className="max-w-2xl mx-auto sm:px-6 lg:px-8">
@@ -202,7 +216,7 @@ export default function Form({ auth, projectSiteNames = [] }) {
                                 </div>
 
                                 <div className="mt-6">
-                                    <InputLabel htmlFor="picture" value="Picture" />
+                                    <InputLabel htmlFor="picture" value="Picture (Leave empty to keep current picture(s))" />
                                     <input
                                         id="picture"
                                         type="file"
@@ -213,6 +227,22 @@ export default function Form({ auth, projectSiteNames = [] }) {
                                         onChange={(e) => setData('picture', Array.from(e.target.files))}
                                     />
                                     <InputError message={errors.picture} className="mt-2" />
+
+                                    {/* Display current pictures */}
+                                    {shipmentApproval?.picture && data.picture.length === 0 && (
+                                        <div className="mt-4 flex flex-wrap gap-2">
+                                            <p className="w-full text-sm text-gray-500 dark:text-gray-400 mb-1">Current Picture(s):</p>
+                                            {shipmentApproval.picture.map((pic, idx) => (
+                                                <img
+                                                    key={idx}
+                                                    src={`/storage/${pic}`}
+                                                    alt={`Current Picture ${idx + 1}`}
+                                                    className="h-20 w-auto rounded border border-gray-300 dark:border-gray-600"
+                                                />
+                                            ))}
+                                        </div>
+                                    )}
+
                                     {Object.keys(errors)
                                         .filter(key => key.startsWith('picture.'))
                                         .map(key => (
@@ -220,14 +250,14 @@ export default function Form({ auth, projectSiteNames = [] }) {
                                         ))}
                                     {data.picture && data.picture.length > 0 && (
                                         <div className="mt-2 text-sm text-gray-500">
-                                            {data.picture.length} file(s) selected
+                                            {data.picture.length} new file(s) selected
                                         </div>
                                     )}
                                 </div>
 
                                 <div className="flex items-center justify-end mt-6">
                                     <PrimaryButton className="ml-4" disabled={processing}>
-                                        Create Shipment Approval
+                                        Save Changes
                                     </PrimaryButton>
                                 </div>
                             </form>

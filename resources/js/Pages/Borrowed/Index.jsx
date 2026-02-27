@@ -209,8 +209,13 @@ export default function Index({ auth, borrowings, status, statusOptions }) {
                                                                 <span className="font-medium">Borrower:</span> {borrowing.borrower_name}
                                                             </div>
                                                             <div>
-                                                                <span className="font-medium">Item Borrowed.:</span> {borrowing.item_name}
+                                                                <span className="font-medium">Item Borrowed:</span> {borrowing.item_name}
                                                             </div>
+                                                            {borrowing.tool_id ? (
+                                                                <div>
+                                                                    <span className="font-medium">Tool ID:</span> {borrowing.tool_id}
+                                                                </div>
+                                                            ) : null}
                                                             <div>
                                                                 <span className="font-medium">Borrow Date:</span> {new Date(borrowing.borrow_date).toLocaleString()}
                                                             </div>
@@ -218,9 +223,7 @@ export default function Index({ auth, borrowings, status, statusOptions }) {
                                                                 <span className="font-medium">Expected Return:</span> {new Date(borrowing.expected_return_date).toLocaleString()}
                                                             </div>
                                                         </div>
-                                                        {borrowing.description && (
-                                                            <p className="mt-2 text-sm text-gray-600 dark:text-gray-300">{borrowing.description}</p>
-                                                        )}
+
                                                     </div>
                                                     <div className="flex items-center gap-2">
                                                         <Link

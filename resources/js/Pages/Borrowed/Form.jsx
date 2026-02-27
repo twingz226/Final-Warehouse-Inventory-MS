@@ -7,15 +7,10 @@ import axios from 'axios';
 export default function Form({ auth, borrowing, statusOptions }) {
     const { data, setData, post, put, processing, errors, reset } = useForm({
         borrower_name: borrowing?.borrower_name || '',
-        borrower_email: borrowing?.borrower_email || '',
-        borrower_phone: borrowing?.borrower_phone || '',
-        items: borrowing ? [{ item_name: borrowing.item_name, quantity: borrowing.quantity, description: borrowing.description }] : [{ item_name: '', quantity: '', description: '' }],
+        items: borrowing ? [{ item_name: borrowing.item_name, tool_id: borrowing.tool_id || '', quantity: borrowing.quantity }] : [{ item_name: '', tool_id: '', quantity: '' }],
         borrow_date: borrowing?.borrow_date || new Date().toISOString().slice(0, 16),
         expected_return_date: borrowing?.expected_return_date || new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString().slice(0, 16),
         status: borrowing?.status || 'borrowed',
-        notes: borrowing?.notes || '',
-        project_type: borrowing?.project_type || '',
-        project_name: borrowing?.project_name || '',
     });
 
     const [searchState, setSearchState] = useState(
@@ -83,9 +78,6 @@ export default function Form({ auth, borrowing, statusOptions }) {
     const handleItemSelect = (item, index) => {
         const newItems = [...data.items];
         newItems[index].item_name = item.name;
-        if (item.description) {
-            newItems[index].description = item.description;
-        }
         setData('items', newItems);
 
         const newSearchState = [...searchState];
@@ -112,7 +104,7 @@ export default function Form({ auth, borrowing, statusOptions }) {
     };
 
     const addItem = () => {
-        setData('items', [...data.items, { item_name: '', quantity: '', description: '' }]);
+        setData('items', [...data.items, { item_name: '', tool_id: '', quantity: '' }]);
         setSearchState([...searchState, { query: '', results: [], show: false, isSearching: false }]);
     };
 
@@ -190,34 +182,6 @@ export default function Form({ auth, borrowing, statusOptions }) {
                                         required
                                     />
                                     {errors.borrower_name && <p className="mt-2 text-sm text-red-600 dark:text-red-400">{errors.borrower_name}</p>}
-                                </div>
-
-                                <div>
-                                    <label htmlFor="borrower_email" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                                        Email
-                                    </label>
-                                    <input
-                                        id="borrower_email"
-                                        type="email"
-                                        value={data.borrower_email}
-                                        onChange={(e) => setData('borrower_email', e.target.value)}
-                                        className="mt-1 block w-full bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-blue-500 dark:focus:border-blue-400"
-                                    />
-                                    {errors.borrower_email && <p className="mt-2 text-sm text-red-600 dark:text-red-400">{errors.borrower_email}</p>}
-                                </div>
-
-                                <div>
-                                    <label htmlFor="borrower_phone" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                                        Phone
-                                    </label>
-                                    <input
-                                        id="borrower_phone"
-                                        type="tel"
-                                        value={data.borrower_phone}
-                                        onChange={(e) => setData('borrower_phone', e.target.value)}
-                                        className="mt-1 block w-full bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-blue-500 dark:focus:border-blue-400"
-                                    />
-                                    {errors.borrower_phone && <p className="mt-2 text-sm text-red-600 dark:text-red-400">{errors.borrower_phone}</p>}
                                 </div>
 
                                 {/* Item Information */}
@@ -301,6 +265,24 @@ export default function Form({ auth, borrowing, statusOptions }) {
                                         </div>
 
                                         <div>
+                                            <label htmlFor={`tool_id_${index}`} className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                                                Tool ID
+                                            </label>
+                                            <input
+                                                id={`tool_id_${index}`}
+                                                type="text"
+                                                value={item.tool_id || ''}
+                                                onChange={(e) => {
+                                                    const newItems = [...data.items];
+                                                    newItems[index].tool_id = e.target.value;
+                                                    setData('items', newItems);
+                                                }}
+                                                className="mt-1 block w-full bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-blue-500 dark:focus:border-blue-400"
+                                            />
+                                            {errors[`items.${index}.tool_id`] && <p className="mt-2 text-sm text-red-600 dark:text-red-400">{errors[`items.${index}.tool_id`]}</p>}
+                                        </div>
+
+                                        <div>
                                             <label htmlFor={`quantity_${index}`} className="block text-sm font-medium text-gray-700 dark:text-gray-300">
                                                 Quantity *
                                             </label>
@@ -316,7 +298,6 @@ export default function Form({ auth, borrowing, statusOptions }) {
                                             {errors[`items.${index}.quantity`] && <p className="mt-2 text-sm text-red-600 dark:text-red-400">{errors[`items.${index}.quantity`]}</p>}
                                         </div>
 
-                                        {/* Description mapping to the specific item if we want it to be per-item, otherwise we can keep it global. Let's keep it global as it was for now and just set one description if needed. Or we can just drop it per item. The previous form had a single global description anyway. */}
                                     </div>
                                 ))}
 
@@ -370,71 +351,6 @@ export default function Form({ auth, borrowing, statusOptions }) {
                                     </div>
                                 )}
 
-                                {/* Project Information */}
-                                <div className="md:col-span-2">
-                                    <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-4">Project Information (Optional)</h3>
-                                </div>
-
-                                <div>
-                                    <label htmlFor="project_type" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                                        Project Type
-                                    </label>
-                                    <input
-                                        id="project_type"
-                                        type="text"
-                                        value={data.project_type}
-                                        onChange={(e) => setData('project_type', e.target.value)}
-                                        className="mt-1 block w-full bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-blue-500 dark:focus:border-blue-400"
-                                    />
-                                    {errors.project_type && <p className="mt-2 text-sm text-red-600 dark:text-red-400">{errors.project_type}</p>}
-                                </div>
-
-                                <div>
-                                    <label htmlFor="project_name" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                                        Project Name
-                                    </label>
-                                    <input
-                                        id="project_name"
-                                        type="text"
-                                        value={data.project_name}
-                                        onChange={(e) => setData('project_name', e.target.value)}
-                                        className="mt-1 block w-full bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-blue-500 dark:focus:border-blue-400"
-                                    />
-                                    {errors.project_name && <p className="mt-2 text-sm text-red-600 dark:text-red-400">{errors.project_name}</p>}
-                                </div>
-
-                                <div className="md:col-span-2">
-                                    <label htmlFor="description" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                                        Description
-                                    </label>
-                                    <textarea
-                                        id="description"
-                                        value={data.items[0]?.description || ''}
-                                        onChange={(e) => {
-                                            const newItems = [...data.items];
-                                            if (newItems.length > 0) newItems[0].description = e.target.value;
-                                            setData('items', newItems);
-                                        }}
-                                        rows={3}
-                                        className="mt-1 block w-full bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-blue-500 dark:focus:border-blue-400"
-                                        placeholder="Description (Optional)"
-                                    />
-                                    {errors.description && <p className="mt-2 text-sm text-red-600 dark:text-red-400">{errors.description}</p>}
-                                </div>
-
-                                <div className="md:col-span-2">
-                                    <label htmlFor="notes" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                                        Notes
-                                    </label>
-                                    <textarea
-                                        id="notes"
-                                        value={data.notes}
-                                        onChange={(e) => setData('notes', e.target.value)}
-                                        rows={3}
-                                        className="mt-1 block w-full bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-blue-500 dark:focus:border-blue-400"
-                                    />
-                                    {errors.notes && <p className="mt-2 text-sm text-red-600 dark:text-red-400">{errors.notes}</p>}
-                                </div>
                             </div>
 
                             <div className="flex items-center justify-end mt-6 space-x-4">

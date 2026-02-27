@@ -42,8 +42,7 @@ class BorrowingController extends Controller
         if ($search) {
             $query->where(function($q) use ($search) {
                 $q->where('borrowings.borrower_name', 'like', '%' . $search . '%')
-                  ->orWhere('borrowings.item_name', 'like', '%' . $search . '%')
-                  ->orWhere('borrowings.description', 'like', '%' . $search . '%');
+                  ->orWhere('borrowings.item_name', 'like', '%' . $search . '%');
             });
         }
 
@@ -81,18 +80,13 @@ class BorrowingController extends Controller
     {
         $validated = $request->validate([
             'borrower_name' => 'required|string|max:255',
-            'borrower_email' => 'nullable|email|max:255',
-            'borrower_phone' => 'nullable|string|max:20',
             'items' => 'required|array|min:1',
             'items.*.item_name' => 'required|string|max:255',
-            'items.*.description' => 'nullable|string',
+            'items.*.tool_id' => 'nullable|string|max:255',
             'items.*.quantity' => 'required|integer|min:1',
             'borrow_date' => 'required|date',
             'expected_return_date' => 'required|date|after_or_equal:borrow_date',
             'status' => 'required|in:borrowed,returned,overdue',
-            'notes' => 'nullable|string',
-            'project_type' => 'nullable|string|max:255',
-            'project_name' => 'nullable|string|max:255',
         ]);
 
         $validated['created_by'] = Auth::id();
@@ -146,19 +140,14 @@ class BorrowingController extends Controller
 
         $validated = $request->validate([
             'borrower_name' => 'required|string|max:255',
-            'borrower_email' => 'nullable|email|max:255',
-            'borrower_phone' => 'nullable|string|max:20',
             'items' => 'required|array|min:1',
             'items.*.item_name' => 'required|string|max:255',
-            'items.*.description' => 'nullable|string',
+            'items.*.tool_id' => 'nullable|string|max:255',
             'items.*.quantity' => 'required|integer|min:1',
             'borrow_date' => 'required|date',
             'expected_return_date' => 'required|date|after_or_equal:borrow_date',
             'actual_return_date' => 'nullable|date|after_or_equal:borrow_date',
             'status' => 'required|in:borrowed,returned,overdue',
-            'notes' => 'nullable|string',
-            'project_type' => 'nullable|string|max:255',
-            'project_name' => 'nullable|string|max:255',
         ]);
 
         $oldStatus = $borrowing->status;

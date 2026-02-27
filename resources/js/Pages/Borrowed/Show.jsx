@@ -103,18 +103,7 @@ export default function Show({ auth, borrowing }) {
                                                 <dt className="text-sm font-medium text-gray-500 dark:text-gray-400">Name</dt>
                                                 <dd className="text-sm text-gray-900 dark:text-gray-100">{borrowing.borrower_name}</dd>
                                             </div>
-                                            {borrowing.borrower_email && (
-                                                <div>
-                                                    <dt className="text-sm font-medium text-gray-500 dark:text-gray-400">Email</dt>
-                                                    <dd className="text-sm text-gray-900 dark:text-gray-100">{borrowing.borrower_email}</dd>
-                                                </div>
-                                            )}
-                                            {borrowing.borrower_phone && (
-                                                <div>
-                                                    <dt className="text-sm font-medium text-gray-500 dark:text-gray-400">Phone</dt>
-                                                    <dd className="text-sm text-gray-900 dark:text-gray-100">{borrowing.borrower_phone}</dd>
-                                                </div>
-                                            )}
+
                                         </dl>
                                     </div>
 
@@ -126,16 +115,17 @@ export default function Show({ auth, borrowing }) {
                                                 <dt className="text-sm font-medium text-gray-500 dark:text-gray-400">Item Name</dt>
                                                 <dd className="text-sm text-gray-900 dark:text-gray-100">{borrowing.item_name}</dd>
                                             </div>
+                                            {borrowing.tool_id && (
+                                                <div>
+                                                    <dt className="text-sm font-medium text-gray-500 dark:text-gray-400">Tool ID</dt>
+                                                    <dd className="text-sm text-gray-900 dark:text-gray-100">{borrowing.tool_id}</dd>
+                                                </div>
+                                            )}
                                             <div>
                                                 <dt className="text-sm font-medium text-gray-500 dark:text-gray-400">Quantity</dt>
                                                 <dd className="text-sm text-gray-900 dark:text-gray-100">{borrowing.quantity}</dd>
                                             </div>
-                                            {borrowing.description && (
-                                                <div>
-                                                    <dt className="text-sm font-medium text-gray-500 dark:text-gray-400">Description</dt>
-                                                    <dd className="text-sm text-gray-900 dark:text-gray-100">{borrowing.description}</dd>
-                                                </div>
-                                            )}
+
                                         </dl>
                                     </div>
 
@@ -160,35 +150,7 @@ export default function Show({ auth, borrowing }) {
                                         </dl>
                                     </div>
 
-                                    {/* Project Information */}
-                                    {(borrowing.project_type || borrowing.project_name) && (
-                                        <div>
-                                            <h4 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-4">Project Information</h4>
-                                            <dl className="space-y-2">
-                                                {borrowing.project_type && (
-                                                    <div>
-                                                        <dt className="text-sm font-medium text-gray-500 dark:text-gray-400">Project Type</dt>
-                                                        <dd className="text-sm text-gray-900 dark:text-gray-100">{borrowing.project_type}</dd>
-                                                    </div>
-                                                )}
-                                                {borrowing.project_name && (
-                                                    <div>
-                                                        <dt className="text-sm font-medium text-gray-500 dark:text-gray-400">Project Name</dt>
-                                                        <dd className="text-sm text-gray-900 dark:text-gray-100">{borrowing.project_name}</dd>
-                                                    </div>
-                                                )}
-                                            </dl>
-                                        </div>
-                                    )}
                                 </div>
-
-                                {/* Notes */}
-                                {borrowing.notes && (
-                                    <div className="mt-6">
-                                        <h4 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">Notes</h4>
-                                        <p className="text-sm text-gray-600 dark:text-gray-300 bg-gray-50 dark:bg-gray-700 p-3 rounded-md">{borrowing.notes}</p>
-                                    </div>
-                                )}
 
                                 {/* Created By */}
                                 <div className="mt-6 pt-6 border-t border-gray-200 dark:border-gray-600">

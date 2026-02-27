@@ -16,7 +16,7 @@ export default function AuthenticatedLayout({ header, children }) {
     return (
         <div className="min-h-screen bg-gray-100 dark:bg-gray-900 flex">
             {/* Sidebar - Hidden on mobile, visible on desktop */}
-            <div className="hidden md:flex md:w-64 md:flex-col md:fixed md:inset-y-0">
+            <div className="hidden md:flex md:w-64 md:flex-col md:fixed md:inset-y-0 print:hidden">
                 <div className="flex flex-col flex-grow pt-5 bg-blue-600/70 dark:bg-blue-900/80 backdrop-blur-sm border-r border-white/10 dark:border-white/5 overflow-y-auto [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-white/20 hover:[&::-webkit-scrollbar-thumb]:bg-white/40 [&::-webkit-scrollbar-thumb]:rounded-full shadow-2xl">
                     <div className="flex items-center justify-center flex-shrink-0 px-4 border-b border-white/20 pb-4">
                         <Link href="/">
@@ -192,7 +192,7 @@ export default function AuthenticatedLayout({ header, children }) {
             </div>
 
             {/* Main content */}
-            <div className="md:pl-64 flex flex-col flex-1 min-w-0 h-screen overflow-y-auto [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-track]:bg-gray-100 dark:[&::-webkit-scrollbar-track]:bg-gray-800 [&::-webkit-scrollbar-thumb]:bg-gray-300 dark:[&::-webkit-scrollbar-thumb]:bg-gray-600 hover:[&::-webkit-scrollbar-thumb]:bg-gray-400 dark:hover:[&::-webkit-scrollbar-thumb]:bg-gray-500 [&::-webkit-scrollbar-thumb]:rounded-full">
+            <div className="md:pl-64 print:pl-0 flex flex-col flex-1 min-w-0 h-screen print:h-auto overflow-y-auto print:overflow-visible [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-track]:bg-gray-100 dark:[&::-webkit-scrollbar-track]:bg-gray-800 [&::-webkit-scrollbar-thumb]:bg-gray-300 dark:[&::-webkit-scrollbar-thumb]:bg-gray-600 hover:[&::-webkit-scrollbar-thumb]:bg-gray-400 dark:hover:[&::-webkit-scrollbar-thumb]:bg-gray-500 [&::-webkit-scrollbar-thumb]:rounded-full">
                 {/* Mobile menu button */}
                 <div className="md:hidden bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-4 py-3 print:hidden">
                     <button

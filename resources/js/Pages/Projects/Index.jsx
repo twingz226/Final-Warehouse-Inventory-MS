@@ -153,48 +153,48 @@ export default function Index({ auth, purchases }) {
                                         <div className="border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 p-6 print:p-0 print:border-none print:bg-white text-black">
                                             {/* Print header showing project name in the print output */}
                                             <div className="hidden print:block mb-6 text-center">
-                                                <h2 className="text-2xl font-bold">{group.destinationName} Distributions</h2>
+                                                <h2 className="text-2xl font-bold">Withdrawal Slip ({group.destinationName})</h2>
                                                 {group.projectName && <p className="text-gray-600">Project: {group.projectName}</p>}
                                             </div>
                                             <div className="overflow-x-auto pb-2 [&::-webkit-scrollbar]:h-2 [&::-webkit-scrollbar-track]:bg-gray-100 dark:[&::-webkit-scrollbar-track]:bg-gray-800 [&::-webkit-scrollbar-thumb]:bg-gray-300 dark:[&::-webkit-scrollbar-thumb]:bg-gray-600 hover:[&::-webkit-scrollbar-thumb]:bg-gray-400 dark:hover:[&::-webkit-scrollbar-thumb]:bg-gray-500 [&::-webkit-scrollbar-thumb]:rounded-full print:overflow-visible">
                                                 <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700 print:border-collapse print:border print:border-black print:divide-y-0">
-                                                    <thead className="bg-blue-600/70 dark:bg-blue-900/80 print:bg-white">
+                                                    <thead className="bg-blue-600/70 dark:bg-blue-900/80 print:bg-blue-600/70 print:dark:bg-blue-900/80 print:[print-color-adjust:exact]">
                                                         <tr>
-                                                            <th className="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider print:border print:border-black print:p-2 print:text-black print:font-bold">
+                                                            <th className="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider print:border print:border-black print:p-2 print:text-white print:font-bold">
                                                                 Date
                                                             </th>
-                                                            <th className="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider print:border print:border-black print:p-2 print:text-black print:font-bold">
+                                                            <th className="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider print:border print:border-black print:p-2 print:text-white print:font-bold">
                                                                 O.S
                                                             </th>
-                                                            <th className="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider print:border print:border-black print:p-2 print:text-black print:font-bold">
+                                                            <th className="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider print:border print:border-black print:p-2 print:text-white print:font-bold">
                                                                 Name of Project
                                                             </th>
-                                                            <th className="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider print:border print:border-black print:p-2 print:text-black print:font-bold">
+                                                            <th className="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider print:border print:border-black print:p-2 print:text-white print:font-bold">
                                                                 Type of Project
                                                             </th>
-                                                            <th className="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider print:border print:border-black print:p-2 print:text-black print:font-bold">
+                                                            <th className="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider print:border print:border-black print:p-2 print:text-white print:font-bold">
                                                                 QTY
                                                             </th>
-                                                            <th className="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider print:border print:border-black print:p-2 print:text-black print:font-bold">
+                                                            <th className="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider print:border print:border-black print:p-2 print:text-white print:font-bold">
                                                                 Unit
                                                             </th>
-                                                            <th className="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider print:border print:border-black print:p-2 print:text-black print:font-bold">
+                                                            <th className="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider print:border print:border-black print:p-2 print:text-white print:font-bold">
                                                                 Material Description
                                                             </th>
-                                                            <th className="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider print:border print:border-black print:p-2 print:text-black print:font-bold">
+                                                            <th className="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider print:border print:border-black print:p-2 print:text-white print:font-bold">
                                                                 Issued By
                                                             </th>
-                                                            <th className="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider print:border print:border-black print:p-2 print:text-black print:font-bold">
+                                                            <th className="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider print:border print:border-black print:p-2 print:text-white print:font-bold">
                                                                 Issued To
                                                             </th>
-                                                            <th className="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider print:border print:border-black print:p-2 print:text-black print:font-bold">
+                                                            <th className="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider print:border print:border-black print:p-2 print:text-white print:font-bold">
                                                                 Remarks
                                                             </th>
                                                         </tr>
                                                     </thead>
                                                     <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700 print:divide-y-0 text-black">
                                                         {group.items.map((item, idx) => (
-                                                            <tr key={idx} className="odd:bg-white even:bg-gray-200 dark:odd:bg-gray-800 dark:even:bg-gray-700 hover:bg-blue-200 dark:hover:bg-gray-600 border-b border-gray-300 dark:border-gray-600 transition-colors duration-200 print:bg-white print:border-none">
+                                                            <tr key={idx} className="odd:bg-white even:bg-gray-200 dark:odd:bg-gray-800 dark:even:bg-gray-700 hover:bg-blue-200 dark:hover:bg-gray-600 border-b border-gray-300 dark:border-gray-600 transition-colors duration-200 print:bg-white print:odd:bg-white print:even:bg-white print:border-none print:[print-color-adjust:exact]">
                                                                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100 font-medium print:border print:border-black print:p-2 print:text-black">
                                                                     {new Date(item.purchase_date).toLocaleDateString()}
                                                                 </td>
@@ -239,7 +239,7 @@ export default function Index({ auth, purchases }) {
 
                     {/* Pagination */}
                     {purchases.last_page > 1 && (
-                        <div className="bg-white dark:bg-gray-800 shadow sm:rounded-lg overflow-hidden mt-6 mb-6">
+                        <div className="bg-white dark:bg-gray-800 shadow sm:rounded-lg overflow-hidden mt-6 mb-6 print:hidden">
                             <div className="px-6 py-4 border-t border-gray-200 dark:border-gray-700">
                                 <div className="flex flex-col sm:flex-row justify-between items-center gap-3">
                                     <div className="text-sm text-gray-700 dark:text-gray-300">

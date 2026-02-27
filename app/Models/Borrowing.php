@@ -14,18 +14,13 @@ class Borrowing extends Model
 {
     protected $fillable = [
         'borrower_name',
-        'borrower_email',
-        'borrower_phone',
         'item_name',
-        'description',
+        'tool_id',
         'quantity',
         'borrow_date',
         'expected_return_date',
         'actual_return_date',
         'status',
-        'notes',
-        'project_type',
-        'project_name',
         'created_by',
     ];
 
@@ -61,18 +56,13 @@ class Borrowing extends Model
      */
     public static $rules = [
         'borrower_name' => 'required|string|max:255',
-        'borrower_email' => 'nullable|email|max:255',
-        'borrower_phone' => 'nullable|string|max:20',
         'item_name' => 'required|string|max:255',
-        'description' => 'nullable|string',
+        'tool_id' => 'nullable|string|max:255',
         'quantity' => 'required|integer|min:1',
         'borrow_date' => 'required|date',
         'expected_return_date' => 'required|date|after_or_equal:borrow_date',
         'actual_return_date' => 'nullable|date|after_or_equal:borrow_date',
         'status' => 'required|in:borrowed,returned,overdue',
-        'notes' => 'nullable|string',
-        'project_type' => 'nullable|string|max:255',
-        'project_name' => 'nullable|string|max:255',
     ];
 
     /**

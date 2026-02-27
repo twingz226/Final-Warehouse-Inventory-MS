@@ -8,6 +8,7 @@ import ImportModal from '@/Components/ImportModal';
 export default function Index({ auth, items, status }) {
     const [confirmingItemDeletion, setConfirmingItemDeletion] = useState(false);
     const [itemToDelete, setItemToDelete] = useState(null);
+    const [isBulkDelete, setIsBulkDelete] = useState(false);
     const [search, setSearch] = useState('');
     const [searchTimeout, setSearchTimeout] = useState(null);
     const [tooltip, setTooltip] = useState({ show: false, text: '', x: 0, y: 0 });
@@ -134,15 +135,8 @@ export default function Index({ auth, items, status }) {
     const handleBulkDelete = () => {
         if (selectedItems.length === 0) return;
 
-        if (confirm(`Are you sure you want to delete ${selectedItems.length} selected item(s)? This action cannot be undone.`)) {
-            // Delete selected items
-            selectedItems.forEach(itemId => {
-                router.delete(route('items.destroy', itemId), {
-                    preserveScroll: true,
-                });
-            });
-            setSelectedItems([]);
-        }
+        setIsBulkDelete(true);
+        setConfirmingItemDeletion(true);
     };
 
     const getItemStatus = (quantity) => {
@@ -697,20 +691,39 @@ export default function Index({ auth, items, status }) {
                     <div className="fixed inset-0 bg-gray-500 dark:bg-gray-600 bg-opacity-75 flex items-center justify-center z-50">
                         <div className="bg-white dark:bg-gray-800 rounded-lg p-6 max-w-md w-full">
                             <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-4">
-                                Delete Tool/Material
+                                {isBulkDelete ? 'Delete Selected Items' : 'Delete Tool/Material'}
                             </h3>
                             <p className="text-gray-600 dark:text-gray-400 mb-6">
-                                Are you sure you want to delete "{itemToDelete?.name}"? This action cannot be undone.
+                                {isBulkDelete
+                                    ? `Are you sure you want to delete ${selectedItems.length} selected item(s)? This action cannot be undone.`
+                                    : `Are you sure you want to delete "${itemToDelete?.name}"? This action cannot be undone.`}
                             </p>
                             <div className="flex justify-end space-x-3">
                                 <button
-                                    onClick={() => setConfirmingItemDeletion(false)}
+                                    onClick={() => {
+                                        setConfirmingItemDeletion(false);
+                                        setItemToDelete(null);
+                                        setIsBulkDelete(false);
+                                    }}
                                     className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none"
                                 >
                                     Cancel
                                 </button>
                                 <button
-                                    onClick={() => deleteItem(itemToDelete.id)}
+                                    onClick={() => {
+                                        if (isBulkDelete) {
+                                            selectedItems.forEach(itemId => {
+                                                router.delete(route('items.destroy', itemId), {
+                                                    preserveScroll: true,
+                                                });
+                                            });
+                                            setSelectedItems([]);
+                                            setConfirmingItemDeletion(false);
+                                            setIsBulkDelete(false);
+                                        } else if (itemToDelete) {
+                                            deleteItem(itemToDelete.id);
+                                        }
+                                    }}
                                     className="px-4 py-2 bg-red-600 text-white rounded-md text-sm font-medium hover:bg-red-700 focus:outline-none"
                                 >
                                     Delete
