@@ -475,48 +475,48 @@ export default function InventoryIndex({ auth, items, low_stock_items, summary, 
                             {items.data.length > 0 ? (
                                 <div className="hidden lg:block overflow-x-auto">
                                     <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-                                        <thead className="bg-gray-50 dark:bg-gray-700">
+                                        <thead className="bg-blue-600/70 dark:bg-blue-900/80">
                                             <tr>
                                                 <th
                                                     scope="col"
-                                                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600"
+                                                    className="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider cursor-pointer hover:bg-blue-700/50 dark:hover:bg-blue-800/50 transition-colors"
                                                     onClick={() => toggleSort('name')}
                                                 >
                                                     <div className="flex items-center">
                                                         Item Name
                                                         {sortBy === 'name' && (
-                                                            <ChevronUpDownIcon className="ml-1 h-4 w-4 text-indigo-500" />
+                                                            <ChevronUpDownIcon className="ml-1 h-4 w-4 text-white" />
                                                         )}
                                                     </div>
                                                 </th>
                                                 <th
                                                     scope="col"
-                                                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600"
+                                                    className="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider cursor-pointer hover:bg-blue-700/50 dark:hover:bg-blue-800/50 transition-colors"
                                                     onClick={() => toggleSort('category')}
                                                 >
                                                     <div className="flex items-center">
                                                         Category
                                                         {sortBy === 'category' && (
-                                                            <ChevronUpDownIcon className="ml-1 h-4 w-4 text-indigo-500" />
+                                                            <ChevronUpDownIcon className="ml-1 h-4 w-4 text-white" />
                                                         )}
                                                     </div>
                                                 </th>
                                                 <th
                                                     scope="col"
-                                                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600"
+                                                    className="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider cursor-pointer hover:bg-blue-700/50 dark:hover:bg-blue-800/50 transition-colors"
                                                     onClick={() => toggleSort('quantity')}
                                                 >
                                                     <div className="flex items-center">
                                                         Total Stocks
                                                         {sortBy === 'quantity' && (
-                                                            <ChevronUpDownIcon className="ml-1 h-4 w-4 text-indigo-500" />
+                                                            <ChevronUpDownIcon className="ml-1 h-4 w-4 text-white" />
                                                         )}
                                                     </div>
                                                 </th>
-                                                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                                                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">
                                                     Total Distributed
                                                 </th>
-                                                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                                                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">
                                                     Available Stocks
                                                 </th>
                                             </tr>

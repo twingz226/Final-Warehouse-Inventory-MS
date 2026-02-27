@@ -331,24 +331,24 @@ export default function Index({ auth, purchases, status }) {
                         <div className="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
                             <div className="overflow-x-auto">
                                 <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-                                    <thead className="bg-gray-50 dark:bg-gray-700">
+                                    <thead className="bg-blue-600/70 dark:bg-blue-900/80">
                                         <tr>
-                                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                                            <th className="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">
                                                 Name of Project
                                             </th>
-                                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                                            <th className="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">
                                                 Type of Project
                                             </th>
-                                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                                            <th className="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">
                                                 Item
                                             </th>
-                                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                                            <th className="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">
                                                 Category
                                             </th>
-                                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                                            <th className="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">
                                                 Quantity
                                             </th>
-                                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                                            <th className="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">
                                                 Actions
                                             </th>
                                         </tr>

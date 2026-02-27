@@ -411,9 +411,9 @@ export default function Index({ auth, items, status }) {
                             {viewMode === 'table' ? (
                                 <div className="overflow-x-auto">
                                     <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-                                        <thead className="bg-gray-50 dark:bg-gray-700">
+                                        <thead className="bg-blue-600/70 dark:bg-blue-900/80">
                                             <tr>
-                                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                                                <th className="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">
                                                     <input
                                                         type="checkbox"
                                                         checked={selectedItems.length === items.data.length && items.data.length > 0}
@@ -421,34 +421,34 @@ export default function Index({ auth, items, status }) {
                                                         className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
                                                     />
                                                 </th>
-                                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                                                <th className="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">
                                                     <button
                                                         onClick={() => handleSort('name')}
-                                                        className="group flex items-center hover:text-gray-700 dark:hover:text-gray-200 transition-colors"
+                                                        className="group flex items-center hover:text-white/80 transition-colors"
                                                     >
                                                         Item
                                                         {getSortIcon('name')}
                                                     </button>
                                                 </th>
-                                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                                                <th className="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">
                                                     <button
                                                         onClick={() => handleSort('quantity')}
-                                                        className="group flex items-center hover:text-gray-700 dark:hover:text-gray-200 transition-colors"
+                                                        className="group flex items-center hover:text-white/80 transition-colors"
                                                     >
                                                         Quantity
                                                         {getSortIcon('quantity')}
                                                     </button>
                                                 </th>
-                                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                                                <th className="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">
                                                     <button
                                                         onClick={() => handleSort('date_time')}
-                                                        className="group flex items-center hover:text-gray-700 dark:hover:text-gray-200 transition-colors"
+                                                        className="group flex items-center hover:text-white/80 transition-colors"
                                                     >
                                                         Date & Time
                                                         {getSortIcon('date_time')}
                                                     </button>
                                                 </th>
-                                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                                                <th className="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">
                                                     Actions
                                                 </th>
                                             </tr>

@@ -237,6 +237,8 @@ class ItemController extends Controller
                 'name' => $item->name,
                 'description' => $item->description,
                 'quantity' => $available,
+                'available_stock' => $available,
+                'unit' => $item->unit,
             ];
         })->filter()->values();
 
