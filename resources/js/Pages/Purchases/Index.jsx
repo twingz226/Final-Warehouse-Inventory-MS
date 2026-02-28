@@ -6,6 +6,23 @@ import { PlusIcon, EyeIcon, TrashIcon, PrinterIcon } from '@heroicons/react/24/o
 export default function Index({ auth, purchases, status }) {
     const [tooltip, setTooltip] = useState({ show: false, text: '', x: 0, y: 0 });
     const [dateFilter, setDateFilter] = useState('');
+    const [printProjectName, setPrintProjectName] = useState(null);
+    const [printProjectItems, setPrintProjectItems] = useState([]);
+    const [openDropdown, setOpenDropdown] = useState(null);
+
+    // Close dropdown when clicking outside
+    useEffect(() => {
+        const handleClickOutside = (event) => {
+            if (openDropdown && !event.target.closest('.print-dropdown-container')) {
+                setOpenDropdown(null);
+            }
+        };
+
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside);
+        };
+    }, [openDropdown]);
 
     useEffect(() => {
         const params = new URLSearchParams(window.location.search);
@@ -307,6 +324,18 @@ export default function Index({ auth, purchases, status }) {
         }, 500);
     };
 
+    const handleShipmentPrint = (group) => {
+        setOpenDropdown(null);
+        setPrintProjectName(group.supplier_name);
+        setPrintProjectItems(group._groupItems || [group]);
+
+        setTimeout(() => {
+            window.print();
+            setPrintProjectName(null);
+            setPrintProjectItems([]);
+        }, 300);
+    };
+
     return (
         <>
             <style>{`
@@ -349,227 +378,377 @@ export default function Index({ auth, purchases, status }) {
                 <Head title="Outgoing Items" />
 
                 <div className="py-12">
+                    <style>
+                        {`
+                        @media print {
+                            @page { 
+                                margin: 0 20mm 20mm 20mm;
+                            }
+                            body {
+                                -webkit-print-color-adjust: exact !important;
+                                print-color-adjust: exact !important;
+                            }
+                        }
+                        `}
+                    </style>
                     <div className="max-w-7xl mx-auto sm:px-6 lg:px-8">
-                        {status && (
-                            <div className="mb-4 p-4 bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300 rounded">
-                                {status}
+                        {/* Printable Layout (Only visible when printing via handleShipmentPrint) */}
+                        {printProjectName && (
+                            <div className="hidden print:block w-full bg-white text-black font-sans leading-relaxed">
+                                {/* Header Section */}
+                                <div className="text-center mb-6">
+                                    <div className="flex justify-center items-center mb-2">
+                                        <h1 className="text-2xl font-bold uppercase tracking-wide text-blue-900" style={{ color: '#1e3a8a' }}>
+                                            WARLEN INDUSTRIAL SALES CORPORATION
+                                        </h1>
+                                    </div>
+                                    <h2 className="text-sm font-semibold uppercase tracking-widest text-red-600 mb-1" style={{ color: '#dc2626' }}>
+                                        General Engineering and Specialty Contractor
+                                    </h2>
+                                    <p className="text-xs">
+                                        Tel. 432-3497 / 435-1573<br />
+                                        Blk. 2 Lot 20, Greenplains Subd., Alijis Road, Bacolod City
+                                    </p>
+                                </div>
+
+                                <h3 className="text-xl text-center font-bold mb-6">
+                                    Shipment Approval and Confirmation of Materials
+                                </h3>
+
+                                <p className="text-sm indent-8 mb-6 text-justify">
+                                    This letter serves as formal confirmation of the approved list of materials for the upcoming shipment.
+                                    Please be advised that only the items listed below have been authorized for inclusion in this shipment and no
+                                    other additional materials to be added in the cargo:
+                                </p>
+
+                                {/* Print Table */}
+                                <table className="w-full border-collapse border border-black text-sm mb-2">
+                                    <thead>
+                                        <tr>
+                                            <th className="border border-black px-2 py-1 text-left font-bold" colSpan={4}>
+                                                Project Site Name: {printProjectName}
+                                            </th>
+                                            <th className="border border-black px-2 py-1 text-left font-bold" colSpan={2}>
+                                                SA#:<br />
+                                                Date: {new Date().toLocaleDateString('en-US', { month: '2-digit', day: '2-digit', year: 'numeric' }).replace(/\//g, '-')}
+                                            </th>
+                                        </tr>
+                                        <tr className="bg-gray-100">
+                                            <th className="border border-black px-2 py-2 text-center w-16">QTY</th>
+                                            <th className="border border-black px-2 py-2 text-center w-16">UNIT</th>
+                                            <th className="border border-black px-2 py-2 text-center w-24">TOOLS ID</th>
+                                            <th className="border border-black px-2 py-2 text-center uppercase" colSpan={2}>Description</th>
+                                            <th className="border border-black px-2 py-2 text-center w-32 uppercase">Picture</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {printProjectName && printProjectItems.map((item, index) => (
+                                            <tr key={index}>
+                                                <td className="border border-black px-2 py-4 text-center">{item.quantity || 1}</td>
+                                                <td className="border border-black px-2 py-4 text-center uppercase">{item.item_unit === 'Quantity' ? 'PC' : (item.item_unit || 'PC')}</td>
+                                                <td className="border border-black px-2 py-4 text-center"></td>
+                                                <td className="border border-black px-4 py-4 uppercase font-semibold text-center" colSpan={2}>
+                                                    {item.item_name || 'UNKNOWN ITEM'}
+                                                </td>
+                                                <td className={`border-black px-2 py-2 text-center border-l border-r ${index === 0 ? 'border-t' : ''} ${index === printProjectItems.length - 1 ? 'border-b' : ''}`}></td>
+                                            </tr>
+                                        ))}
+                                        <tr>
+                                            <td className="border border-black px-2 py-1 text-center font-bold text-xs" colSpan={6}>
+                                                ********************************NOTHING TO FOLLOW********************************
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+
+                                {/* Footer Section */}
+                                <p className="text-sm indent-8 mb-12 text-justify">
+                                    We kindly request and require that no additional materials or items be included in this shipment beyond
+                                    those listed above. This measure ensures proper documentation, compliance with agreed terms, and smooth
+                                    processing at the receiving end.
+                                </p>
+
+                                <div className="text-right font-bold text-sm mb-16 mr-8">
+                                    Thank you for your cooperation.
+                                </div>
+
+                                <div className="flex justify-between items-end mt-12 px-8">
+                                    <div className="text-center">
+                                        <div className="border-b border-black w-48 mb-1"></div>
+                                        <p className="font-bold text-sm">PURCHASING</p>
+                                    </div>
+                                    <div className="text-center">
+                                        <div className="border-b border-black w-48 mb-1"></div>
+                                        <p className="font-bold text-sm">CARRIED BY</p>
+                                    </div>
+                                </div>
+
+                                <div className="flex justify-between items-end mt-20 px-8">
+                                    <div className="text-center">
+                                        <div className="border-b border-black w-48 mb-1"></div>
+                                        <p className="font-bold text-sm">LOGISTIC</p>
+                                    </div>
+                                    <div className="text-center">
+                                        <div className="border-b border-black w-48 mb-1"></div>
+                                        <p className="font-bold text-sm">RECEIVED BY</p>
+                                    </div>
+                                </div>
                             </div>
                         )}
 
-                        {/* Date Filter */}
-                        <div className="mb-6 flex justify-end">
-                            <div className="flex items-center gap-2">
-                                <label htmlFor="date-filter" className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                                    Filter by Date:
-                                </label>
-                                <input
-                                    id="date-filter"
-                                    type="date"
-                                    value={dateFilter}
-                                    onChange={handleDateChange}
-                                    className="border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-indigo-500 dark:focus:border-indigo-600 focus:ring-indigo-500 dark:focus:ring-indigo-600 rounded-md shadow-sm sm:text-sm"
-                                />
-                                {dateFilter && (
-                                    <button
-                                        onClick={() => handleDateChange({ target: { value: '' } })}
-                                        className="text-sm text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300 ml-2 py-1 px-3 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800"
-                                    >
-                                        Clear Filter
-                                    </button>
-                                )}
+                        <div className="print:hidden">
+                            {status && (
+                                <div className="mb-4 p-4 bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300 rounded">
+                                    {status}
+                                </div>
+                            )}
+
+                            {/* Date Filter */}
+                            <div className="mb-6 flex justify-end">
+                                <div className="flex items-center gap-2">
+                                    <label htmlFor="date-filter" className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                                        Filter by Date:
+                                    </label>
+                                    <input
+                                        id="date-filter"
+                                        type="date"
+                                        value={dateFilter}
+                                        onChange={handleDateChange}
+                                        className="border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-indigo-500 dark:focus:border-indigo-600 focus:ring-indigo-500 dark:focus:ring-indigo-600 rounded-md shadow-sm sm:text-sm"
+                                    />
+                                    {dateFilter && (
+                                        <button
+                                            onClick={() => handleDateChange({ target: { value: '' } })}
+                                            className="text-sm text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300 ml-2 py-1 px-3 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800"
+                                        >
+                                            Clear Filter
+                                        </button>
+                                    )}
+                                </div>
                             </div>
-                        </div>
 
-                        <div className="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
-                            <div className="overflow-x-auto">
-                                <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-                                    <thead className="bg-blue-600/70 dark:bg-blue-900/80">
-                                        <tr>
-                                            <th className="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">
-                                                Name of Project
-                                            </th>
-                                            <th className="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">
-                                                Type of Project
-                                            </th>
-                                            <th className="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">
-                                                Item
-                                            </th>
-                                            <th className="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">
-                                                Category
-                                            </th>
-                                            <th className="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">
-                                                Quantity
-                                            </th>
-                                            <th className="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">
-                                                Actions
-                                            </th>
-                                        </tr>
-                                    </thead>
-                                    <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
-                                        {purchases.data.length > 0 ? (() => {
-                                            // ── Group by supplier_name + purchase_date ──────────
-                                            const groups = [];
-                                            const seen = {};
-                                            purchases.data.forEach((p) => {
-                                                const key = `${p.supplier_name}||${p.purchase_date}`;
-                                                if (seen[key] === undefined) {
-                                                    seen[key] = groups.length;
-                                                    groups.push({ key, rows: [p] });
-                                                } else {
-                                                    groups[seen[key]].rows.push(p);
-                                                }
-                                            });
-
-                                            return groups.map((group) => {
-                                                const first = group.rows[0];
-                                                const isMulti = group.rows.length > 1;
-
-                                                // For print: pass representative purchase + all items
-                                                const printGroup = {
-                                                    ...first,
-                                                    // Override items list for print
-                                                    _groupItems: group.rows.map(r => ({
-                                                        item_name: r.item_name,
-                                                        quantity: r.quantity,
-                                                        description: r.description,
-                                                        item_category: r.item_category,
-                                                        item_unit: r.item_unit,
-                                                    })),
-                                                };
-
-                                                const handleGroupDelete = () => {
-                                                    if (window.confirm(
-                                                        isMulti
-                                                            ? `Delete all ${group.rows.length} items distributed to "${first.supplier_name}"?`
-                                                            : `Delete this distribution record?`
-                                                    )) {
-                                                        group.rows.forEach(r => router.delete(route('purchases.destroy', r.id)));
+                            <div className="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
+                                <div className="overflow-x-auto">
+                                    <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                                        <thead className="bg-blue-600/70 dark:bg-blue-900/80">
+                                            <tr>
+                                                <th className="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">
+                                                    Name of Project
+                                                </th>
+                                                <th className="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">
+                                                    Type of Project
+                                                </th>
+                                                <th className="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">
+                                                    Item
+                                                </th>
+                                                <th className="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">
+                                                    Category
+                                                </th>
+                                                <th className="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">
+                                                    Quantity
+                                                </th>
+                                                <th className="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">
+                                                    Actions
+                                                </th>
+                                            </tr>
+                                        </thead>
+                                        <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+                                            {purchases.data.length > 0 ? (() => {
+                                                // ── Group by supplier_name + purchase_date ──────────
+                                                const groups = [];
+                                                const seen = {};
+                                                purchases.data.forEach((p) => {
+                                                    const key = `${p.supplier_name}||${p.purchase_date}`;
+                                                    if (seen[key] === undefined) {
+                                                        seen[key] = groups.length;
+                                                        groups.push({ key, rows: [p] });
+                                                    } else {
+                                                        groups[seen[key]].rows.push(p);
                                                     }
-                                                };
+                                                });
 
-                                                return (
-                                                    <tr key={group.key} className="odd:bg-white even:bg-gray-200 dark:odd:bg-gray-800 dark:even:bg-gray-700 hover:bg-blue-200 dark:hover:bg-gray-600 border-b border-gray-300 dark:border-gray-600 transition-colors duration-200">
-                                                        {/* Destination */}
-                                                        <td className="px-6 py-4 align-top">
-                                                            <div className="text-sm font-medium text-gray-900 dark:text-gray-100">
-                                                                {first.supplier_name}
-                                                            </div>
-                                                            {first.purchase_date && (
-                                                                <div className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">
-                                                                    {new Date(first.purchase_date).toLocaleDateString()}
+                                                return groups.map((group, groupIndex) => {
+                                                    const first = group.rows[0];
+                                                    const isMulti = group.rows.length > 1;
+
+                                                    // For print: pass representative purchase + all items
+                                                    const printGroup = {
+                                                        ...first,
+                                                        // Override items list for print
+                                                        _groupItems: group.rows.map(r => ({
+                                                            item_name: r.item_name,
+                                                            quantity: r.quantity,
+                                                            description: r.description,
+                                                            item_category: r.item_category,
+                                                            item_unit: r.item_unit,
+                                                        })),
+                                                    };
+
+                                                    const handleGroupDelete = () => {
+                                                        if (window.confirm(
+                                                            isMulti
+                                                                ? `Delete all ${group.rows.length} items distributed to "${first.supplier_name}"?`
+                                                                : `Delete this distribution record?`
+                                                        )) {
+                                                            group.rows.forEach(r => router.delete(route('purchases.destroy', r.id)));
+                                                        }
+                                                    };
+
+                                                    return (
+                                                        <tr key={group.key} className="odd:bg-white even:bg-gray-200 dark:odd:bg-gray-800 dark:even:bg-gray-700 hover:bg-blue-200 dark:hover:bg-gray-600 border-b border-gray-300 dark:border-gray-600 transition-colors duration-200">
+                                                            {/* Destination */}
+                                                            <td className="px-6 py-4 align-top">
+                                                                <div className="text-sm font-medium text-gray-900 dark:text-gray-100">
+                                                                    {groupIndex + 1}. {first.supplier_name}
                                                                 </div>
-                                                            )}
-                                                        </td>
-
-                                                        {/* Type of Project */}
-                                                        <td className="px-6 py-4 align-top">
-                                                            <div className="text-sm font-medium text-gray-900 dark:text-gray-100">
-                                                                {first.project_type ? (
-                                                                    <span className="inline-flex px-2 py-0.5 text-xs font-semibold rounded-full capitalize bg-indigo-100 dark:bg-indigo-900 text-indigo-800 dark:text-indigo-200">
-                                                                        {first.project_type}
-                                                                    </span>
-                                                                ) : (
-                                                                    <span className="text-xs text-gray-400 dark:text-gray-500">N/A</span>
-                                                                )}
-                                                            </div>
-                                                        </td>
-
-                                                        {/* Items list */}
-                                                        <td className="px-6 py-4 align-top">
-                                                            <div className="space-y-1">
-                                                                {group.rows.map((r, idx) => (
-                                                                    <div key={idx} className="flex items-center gap-2 min-h-[32px]">
-                                                                        <span className="text-sm font-medium text-gray-900 dark:text-gray-100">
-                                                                            {r.item_name}
-                                                                        </span>
+                                                                {first.purchase_date && (
+                                                                    <div className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">
+                                                                        {new Date(first.purchase_date).toLocaleDateString()}
                                                                     </div>
-                                                                ))}
-                                                            </div>
-                                                        </td>
+                                                                )}
+                                                            </td>
 
-                                                        {/* Category badges */}
-                                                        <td className="px-6 py-4 align-top">
-                                                            <div className="space-y-1">
-                                                                {group.rows.map((r, idx) => (
-                                                                    <div key={idx} className="flex items-center min-h-[32px]">
-                                                                        {r.item_category ? (
-                                                                            <span className={`inline-flex px-2 py-0.5 text-xs font-semibold rounded-full capitalize ${r.item_category === 'material'
-                                                                                ? 'bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200'
-                                                                                : r.item_category === 'tool'
-                                                                                    ? 'bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200'
-                                                                                    : 'bg-indigo-100 dark:bg-indigo-900 text-indigo-800 dark:text-indigo-200'
-                                                                                }`}>
-                                                                                {r.item_category}
+                                                            {/* Type of Project */}
+                                                            <td className="px-6 py-4 align-top">
+                                                                <div className="text-sm font-medium text-gray-900 dark:text-gray-100">
+                                                                    {first.project_type ? (
+                                                                        <span className="inline-flex px-2 py-0.5 text-xs font-semibold rounded-full capitalize bg-indigo-100 dark:bg-indigo-900 text-indigo-800 dark:text-indigo-200">
+                                                                            {first.project_type}
+                                                                        </span>
+                                                                    ) : (
+                                                                        <span className="text-xs text-gray-400 dark:text-gray-500">N/A</span>
+                                                                    )}
+                                                                </div>
+                                                            </td>
+
+                                                            {/* Items list */}
+                                                            <td className="px-6 py-4 align-top">
+                                                                <div className="space-y-1">
+                                                                    {group.rows.map((r, idx) => (
+                                                                        <div key={idx} className="flex items-center gap-2 min-h-[32px]">
+                                                                            <span className="text-sm font-medium text-gray-900 dark:text-gray-100">
+                                                                                {group.rows.length > 1 ? `${idx + 1}. ` : ''}{r.item_name}
                                                                             </span>
-                                                                        ) : (
-                                                                            <span className="text-xs text-gray-400 dark:text-gray-500">N/A</span>
+                                                                        </div>
+                                                                    ))}
+                                                                </div>
+                                                            </td>
+
+                                                            {/* Category badges */}
+                                                            <td className="px-6 py-4 align-top">
+                                                                <div className="space-y-1">
+                                                                    {group.rows.map((r, idx) => (
+                                                                        <div key={idx} className="flex items-center min-h-[32px]">
+                                                                            {r.item_category ? (
+                                                                                <span className={`inline-flex px-2 py-0.5 text-xs font-semibold rounded-full capitalize ${r.item_category === 'material'
+                                                                                    ? 'bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200'
+                                                                                    : r.item_category === 'tool'
+                                                                                        ? 'bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200'
+                                                                                        : 'bg-indigo-100 dark:bg-indigo-900 text-indigo-800 dark:text-indigo-200'
+                                                                                    }`}>
+                                                                                    {r.item_category}
+                                                                                </span>
+                                                                            ) : (
+                                                                                <span className="text-xs text-gray-400 dark:text-gray-500">N/A</span>
+                                                                            )}
+                                                                        </div>
+                                                                    ))}
+                                                                </div>
+                                                            </td>
+
+                                                            {/* Quantities */}
+                                                            <td className="px-6 py-4 align-top">
+                                                                <div className="space-y-1">
+                                                                    {group.rows.map((r, idx) => (
+                                                                        <div key={idx} className="flex items-center text-sm text-gray-500 dark:text-gray-400 min-h-[32px]">
+                                                                            {r.quantity} {r.item_unit === 'Quantity' ? 'pcs' : (r.item_unit ? r.item_unit.toLowerCase() : '')}
+                                                                        </div>
+                                                                    ))}
+                                                                </div>
+                                                            </td>
+
+                                                            {/* Actions */}
+                                                            <td className="px-6 py-4 align-top text-sm font-medium">
+                                                                <div className="flex items-start gap-2 pt-1.5">
+                                                                    {/* Dropdown Print Menu */}
+                                                                    <div className="relative print-dropdown-container">
+                                                                        <button
+                                                                            onClick={() => setOpenDropdown(openDropdown === group.key ? null : group.key)}
+                                                                            className="text-green-600 dark:text-green-400 hover:text-green-900 dark:hover:text-green-300"
+                                                                            onMouseEnter={(e) => {
+                                                                                if (openDropdown !== group.key) {
+                                                                                    const rect = e.currentTarget.getBoundingClientRect();
+                                                                                    setTooltip({ show: true, text: 'Print Options', x: rect.left + rect.width / 2, y: rect.top - 30 });
+                                                                                }
+                                                                            }}
+                                                                            onMouseLeave={() => setTooltip({ show: false, text: '', x: 0, y: 0 })}
+                                                                        >
+                                                                            <PrinterIcon className="h-5 w-5" />
+                                                                        </button>
+
+                                                                        {openDropdown === group.key && (
+                                                                            <div className="absolute right-0 mt-2 w-56 rounded-md shadow-lg bg-white dark:bg-gray-800 ring-1 ring-black ring-opacity-5 z-50">
+                                                                                <div className="py-1" role="menu" aria-orientation="vertical">
+                                                                                    <button
+                                                                                        onClick={() => {
+                                                                                            setOpenDropdown(null);
+                                                                                            handlePrint(printGroup);
+                                                                                        }}
+                                                                                        className="text-left w-full block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700"
+                                                                                        role="menuitem"
+                                                                                    >
+                                                                                        Print Withdrawal Slip
+                                                                                    </button>
+                                                                                    <button
+                                                                                        onClick={() => handleShipmentPrint(printGroup)}
+                                                                                        className="text-left w-full block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700"
+                                                                                        role="menuitem"
+                                                                                    >
+                                                                                        Print Shipment Approval
+                                                                                    </button>
+                                                                                </div>
+                                                                            </div>
                                                                         )}
                                                                     </div>
-                                                                ))}
-                                                            </div>
-                                                        </td>
 
-                                                        {/* Quantities */}
-                                                        <td className="px-6 py-4 align-top">
-                                                            <div className="space-y-1">
-                                                                {group.rows.map((r, idx) => (
-                                                                    <div key={idx} className="flex items-center text-sm text-gray-500 dark:text-gray-400 min-h-[32px]">
-                                                                        {r.quantity} {r.item_unit === 'Quantity' ? 'pcs' : (r.item_unit ? r.item_unit.toLowerCase() : '')}
+                                                                    {/* View — one link per group */}
+                                                                    <div className="flex flex-col gap-1">
+                                                                        <Link
+                                                                            href={route('purchases.show', first.id)}
+                                                                            className="text-indigo-600 dark:text-indigo-400 hover:text-indigo-900 dark:hover:text-indigo-300 mt-0.5"
+                                                                            onMouseEnter={(e) => { const rect = e.currentTarget.getBoundingClientRect(); setTooltip({ show: true, text: 'View Details', x: rect.left + rect.width / 2, y: rect.top - 30 }); }}
+                                                                            onMouseLeave={() => setTooltip({ show: false, text: '', x: 0, y: 0 })}
+                                                                        >
+                                                                            <EyeIcon className="h-5 w-5" />
+                                                                        </Link>
                                                                     </div>
-                                                                ))}
-                                                            </div>
-                                                        </td>
 
-                                                        {/* Actions */}
-                                                        <td className="px-6 py-4 align-top text-sm font-medium">
-                                                            <div className="flex items-start gap-2">
-                                                                {/* Print — prints all items in group */}
-                                                                <button
-                                                                    onClick={() => handlePrint(printGroup)}
-                                                                    className="text-green-600 dark:text-green-400 hover:text-green-900 dark:hover:text-green-300 mt-0.5"
-                                                                    onMouseEnter={(e) => { const rect = e.currentTarget.getBoundingClientRect(); setTooltip({ show: true, text: 'Print Withdrawal Slip', x: rect.left + rect.width / 2, y: rect.top - 30 }); }}
-                                                                    onMouseLeave={() => setTooltip({ show: false, text: '', x: 0, y: 0 })}
-                                                                >
-                                                                    <PrinterIcon className="h-5 w-5" />
-                                                                </button>
-
-                                                                {/* View — one link per group */}
-                                                                <div className="flex flex-col gap-1">
-                                                                    <Link
-                                                                        href={route('purchases.show', first.id)}
-                                                                        className="text-indigo-600 dark:text-indigo-400 hover:text-indigo-900 dark:hover:text-indigo-300 mt-0.5"
-                                                                        onMouseEnter={(e) => { const rect = e.currentTarget.getBoundingClientRect(); setTooltip({ show: true, text: 'View Details', x: rect.left + rect.width / 2, y: rect.top - 30 }); }}
+                                                                    {/* Delete all in group */}
+                                                                    <button
+                                                                        onClick={handleGroupDelete}
+                                                                        className="text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-300 mt-0.5"
+                                                                        onMouseEnter={(e) => { const rect = e.currentTarget.getBoundingClientRect(); setTooltip({ show: true, text: isMulti ? 'Delete All Items' : 'Delete Record', x: rect.left + rect.width / 2, y: rect.top - 30 }); }}
                                                                         onMouseLeave={() => setTooltip({ show: false, text: '', x: 0, y: 0 })}
                                                                     >
-                                                                        <EyeIcon className="h-5 w-5" />
-                                                                    </Link>
+                                                                        <TrashIcon className="h-5 w-5" />
+                                                                    </button>
                                                                 </div>
-
-                                                                {/* Delete all in group */}
-                                                                <button
-                                                                    onClick={handleGroupDelete}
-                                                                    className="text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-300 mt-0.5"
-                                                                    onMouseEnter={(e) => { const rect = e.currentTarget.getBoundingClientRect(); setTooltip({ show: true, text: isMulti ? 'Delete All Items' : 'Delete Record', x: rect.left + rect.width / 2, y: rect.top - 30 }); }}
-                                                                    onMouseLeave={() => setTooltip({ show: false, text: '', x: 0, y: 0 })}
-                                                                >
-                                                                    <TrashIcon className="h-5 w-5" />
-                                                                </button>
-                                                            </div>
-                                                        </td>
-                                                    </tr>
-                                                );
-                                            });
-                                        })() : (
-                                            <tr>
-                                                <td colSpan="6" className="px-6 py-12 text-center">
-                                                    <p className="text-gray-500 dark:text-gray-400 text-sm">
-                                                        No distributions found
-                                                    </p>
-                                                </td>
-                                            </tr>
-                                        )}
-                                    </tbody>
-                                </table>
+                                                            </td>
+                                                        </tr>
+                                                    );
+                                                });
+                                            })() : (
+                                                <tr>
+                                                    <td colSpan="6" className="px-6 py-12 text-center">
+                                                        <p className="text-gray-500 dark:text-gray-400 text-sm">
+                                                            No distributions found
+                                                        </p>
+                                                    </td>
+                                                </tr>
+                                            )}
+                                        </tbody>
+                                    </table>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -584,7 +763,7 @@ export default function Index({ auth, purchases, status }) {
                         {tooltip.text}
                     </div>
                 )}
-            </AuthenticatedLayout >
+            </AuthenticatedLayout>
         </>
     );
 }

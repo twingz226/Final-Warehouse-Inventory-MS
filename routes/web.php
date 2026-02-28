@@ -134,7 +134,7 @@ Route::middleware('auth')->group(function () {
     Route::get('shipment-approvals/project-data/{projectName}', [\App\Http\Controllers\ShipmentApprovalController::class, 'getProjectData'])
         ->name('shipment-approvals.project-data');
     Route::resource('shipment-approvals', \App\Http\Controllers\ShipmentApprovalController::class)->only([
-        'index', 'create', 'store', 'edit', 'update', 'destroy'
+        'index', 'edit', 'update', 'destroy'
     ]);
 
     // Daily Stock Rollover

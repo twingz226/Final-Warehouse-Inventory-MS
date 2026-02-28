@@ -449,7 +449,7 @@ export default function Index({ auth, items, status }) {
                                         </thead>
                                         <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
                                             {items.data.length > 0 ? (
-                                                items.data.map((item) => (
+                                                items.data.map((item, index) => (
                                                     <tr key={item.id} className={`${selectedItems.includes(item.id) ? 'bg-indigo-50 dark:bg-indigo-900/20' : 'odd:bg-white even:bg-gray-200 dark:odd:bg-gray-800 dark:even:bg-gray-700'} hover:bg-blue-200 dark:hover:bg-gray-600 border-b border-gray-300 dark:border-gray-600 transition-colors duration-200`}>
                                                         <td className="px-6 py-4 whitespace-nowrap">
                                                             <input
@@ -461,7 +461,7 @@ export default function Index({ auth, items, status }) {
                                                         </td>
                                                         <td className="px-6 py-4 whitespace-nowrap">
                                                             <div className="text-sm font-medium text-gray-900 dark:text-gray-100">
-                                                                {item.name}
+                                                                {items.from + index}. {item.name}
                                                             </div>
                                                             {item.description && (
                                                                 <div className="text-sm text-gray-500 dark:text-gray-400">
@@ -560,12 +560,12 @@ export default function Index({ auth, items, status }) {
                                 <div className="p-6">
                                     {items.data.length > 0 ? (
                                         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-                                            {items.data.map((item) => (
+                                            {items.data.map((item, index) => (
                                                 <div key={item.id} className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-6 shadow-sm hover:shadow-md transition-shadow">
                                                     <div className="flex justify-between items-start mb-4">
                                                         <div className="flex-1">
                                                             <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-1">
-                                                                {item.name}
+                                                                {items.from + index}. {item.name}
                                                             </h3>
                                                             {item.description && (
                                                                 <p className="text-sm text-gray-600 dark:text-gray-400 line-clamp-2">

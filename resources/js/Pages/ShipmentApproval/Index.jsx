@@ -8,8 +8,6 @@ export default function Index({ auth, shipmentApprovals, status }) {
     const [tooltip, setTooltip] = useState({ show: false, text: '', x: 0, y: 0 });
     const [confirmingDeletion, setConfirmingDeletion] = useState(false);
     const [itemToDelete, setItemToDelete] = useState(null);
-    const [printProjectName, setPrintProjectName] = useState(null);
-    const [printProjectItems, setPrintProjectItems] = useState([]);
 
     const deleteItem = (id) => {
         router.delete(route('shipment-approvals.destroy', id), {
@@ -45,184 +43,13 @@ export default function Index({ auth, shipmentApprovals, status }) {
                         <h2 className="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
                             Shipment Approval
                         </h2>
-                        <div className="flex space-x-2">
-                            <Link
-                                href={route('shipment-approvals.create')}
-                                className="electric-btn-blue inline-flex items-center justify-center p-2 bg-blue-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-blue-700 focus:bg-blue-700 active:bg-blue-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition ease-in-out duration-150"
-                                onMouseEnter={(e) => { const rect = e.currentTarget.getBoundingClientRect(); setTooltip({ show: true, text: 'Add Shipment Approval', x: rect.left + rect.width / 2, y: rect.bottom + 10 }); }}
-                                onMouseLeave={() => setTooltip({ show: false, text: '', x: 0, y: 0 })}
-                            >
-                                <PlusIcon className="h-5 w-5" />
-                            </Link>
-                        </div>
                     </div>
                 }
             >
                 <Head title="Shipment Approval" />
 
                 <div className="py-12">
-                    <style>
-                        {`
-                        @media print {
-                            @page { 
-                                margin: 20mm;
-                            }
-                            body {
-                                -webkit-print-color-adjust: exact !important;
-                                print-color-adjust: exact !important;
-                            }
-                        }
-                        `}
-                    </style>
                     <div className="max-w-7xl mx-auto sm:px-6 lg:px-8">
-                        {/* Printable Layout (Only visible when printing) */}
-                        {printProjectName && (
-                            <div className="hidden print:block w-full bg-white text-black font-sans leading-relaxed">
-                                {/* Header Section */}
-                                <div className="text-center mb-6">
-                                    <div className="flex justify-center items-center mb-2">
-                                        <h1 className="text-2xl font-bold uppercase tracking-wide text-blue-900" style={{ color: '#1e3a8a' }}>
-                                            WARLEN INDUSTRIAL SALES CORPORATION
-                                        </h1>
-                                    </div>
-                                    <h2 className="text-sm font-semibold uppercase tracking-widest text-red-600 mb-1" style={{ color: '#dc2626' }}>
-                                        General Engineering and Specialty Contractor
-                                    </h2>
-                                    <p className="text-xs">
-                                        Tel. 432-3497 / 435-1573<br />
-                                        Blk. 2 Lot 20, Greenplains Subd., Alijis Road, Bacolod City
-                                    </p>
-                                </div>
-
-                                <h3 className="text-xl text-center font-bold mb-6">
-                                    Shipment Approval and Confirmation of Materials
-                                </h3>
-
-                                <p className="text-sm indent-8 mb-6 text-justify">
-                                    This letter serves as formal confirmation of the approved list of materials for the upcoming shipment.
-                                    Please be advised that only the items listed below have been authorized for inclusion in this shipment and no
-                                    other additional materials to be added in the cargo:
-                                </p>
-
-                                {/* Print Table */}
-                                <table className="w-full border-collapse border border-black text-sm mb-2">
-                                    <thead>
-                                        <tr>
-                                            <th className="border border-black px-2 py-1 text-left font-bold" colSpan={4}>
-                                                Project Site Name: {printProjectName}
-                                            </th>
-                                            <th className="border border-black px-2 py-1 text-left font-bold" colSpan={2}>
-                                                SA#: {shipmentApprovals.data.find(a => a.project_site_name === printProjectName)?.sa_number || ''}<br />
-                                                Date: {new Date().toLocaleDateString('en-US', { month: '2-digit', day: '2-digit', year: 'numeric' }).replace(/\//g, '-')}
-                                            </th>
-                                        </tr>
-                                        <tr className="bg-gray-100">
-                                            <th className="border border-black px-2 py-2 text-center w-16">QTY</th>
-                                            <th className="border border-black px-2 py-2 text-center w-16">UNIT</th>
-                                            <th className="border border-black px-2 py-2 text-center w-24">TOOLS ID</th>
-                                            <th className="border border-black px-2 py-2 text-center uppercase" colSpan={2}>Description</th>
-                                            <th className="border border-black px-2 py-2 text-center w-32 uppercase">Picture</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {printProjectName && (() => {
-                                            const activeApproval = shipmentApprovals.data.find(a => a.project_site_name === printProjectName);
-
-                                            if (printProjectItems.length > 0) {
-                                                return printProjectItems.map((item, index) => (
-                                                    <tr key={index}>
-                                                        <td className="border border-black px-2 py-4 text-center">{item.quantity || 1}</td>
-                                                        <td className="border border-black px-2 py-4 text-center uppercase">{item.unit === 'Quantity' ? 'PC' : (item.unit || 'PC')}</td>
-                                                        <td className="border border-black px-2 py-4 text-center"></td>
-                                                        <td className="border border-black px-4 py-4 uppercase font-semibold text-center" colSpan={2}>
-                                                            {item.item_name || 'UNKNOWN ITEM'}
-                                                        </td>
-                                                        <td className="border border-black px-2 py-2 text-center">
-                                                            {/* Only display the picture to the very first row to match layout visually to avoid spamming the same picture */}
-                                                            {index === 0 && activeApproval?.picture && Array.isArray(activeApproval.picture) && activeApproval.picture.length > 0 ? (
-                                                                <div className="flex justify-center items-center">
-                                                                    <img
-                                                                        src={`/storage/${activeApproval.picture[0]}`}
-                                                                        alt="Shipment"
-                                                                        className="max-h-16 max-w-[100px] object-contain"
-                                                                    />
-                                                                </div>
-                                                            ) : (
-                                                                ''
-                                                            )}
-                                                        </td>
-                                                    </tr>
-                                                ));
-                                            } else if (activeApproval) {
-                                                return (
-                                                    <tr>
-                                                        <td className="border border-black px-2 py-4 text-center">1</td>
-                                                        <td className="border border-black px-2 py-4 text-center">PC</td>
-                                                        <td className="border border-black px-2 py-4 text-center"></td>
-                                                        <td className="border border-black px-4 py-4 uppercase font-semibold text-center" colSpan={2}>
-                                                            {activeApproval.description || 'NOTHING TO FOLLOW'}
-                                                        </td>
-                                                        <td className="border border-black px-2 py-2 text-center">
-                                                            {activeApproval.picture && Array.isArray(activeApproval.picture) && activeApproval.picture.length > 0 ? (
-                                                                <div className="flex justify-center items-center">
-                                                                    <img
-                                                                        src={`/storage/${activeApproval.picture[0]}`}
-                                                                        alt="Shipment"
-                                                                        className="max-h-16 max-w-[100px] object-contain"
-                                                                    />
-                                                                </div>
-                                                            ) : (
-                                                                ''
-                                                            )}
-                                                        </td>
-                                                    </tr>
-                                                );
-                                            }
-                                        })()}
-                                        <tr>
-                                            <td className="border border-black px-2 py-1 text-center font-bold text-xs" colSpan={6}>
-                                                ********************************NOTHING TO FOLLOW********************************
-                                            </td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-
-                                {/* Footer Section */}
-                                <p className="text-sm indent-8 mb-12 text-justify">
-                                    We kindly request and require that no additional materials or items be included in this shipment beyond
-                                    those listed above. This measure ensures proper documentation, compliance with agreed terms, and smooth
-                                    processing at the receiving end.
-                                </p>
-
-                                <div className="text-right font-bold text-sm mb-16 mr-8">
-                                    Thank you for your cooperation.
-                                </div>
-
-                                <div className="flex justify-between items-end mt-12 px-8">
-                                    <div className="text-center">
-                                        <div className="border-b border-black w-48 mb-1"></div>
-                                        <p className="font-bold text-sm">PURCHASING</p>
-                                    </div>
-                                    <div className="text-center">
-                                        <div className="border-b border-black w-48 mb-1"></div>
-                                        <p className="text-xs">WISC Electrical Engineer</p>
-                                        <p className="font-bold text-sm">CARRIED BY</p>
-                                    </div>
-                                </div>
-
-                                <div className="flex justify-between items-end mt-20 px-8">
-                                    <div className="text-center">
-                                        <div className="border-b border-black w-48 mb-1"></div>
-                                        <p className="font-bold text-sm">LOGISTIC</p>
-                                    </div>
-                                    <div className="text-center">
-                                        <div className="border-b border-black w-48 mb-1"></div>
-                                        <p className="font-bold text-sm">RECEIVED BY</p>
-                                    </div>
-                                </div>
-                            </div>
-                        )}
-
                         <div className="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg print:hidden">
                             <div className="p-6 text-gray-900 dark:text-gray-100">
                                 {status && (
@@ -291,39 +118,6 @@ export default function Index({ auth, shipmentApprovals, status }) {
                                                         </td>
                                                         <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                                                             <div className="flex space-x-2">
-                                                                <button
-                                                                    onClick={() => {
-                                                                        setPrintProjectName(approval.project_site_name);
-
-                                                                        // Fetch exact items configured for this shipment approval
-                                                                        axios.get(route('shipment-approvals.project-data', approval.project_site_name))
-                                                                            .then(res => {
-                                                                                if (Array.isArray(res.data)) {
-                                                                                    setPrintProjectItems(res.data);
-                                                                                } else {
-                                                                                    setPrintProjectItems([]);
-                                                                                }
-                                                                                setTimeout(() => {
-                                                                                    window.print();
-                                                                                    setPrintProjectName(null);
-                                                                                    setPrintProjectItems([]);
-                                                                                }, 300);
-                                                                            })
-                                                                            .catch(err => {
-                                                                                console.error('Error fetching project print data:', err);
-                                                                                setPrintProjectItems([]);
-                                                                                setTimeout(() => {
-                                                                                    window.print();
-                                                                                    setPrintProjectName(null);
-                                                                                }, 300);
-                                                                            });
-                                                                    }}
-                                                                    className="text-indigo-600 dark:text-indigo-400 hover:text-indigo-900 dark:hover:text-indigo-300"
-                                                                    onMouseEnter={(e) => { const rect = e.currentTarget.getBoundingClientRect(); setTooltip({ show: true, text: 'Print', x: rect.left + rect.width / 2, y: rect.bottom + 10 }); }}
-                                                                    onMouseLeave={() => setTooltip({ show: false, text: '', x: 0, y: 0 })}
-                                                                >
-                                                                    <PrinterIcon className="h-5 w-5" />
-                                                                </button>
                                                                 <Link
                                                                     href={route('shipment-approvals.edit', approval.id)}
                                                                     className="text-yellow-600 dark:text-yellow-400 hover:text-yellow-900 dark:hover:text-yellow-300"

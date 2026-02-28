@@ -341,15 +341,32 @@ class ItemController extends Controller
 
         try {
             DB::transaction(function () use ($request) {
-                Excel::import(new ItemsImport, $request->file('file'));
+                $file = $request->file('file');
+                $headingRow = 1;
+
+                // Auto-detect heading row by scanning the first 30 rows
+                $rows = Excel::toArray(new class implements \Maatwebsite\Excel\Concerns\ToArray {
+                    public function array(array $array) { return $array; }
+                }, $file)[0] ?? [];
+
+                foreach ($rows as $index => $row) {
+                    if ($index > 30) break;
+                    // Ignore empty rows
+                    if (empty(array_filter($row))) continue;
+                    
+                    $rowStr = strtolower(implode(' ', array_filter(array_map('trim', $row))));
+                    // Stricter check: needs 'description', or both 'item' and 'name'
+                    if (strpos($rowStr, 'description') !== false || (strpos($rowStr, 'item') !== false && strpos($rowStr, 'name') !== false)) {
+                        $headingRow = $index + 1; // 1-based index
+                        break;
+                    }
+                }
+
+                Excel::import(new ItemsImport($headingRow), $file);
             });
 
-            // Log activity
-            ActivityHistory::create([
-                'user_id' => Auth::id(),
-                'action' => 'import',
-                'description' => 'Imported items from Excel file',
-            ]);
+            // Items import handles creating/updating items.
+            // Further history logging can be implemented on an item-by-item basis.
 
             return redirect()->route('items.index')->with('status', 'Items imported successfully.');
         } catch (\Maatwebsite\Excel\Validators\ValidationException $e) {

@@ -381,13 +381,13 @@ export default function InventoryIndex({ auth, items, low_stock_items, summary, 
                             <div className="bg-red-50 dark:bg-red-950 border border-red-200 dark:border-red-800 rounded-md p-4 mb-6">
                                 <h3 className="text-lg font-medium text-red-800 dark:text-red-400">Low Stock Alert</h3>
                                 <p className="text-sm text-red-700 dark:text-red-300 mb-2">The following items are running low on stock:</p>
-                                <ul className="list-disc list-inside text-sm text-red-700 dark:text-red-300">
+                                <ol className="list-decimal list-inside text-sm text-red-700 dark:text-red-300">
                                     {lowStockItems.map(item => (
                                         <li key={item.id}>
                                             {item.name} - {item.unit === 'Quantity' ? Math.floor(item.available_stock) : item.available_stock} {item.unit === 'Quantity' ? 'pcs.' : item.unit} available
                                         </li>
                                     ))}
-                                </ul>
+                                </ol>
                             </div>
                         )}
 
@@ -411,13 +411,13 @@ export default function InventoryIndex({ auth, items, low_stock_items, summary, 
                                 <div className="block lg:hidden">
                                     {/* Mobile Card View */}
                                     <div className="space-y-4">
-                                        {items.data.map((item) => (
+                                        {items.data.map((item, index) => (
                                             <div key={item.id} className={`bg-white dark:bg-gray-800 rounded-lg shadow p-4 border ${isLowStock(item.available_stock) ? 'border-red-200 dark:border-red-800' : 'border-gray-200 dark:border-gray-700'
                                                 }`}>
                                                 <div className="flex items-start justify-between mb-3">
                                                     <div>
                                                         <h4 className="text-sm font-medium text-gray-900 dark:text-gray-100">
-                                                            {item.name}
+                                                            {items.from + index}. {item.name}
                                                         </h4>
                                                         {item.description && (
                                                             <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
@@ -522,14 +522,14 @@ export default function InventoryIndex({ auth, items, low_stock_items, summary, 
                                             </tr>
                                         </thead>
                                         <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
-                                            {items.data.map((item) => (
+                                            {items.data.map((item, index) => (
                                                 <tr
                                                     key={item.id}
                                                     className={`odd:bg-white even:bg-gray-200 dark:odd:bg-gray-800 dark:even:bg-gray-700 hover:bg-blue-200 dark:hover:bg-gray-600 border-b border-gray-300 dark:border-gray-600 transition-colors duration-200 ${isLowStock(item.available_stock) ? '!bg-red-200 dark:!bg-red-900 border-red-300 dark:border-red-800' : ''}`}
                                                 >
                                                     <td className="px-6 py-4 whitespace-nowrap">
                                                         <div className="text-sm font-medium text-gray-900 dark:text-gray-100">
-                                                            {item.name}
+                                                            {items.from + index}. {item.name}
                                                         </div>
                                                         {item.description && (
                                                             <div className="text-sm text-gray-500 dark:text-gray-400">
