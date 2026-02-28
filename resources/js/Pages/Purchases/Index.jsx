@@ -8,6 +8,9 @@ export default function Index({ auth, purchases, status }) {
     const [dateFilter, setDateFilter] = useState('');
     const [printProjectName, setPrintProjectName] = useState(null);
     const [printProjectItems, setPrintProjectItems] = useState([]);
+    const [printImages, setPrintImages] = useState({});
+    const [printSaNumber, setPrintSaNumber] = useState('');
+    const [printToolsId, setPrintToolsId] = useState({});
     const [openDropdown, setOpenDropdown] = useState(null);
 
     // Close dropdown when clicking outside
@@ -70,233 +73,259 @@ export default function Index({ auth, purchases, status }) {
             <head>
                 <title>Withdrawal Slip #${purchase.id}</title>
                 <style>
+                    * {
+                        box-sizing: border-box;
+                    }
                     body {
                         font-family: Arial, sans-serif;
-                        padding: 20px;
-                        max-width: 800px;
+                        margin: 0;
+                        padding: 0;
+                        background: #fff;
+                    }
+                    .slip-container {
+                        width: 100%;
+                        max-width: 500px; /* Small slip size approximation */
                         margin: 0 auto;
+                        padding: 20px 15px;
+                        font-size: 14px;
                     }
-                    .withdrawal-slip { 
-                        font-family: Arial, sans-serif; 
-                        padding: 10px; 
-                        max-width: 800px; 
-                        margin: 0 auto; 
+                    .header {
+                        position: relative;
+                        padding-left: 50px; /* Space for logo placeholder if needed */
+                        margin-bottom: 5px;
                     }
-                    .company-header { 
-                        text-align: center; 
-                        margin-bottom: 15px; 
-                        border-bottom: 2px solid #333; 
-                        padding-bottom: 10px; 
+                    .company-name {
+                        font-family: "Arial Black", sans-serif;
+                        font-weight: 900;
+                        font-size: 16px;
+                        margin: 0;
+                        letter-spacing: -0.5px;
                     }
-                    .company-name { 
-                        font-size: 20px; 
-                        font-weight: bold; 
-                        margin: 0; 
+                    .company-address {
+                        font-size: 11px;
+                        font-weight: bold;
+                        margin-top: 2px;
                     }
-                    .company-address { 
-                        font-size: 12px; 
-                        margin: 5px 0 0 0; 
-                        color: #666; 
+                    .logo-placeholder {
+                        position: absolute;
+                        left: 0;
+                        top: 0;
+                        width: 40px;
+                        height: 40px;
+                        border-radius: 50%;
+                        background-color: #333; /* Dark circle like in the image */
+                        -webkit-print-color-adjust: exact;
+                        print-color-adjust: exact;
                     }
-                    .slip-title { 
-                        font-size: 16px; 
-                        font-weight: bold; 
-                        margin: 10px 0 0 0; 
-                        text-transform: uppercase; 
+                    .slip-title-row {
+                        display: flex;
+                        justify-content: space-between;
+                        align-items: flex-end;
+                        margin-bottom: 2px;
                     }
-                    .info-section { 
-                        margin-bottom: 15px; 
-                        display: flex; 
-                        flex-wrap: wrap; 
-                        gap: 20px; 
+                    .year-prefix {
+                        font-weight: bold;
+                        font-size: 18px;
                     }
-                    .info-field { 
-                        flex: 1; 
-                        min-width: 200px; 
+                    .slip-main-title {
+                        font-family: "Arial Black", sans-serif;
+                        font-weight: 900;
+                        font-size: 18px;
+                        letter-spacing: -0.5px;
                     }
-                    .field-label { 
-                        font-weight: bold; 
-                        font-size: 12px; 
-                        margin-bottom: 3px; 
+                    .slip-no {
+                        font-weight: bold;
+                        font-size: 14px;
+                        border-bottom: 1px solid #000;
+                        padding-bottom: 2px;
+                        min-width: 100px;
                     }
-                    .field-value { 
-                        border-bottom: 1px solid #333; 
-                        padding: 2px 0; 
-                        font-size: 12px; 
-                        min-height: 18px; 
+                    .info-row {
+                        margin-bottom: 4px;
                     }
-                    .category-section { 
-                        margin: 10px 0; 
+                    .info-row-flex {
+                        display: flex;
+                        justify-content: space-between;
+                        margin-bottom: 4px;
                     }
-                    .category-title { 
-                        font-weight: bold; 
-                        font-size: 12px; 
-                        margin-bottom: 10px; 
+                    .label {
+                        font-weight: bold;
                     }
-                    .category-options { 
-                        display: flex; 
-                        gap: 30px; 
+                    .underline-field {
+                        display: inline-block;
+                        border-bottom: 1px solid #000;
+                        min-height: 16px;
                     }
-                    .category-option { 
-                        display: flex; 
-                        align-items: center; 
-                        gap: 5px; 
-                        font-size: 12px; 
+                    .categories-row {
+                        display: flex;
+                        justify-content: space-between;
+                        font-weight: bold;
+                        font-size: 13px;
+                        margin-top: 6px;
+                        margin-bottom: 2px;
                     }
-                    .checkbox { 
-                        width: 12px; 
-                        height: 12px; 
-                        border: 1px solid #333; 
+                    
+                    /* Table Styles */
+                    table {
+                        width: 100%;
+                        border-collapse: collapse;
+                        border: 1px solid #000;
+                        margin-bottom: 5px;
                     }
-                    .items-table { 
-                        width: 100%; 
-                        border-collapse: collapse; 
-                        margin: 10px 0; 
+                    th {
+                        border: 1px solid #000;
+                        padding: 3px 5px;
+                        text-align: center;
+                        font-weight: bold;
                     }
-                    .items-table th { 
-                        border: 1px solid #333; 
-                        padding: 8px; 
-                        text-align: center; 
-                        font-weight: bold; 
-                        font-size: 12px; 
-                        background: #f5f5f5; 
+                    td {
+                        border: 1px solid #000;
+                        padding: 3px 5px;
+                        height: 22px; /* Fixed height for blank rows */
                     }
-                    .items-table td { 
-                        border: 1px solid #333; 
-                        padding: 8px; 
-                        font-size: 12px; 
+                    .qty-col {
+                        width: 25%;
+                        text-align: center;
+                        font-weight: bold;
                     }
-                    .qty-col { 
-                        width: 80px; 
-                        text-align: center; 
+                    .desc-col {
+                        text-align: left;
+                        font-weight: bold;
                     }
-                    .description-col { 
-                        text-align: left; 
+
+                    .purpose-row {
+                        display: flex;
+                        margin-bottom: 15px;
+                        font-weight: bold;
                     }
-                    .purpose-section { 
-                        margin: 15px 0; 
+                    .signatures-row {
+                        display: flex;
+                        justify-content: space-between;
+                        margin-bottom: 5px;
+                        font-weight: bold;
                     }
-                    .purpose-label { 
-                        font-weight: bold; 
-                        font-size: 12px; 
-                        margin-bottom: 5px; 
+                    .signature-block {
+                        width: 30%;
                     }
-                    .purpose-field { 
-                        border: 1px solid #333; 
-                        padding: 8px; 
-                        min-height: 40px; 
-                        font-size: 12px; 
+                    .signature-line {
+                        border-bottom: 1px solid #000;
+                        min-height: 20px;
+                        margin-left: 5px;
+                        display: inline-block;
+                        width: calc(100% - 70px);
                     }
-                    .signature-section { 
-                        margin-top: 20px; 
-                        display: flex; 
-                        justify-content: space-between; 
+                    .footer-codes {
+                        font-weight: bold;
+                        font-size: 14px;
+                        line-height: 1.2;
+                        margin-top: 10px;
                     }
-                    .signature-field { 
-                        text-align: center; 
-                        width: 200px; 
-                    }
-                    .signature-label { 
-                        font-size: 11px; 
-                        margin-bottom: 30px; 
-                    }
-                    .signature-line { 
-                        border-bottom: 1px solid #333; 
-                        height: 20px; 
-                    }
+
                     @media print {
-                        body { margin: 0; padding: 10px; }
+                        body {
+                            margin: 0;
+                            padding: 0;
+                        }
+                        @page {
+                            margin: 10mm;
+                            size: portrait;
+                        }
                     }
                 </style>
             </head>
             <body>
-                <div class="withdrawal-slip">
-                    <!-- Company Header -->
-                    <div class="company-header">
+                <div class="slip-container">
+                    <div class="header">
+                        <img src="/images/warlen.png" alt="Logo" class="logo-placeholder" style="object-fit: contain; background: none; border-radius: 0;" />
                         <div class="company-name">Warlen Industrial Sales Corporation</div>
                         <div class="company-address">Deka Sales Bldg., Lacson Ext., Alijis Rd., Bacolod City</div>
-                        <img src="/images/warlen.png" alt="Warlen Logo" style="max-width: 80px; height: auto; display: block; margin: 0 auto 5px;" />
-                        <div class="slip-title">Withdrawal Slip</div>
                     </div>
                     
-                    <!-- Information Fields -->
-                    <div class="info-section">
-                        <div class="info-field">
-                            <div class="field-label">No.</div>
-                            <div class="field-value">${purchase.id}</div>
+                    <div class="slip-title-row">
+                        <div class="year-prefix">#${new Date().getFullYear()}</div>
+                        <div class="slip-main-title">WITHDRAWAL SLIP</div>
+                        <div class="slip-no">No. ${((purchase.os || purchase.notes || '').match(/\d+/) || [''])[0]}</div>
+                    </div>
+
+                    <div class="info-row-flex">
+                        <div style="flex-grow: 1;">
+                            <span class="label">Name of Project:</span>
+                            <span class="underline-field" style="width: calc(100% - 130px);">${purchase.project_name || ''}</span>
                         </div>
-                        <div class="info-field">
-                            <div class="field-label">Name of Project</div>
-                            <div class="field-value">${purchase.project_name || ''}</div>
-                        </div>
-                        <div class="info-field">
-                            <div class="field-label">Date</div>
-                            <div class="field-value">${new Date(purchase.purchase_date).toLocaleDateString()}</div>
-                        </div>
-                        <div class="info-field">
-                            <div class="field-label">Type of Project</div>
-                            <div class="field-value">${purchase.project_type || ''}</div>
+                        <div style="width: 150px; text-align: right;">
+                            <span class="label">Date:</span>
+                            <span class="underline-field" style="width: 100px; text-align: center;">${new Date(purchase.purchase_date).toLocaleDateString()}</span>
                         </div>
                     </div>
-                    
-                    <!-- Category Selection -->
-                    <div class="category-section">
-                        <div class="category-title">Type of Items:</div>
-                        <div class="category-options">
-                            <div class="category-option">
-                                <div class="checkbox">${purchase.item_category === 'material' ? '✓' : ''}</div>
-                                <span>Construction Materials</span>
-                            </div>
-                            <div class="category-option">
-                                <div class="checkbox">${purchase.item_category === 'tool' ? '✓' : ''}</div>
-                                <span>Spare Parts</span>
-                            </div>
-                            <div class="category-option">
-                                <div class="checkbox">${!purchase.item_category || (purchase.item_category !== 'material' && purchase.item_category !== 'tool') ? '✓' : ''}</div>
-                                <span>Others</span>
-                            </div>
-                        </div>
+
+                    <div class="info-row">
+                        <span class="label">Type of Project:</span>
+                        <span class="underline-field" style="width: calc(100% - 120px);">${purchase.project_type || ''}</span>
                     </div>
-                    
-                    <!-- Items Table -->
-                    <table class="items-table">
+
+                    <div class="categories-row">
+                        <div>Construction materials (${purchase.item_category === 'material' ? '✓' : ' '})</div>
+                        <div>Spares parts (${purchase.item_category === 'tool' ? '✓' : ' '})</div>
+                        <div>others: <span class="underline-field" style="width: 60px;">${(!purchase.item_category || (purchase.item_category !== 'material' && purchase.item_category !== 'tool')) ? '✓' : ''}</span></div>
+                    </div>
+
+                    <table>
                         <thead>
                             <tr>
                                 <th class="qty-col">Qty</th>
-                                <th class="description-col">Item Description</th>
+                                <th class="desc-col">Item Description</th>
                             </tr>
                         </thead>
                         <tbody>
-                            ${(purchase._groupItems || [{ item_name: purchase.item_name, quantity: purchase.quantity, description: purchase.description }])
-                .map(item => `
-                                <tr>
-                                    <td class="qty-col">${item.quantity}</td>
-                                    <td class="description-col">${item.item_name}${item.description ? ' - ' + item.description : ''}</td>
-                                </tr>
-                            `).join('')}
+                            ${(() => {
+                const items = purchase._groupItems || [{ item_name: purchase.item_name, quantity: purchase.quantity, description: purchase.description }];
+                const rows = [];
+                for (let i = 0; i < 15; i++) { // Render 15 rows to match the physical slip look
+                    if (i < items.length) {
+                        const item = items[i];
+                        rows.push(`
+                                            <tr>
+                                                <td class="qty-col" style="font-weight: normal;">${item.quantity}</td>
+                                                <td class="desc-col" style="font-weight: normal;">${item.item_name}${item.description ? ' - ' + item.description : ''}</td>
+                                            </tr>
+                                        `);
+                    } else {
+                        rows.push(`
+                                            <tr>
+                                                <td></td>
+                                                <td></td>
+                                            </tr>
+                                        `);
+                    }
+                }
+                return rows.join('');
+            })()}
                         </tbody>
                     </table>
-                    
-                    <!-- Purpose Section -->
-                    <div class="purpose-section">
-                        <div class="purpose-label">Purpose/O.S:</div>
-                        <div class="purpose-field">${purchase.os || purchase.notes || ''}</div>
+
+                    <div class="purpose-row">
+                        <span>Purpose:</span>
+                        <span class="underline-field" style="flex-grow: 1; border-bottom: none; margin-left: 5px; font-weight: normal;">${purchase.os || purchase.notes || ''}</span>
                     </div>
-                    
-                    <!-- Signature Section -->
-                    <div class="signature-section">
-                        <div class="signature-field">
-                            <div class="signature-label">Issued By:</div>
-                            <div class="signature-line" style="text-align: center; line-height: 20px;">${purchase.issued_by || ''}</div>
+
+                    <div class="signatures-row">
+                        <div class="signature-block">
+                            <span>Noted By:</span>
+                            <span class="underline-field" style="width: 100%; display: block; margin-top: 15px;"></span>
                         </div>
-                        <div class="signature-field">
-                            <div class="signature-label">Issued To:</div>
-                            <div class="signature-line" style="text-align: center; line-height: 20px;">${purchase.issued_to || ''}</div>
+                        <div class="signature-block">
+                            <span>Issued By:</span>
+                            <span class="underline-field" style="width: 100%; display: block; margin-top: 15px; text-align: center; font-weight: normal;">${purchase.issued_by || ''}</span>
                         </div>
-                        <div class="signature-field">
-                            <div class="signature-label">Noted By:</div>
-                            <div class="signature-line"></div>
+                        <div class="signature-block">
+                            <span>Issued To:</span>
+                            <span class="underline-field" style="width: 100%; display: block; margin-top: 15px; text-align: center; font-weight: normal;">${purchase.issued_to || ''}</span>
                         </div>
+                    </div>
+
+                    <div class="footer-codes">
+                        <div>QF-WHS-003</div>
+                        <div>Rev 00 EFF: 02/10/2025</div>
                     </div>
                 </div>
             </body>
@@ -328,12 +357,9 @@ export default function Index({ auth, purchases, status }) {
         setOpenDropdown(null);
         setPrintProjectName(group.supplier_name);
         setPrintProjectItems(group._groupItems || [group]);
-
-        setTimeout(() => {
-            window.print();
-            setPrintProjectName(null);
-            setPrintProjectItems([]);
-        }, 300);
+        setPrintImages({});
+        setPrintSaNumber('');
+        setPrintToolsId({});
     };
 
     return (
@@ -384,6 +410,10 @@ export default function Index({ auth, purchases, status }) {
                             @page { 
                                 margin: 0 20mm 20mm 20mm;
                             }
+                            html, body, #app {
+                                background-color: white !important;
+                                background: white !important;
+                            }
                             body {
                                 -webkit-print-color-adjust: exact !important;
                                 print-color-adjust: exact !important;
@@ -391,106 +421,226 @@ export default function Index({ auth, purchases, status }) {
                         }
                         `}
                     </style>
-                    <div className="max-w-7xl mx-auto sm:px-6 lg:px-8">
-                        {/* Printable Layout (Only visible when printing via handleShipmentPrint) */}
+                    <div className="max-w-7xl mx-auto sm:px-6 lg:px-8 print:bg-white print:p-0">
+                        {/* Printable Layout Preview Modal */}
                         {printProjectName && (
-                            <div className="hidden print:block w-full bg-white text-black font-sans leading-relaxed">
-                                {/* Header Section */}
-                                <div className="text-center mb-6">
-                                    <div className="flex justify-center items-center mb-2">
-                                        <h1 className="text-2xl font-bold uppercase tracking-wide text-blue-900" style={{ color: '#1e3a8a' }}>
-                                            WARLEN INDUSTRIAL SALES CORPORATION
-                                        </h1>
+                            <div className="fixed inset-0 z-[100] bg-gray-500/80 md:p-8 flex items-start justify-center overflow-y-auto print:bg-white print:p-0 print:block print:relative print:inset-auto print:z-auto print:border-none print:shadow-none bg-white">
+                                <div className="bg-white w-full max-w-5xl shadow-2xl print:shadow-none print:border-none print:ring-0 print:outline-none print:max-w-none print:m-0 print:rounded-none relative min-h-screen print:min-h-0 md:min-h-0 md:rounded-lg">
+
+                                    {/* Action Bar (Hidden on Print) */}
+                                    <div className="print:hidden sticky top-0 bg-gray-100 border-b px-6 py-4 flex flex-col sm:flex-row justify-between items-center z-10 shadow-sm md:rounded-t-lg">
+                                        <h3 className="text-lg font-bold text-gray-800 mb-4 sm:mb-0">Print Preview - Shipment Approval</h3>
+                                        <div className="flex gap-3">
+                                            <button
+                                                onClick={() => {
+                                                    setPrintProjectName(null);
+                                                    setPrintProjectItems([]);
+                                                    setPrintImages({});
+                                                    setPrintSaNumber('');
+                                                    setPrintToolsId({});
+                                                }}
+                                                className="px-4 py-2 bg-white border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none"
+                                            >
+                                                Cancel
+                                            </button>
+                                            <button
+                                                onClick={() => {
+                                                    const formData = new FormData();
+                                                    formData.append('project_site_name', printProjectName || 'Unknown Site');
+                                                    formData.append('sa_number', printSaNumber || 'N/A');
+
+                                                    // Collect Tools IDs and merge them (if multiple rows have tools id)
+                                                    const toolsList = Object.values(printToolsId).filter(val => val.trim() !== '');
+                                                    formData.append('tools_id', toolsList.length > 0 ? toolsList.join(', ') : '');
+
+                                                    const descItems = printProjectItems.map(item => `${item.quantity || 1} ${item.item_unit === 'Quantity' ? 'PC' : (item.item_unit || 'PC')} - ${item.item_name}`).join(', ');
+                                                    formData.append('description', descItems);
+
+                                                    Object.keys(printImages).forEach(idx => {
+                                                        const imgData = printImages[idx];
+                                                        if (imgData && imgData.file) {
+                                                            formData.append('picture[]', imgData.file);
+                                                        }
+                                                    });
+
+                                                    router.post(route('shipment-approvals.store'), formData, {
+                                                        preserveState: true,
+                                                        preserveScroll: true,
+                                                    });
+
+                                                    setTimeout(() => window.print(), 100);
+                                                }}
+                                                className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none flex items-center"
+                                            >
+                                                <PrinterIcon className="h-5 w-5 mr-2" />
+                                                Print Document
+                                            </button>
+                                        </div>
                                     </div>
-                                    <h2 className="text-sm font-semibold uppercase tracking-widest text-red-600 mb-1" style={{ color: '#dc2626' }}>
-                                        General Engineering and Specialty Contractor
-                                    </h2>
-                                    <p className="text-xs">
-                                        Tel. 432-3497 / 435-1573<br />
-                                        Blk. 2 Lot 20, Greenplains Subd., Alijis Road, Bacolod City
-                                    </p>
-                                </div>
 
-                                <h3 className="text-xl text-center font-bold mb-6">
-                                    Shipment Approval and Confirmation of Materials
-                                </h3>
+                                    {/* Printable Content */}
+                                    <div className="p-8 print:p-0 w-full bg-white text-black font-sans leading-relaxed max-w-[210mm] mx-auto min-h-[297mm] print:min-h-0">
+                                        {/* Header Section */}
+                                        <div className="text-center mb-6 print:mb-1">
+                                            <div className="flex justify-center items-center mb-2 print:mb-0">
+                                                <img src="/images/warlen.png" alt="Logo" className="h-12 w-12 object-contain mr-3" />
+                                                <h1 className="text-2xl print:text-[20px] font-bold uppercase tracking-wide text-blue-900 print:leading-none" style={{ color: '#1e3a8a' }}>
+                                                    WARLEN INDUSTRIAL SALES CORPORATION
+                                                </h1>
+                                            </div>
+                                            <h2 className="text-sm font-semibold uppercase tracking-widest text-red-600 mb-1 print:mb-0 print:leading-none" style={{ color: '#dc2626' }}>
+                                                General Engineering and Specialty Contractor
+                                            </h2>
+                                            <p className="text-xs print:leading-tight">
+                                                Tel. 432-3497 / 435-1573<br />
+                                                Blk. 2 Lot 20, Greenplains Subd., Alijis Road, Bacolod City
+                                            </p>
+                                        </div>
 
-                                <p className="text-sm indent-8 mb-6 text-justify">
-                                    This letter serves as formal confirmation of the approved list of materials for the upcoming shipment.
-                                    Please be advised that only the items listed below have been authorized for inclusion in this shipment and no
-                                    other additional materials to be added in the cargo:
-                                </p>
+                                        <h3 className="text-xl text-center font-bold mb-6 print:mb-2">
+                                            Shipment Approval and Confirmation of Materials
+                                        </h3>
 
-                                {/* Print Table */}
-                                <table className="w-full border-collapse border border-black text-sm mb-2">
-                                    <thead>
-                                        <tr>
-                                            <th className="border border-black px-2 py-1 text-left font-bold" colSpan={4}>
-                                                Project Site Name: {printProjectName}
-                                            </th>
-                                            <th className="border border-black px-2 py-1 text-left font-bold" colSpan={2}>
-                                                SA#:<br />
-                                                Date: {new Date().toLocaleDateString('en-US', { month: '2-digit', day: '2-digit', year: 'numeric' }).replace(/\//g, '-')}
-                                            </th>
-                                        </tr>
-                                        <tr className="bg-gray-100">
-                                            <th className="border border-black px-2 py-2 text-center w-16">QTY</th>
-                                            <th className="border border-black px-2 py-2 text-center w-16">UNIT</th>
-                                            <th className="border border-black px-2 py-2 text-center w-24">TOOLS ID</th>
-                                            <th className="border border-black px-2 py-2 text-center uppercase" colSpan={2}>Description</th>
-                                            <th className="border border-black px-2 py-2 text-center w-32 uppercase">Picture</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {printProjectName && printProjectItems.map((item, index) => (
-                                            <tr key={index}>
-                                                <td className="border border-black px-2 py-4 text-center">{item.quantity || 1}</td>
-                                                <td className="border border-black px-2 py-4 text-center uppercase">{item.item_unit === 'Quantity' ? 'PC' : (item.item_unit || 'PC')}</td>
-                                                <td className="border border-black px-2 py-4 text-center"></td>
-                                                <td className="border border-black px-4 py-4 uppercase font-semibold text-center" colSpan={2}>
-                                                    {item.item_name || 'UNKNOWN ITEM'}
-                                                </td>
-                                                <td className={`border-black px-2 py-2 text-center border-l border-r ${index === 0 ? 'border-t' : ''} ${index === printProjectItems.length - 1 ? 'border-b' : ''}`}></td>
-                                            </tr>
-                                        ))}
-                                        <tr>
-                                            <td className="border border-black px-2 py-1 text-center font-bold text-xs" colSpan={6}>
-                                                ********************************NOTHING TO FOLLOW********************************
-                                            </td>
-                                        </tr>
-                                    </tbody>
-                                </table>
+                                        <p className="text-sm indent-8 mb-6 print:mb-2 text-justify">
+                                            This letter serves as formal confirmation of the approved list of materials for the upcoming shipment.
+                                            Please be advised that only the items listed below have been authorized for inclusion in this shipment and no
+                                            other additional materials to be added in the cargo:
+                                        </p>
 
-                                {/* Footer Section */}
-                                <p className="text-sm indent-8 mb-12 text-justify">
-                                    We kindly request and require that no additional materials or items be included in this shipment beyond
-                                    those listed above. This measure ensures proper documentation, compliance with agreed terms, and smooth
-                                    processing at the receiving end.
-                                </p>
+                                        {/* Print Table */}
+                                        <table className="w-full border-collapse border border-black text-sm mb-2">
+                                            <thead>
+                                                <tr>
+                                                    <th className="border border-black px-2 py-1 text-left font-bold" colSpan={4}>
+                                                        Project Site Name: {printProjectName}
+                                                    </th>
+                                                    <th className="border border-black px-2 py-1 text-left font-bold" colSpan={2}>
+                                                        <div className="flex items-center gap-1">
+                                                            <span className="whitespace-nowrap">SA#:</span>
+                                                            <input
+                                                                type="text"
+                                                                value={printSaNumber}
+                                                                onChange={(e) => setPrintSaNumber(e.target.value)}
+                                                                placeholder="Enter SA Number"
+                                                                className="print:text-black print:border-none print:p-0 print:bg-transparent print:placeholder-transparent border-b border-gray-300 bg-transparent text-sm w-full py-0 px-1 focus:outline-none focus:border-blue-500 transition-colors"
+                                                            />
+                                                        </div>
+                                                        <div className="mt-1">
+                                                            Date: {new Date().toLocaleDateString('en-US', { month: '2-digit', day: '2-digit', year: 'numeric' }).replace(/\//g, '-')}
+                                                        </div>
+                                                    </th>
+                                                </tr>
+                                                <tr className="bg-gray-100">
+                                                    <th className="border border-black px-2 py-2 print:py-1 text-center w-16">QTY</th>
+                                                    <th className="border border-black px-2 py-2 print:py-1 text-center w-16">UNIT</th>
+                                                    <th className="border border-black px-2 py-2 print:py-1 text-center w-24">TOOLS ID</th>
+                                                    <th className="border border-black px-2 py-2 print:py-1 text-center uppercase" colSpan={2}>Description</th>
+                                                    <th className="border border-black px-2 py-2 print:py-1 text-center w-32 uppercase">Picture</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {printProjectName && printProjectItems.map((item, index) => (
+                                                    <tr key={index}>
+                                                        <td className="border border-black px-2 py-4 print:py-1 text-center">{item.quantity || 1}</td>
+                                                        <td className="border border-black px-2 py-4 print:py-1 text-center uppercase">{item.item_unit === 'Quantity' ? 'PC' : (item.item_unit || 'PC')}</td>
+                                                        <td className="border border-black px-2 py-4 text-center print:p-0">
+                                                            <input
+                                                                type="text"
+                                                                value={printToolsId[index] || ''}
+                                                                onChange={(e) => setPrintToolsId(prev => ({ ...prev, [index]: e.target.value }))}
+                                                                placeholder="Enter ID"
+                                                                className="print:text-black print:border-none print:p-0 print:bg-transparent print:placeholder-transparent border-b border-gray-300 bg-transparent text-sm w-[80px] text-center py-1 px-1 focus:outline-none focus:border-blue-500 transition-colors mx-auto block"
+                                                            />
+                                                        </td>
+                                                        <td className="border border-black px-4 py-4 print:py-1 uppercase font-semibold text-center" colSpan={2}>
+                                                            {item.item_name || 'UNKNOWN ITEM'}
+                                                        </td>
+                                                        <td className={`border-black px-2 py-2 print:py-1 text-center border-l border-r ${index === 0 ? 'border-t' : ''} ${index === printProjectItems.length - 1 ? 'border-b' : ''}`}>
+                                                            <label className="cursor-pointer block min-h-[60px] print:min-h-0 flex items-center justify-center relative group">
+                                                                <input
+                                                                    type="file"
+                                                                    className="hidden"
+                                                                    accept="image/*"
+                                                                    onChange={(e) => {
+                                                                        if (e.target.files && e.target.files[0]) {
+                                                                            const file = e.target.files[0];
+                                                                            const reader = new FileReader();
+                                                                            reader.onload = (event) => {
+                                                                                setPrintImages(prev => ({
+                                                                                    ...prev,
+                                                                                    [index]: { file, preview: event.target.result }
+                                                                                }));
+                                                                            };
+                                                                            reader.readAsDataURL(file);
+                                                                        }
+                                                                    }}
+                                                                />
+                                                                {printImages[index] ? (
+                                                                    <div className="relative w-full h-full flex items-center justify-center">
+                                                                        <img src={printImages[index].preview || printImages[index]} alt="Uploaded" className="max-h-24 max-w-[120px] object-contain" />
+                                                                        <div
+                                                                            className="print:hidden absolute inset-0 bg-black/50 flex flex-col items-center justify-center opacity-0 hover:opacity-100 transition-opacity rounded cursor-pointer"
+                                                                            onClick={(e) => {
+                                                                                e.preventDefault();
+                                                                                const newImages = { ...printImages };
+                                                                                delete newImages[index];
+                                                                                setPrintImages(newImages);
+                                                                            }}
+                                                                        >
+                                                                            <TrashIcon className="h-6 w-6 text-white mb-1" />
+                                                                            <span className="text-white text-xs font-semibold">Remove</span>
+                                                                        </div>
+                                                                    </div>
+                                                                ) : (
+                                                                    <div className="print:hidden text-gray-400 text-xs flex flex-col items-center p-2 border-2 border-dashed border-transparent hover:border-gray-300 rounded hover:text-blue-500 transition-colors">
+                                                                        <PlusIcon className="h-5 w-5 mb-1 text-gray-400 group-hover:text-blue-500 transition-colors" />
+                                                                        <span>Add Picture</span>
+                                                                    </div>
+                                                                )}
+                                                            </label>
+                                                        </td>
+                                                    </tr>
+                                                ))}
+                                                <tr>
+                                                    <td className="border border-black px-2 py-1 text-center font-bold text-xs" colSpan={6}>
+                                                        ********************************NOTHING TO FOLLOW********************************
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
 
-                                <div className="text-right font-bold text-sm mb-16 mr-8">
-                                    Thank you for your cooperation.
-                                </div>
+                                        {/* Footer Section */}
+                                        <p className="text-sm indent-8 mb-12 text-justify">
+                                            We kindly request and require that no additional materials or items be included in this shipment beyond
+                                            those listed above. This measure ensures proper documentation, compliance with agreed terms, and smooth
+                                            processing at the receiving end.
+                                        </p>
 
-                                <div className="flex justify-between items-end mt-12 px-8">
-                                    <div className="text-center">
-                                        <div className="border-b border-black w-48 mb-1"></div>
-                                        <p className="font-bold text-sm">PURCHASING</p>
-                                    </div>
-                                    <div className="text-center">
-                                        <div className="border-b border-black w-48 mb-1"></div>
-                                        <p className="font-bold text-sm">CARRIED BY</p>
-                                    </div>
-                                </div>
+                                        <div className="text-right font-bold text-sm mb-16 mr-8">
+                                            Thank you for your cooperation.
+                                        </div>
 
-                                <div className="flex justify-between items-end mt-20 px-8">
-                                    <div className="text-center">
-                                        <div className="border-b border-black w-48 mb-1"></div>
-                                        <p className="font-bold text-sm">LOGISTIC</p>
-                                    </div>
-                                    <div className="text-center">
-                                        <div className="border-b border-black w-48 mb-1"></div>
-                                        <p className="font-bold text-sm">RECEIVED BY</p>
+                                        <div className="flex justify-between items-end mt-12 px-8">
+                                            <div className="text-center">
+                                                <div className="border-b border-black w-48 mb-1"></div>
+                                                <p className="font-bold text-sm">PURCHASING</p>
+                                            </div>
+                                            <div className="text-center">
+                                                <div className="border-b border-black w-48 mb-1"></div>
+                                                <p className="font-bold text-sm">CARRIED BY</p>
+                                            </div>
+                                        </div>
+
+                                        <div className="flex justify-between items-end mt-20 px-8">
+                                            <div className="text-center">
+                                                <div className="border-b border-black w-48 mb-1"></div>
+                                                <p className="font-bold text-sm">LOGISTIC</p>
+                                            </div>
+                                            <div className="text-center">
+                                                <div className="border-b border-black w-48 mb-1"></div>
+                                                <p className="font-bold text-sm">RECEIVED BY</p>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>

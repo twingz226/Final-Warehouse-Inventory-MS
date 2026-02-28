@@ -36,6 +36,36 @@ class ShipmentApprovalController extends Controller
         ]);
     }
 
+    public function store(Request $request)
+    {
+        $validated = $request->validate([
+            'project_site_name' => 'required|string|max:255',
+            'sa_number' => 'nullable|string|max:255',
+            'tools_id' => 'nullable|string|max:255',
+            'description' => 'required|string',
+            'picture' => 'nullable|array',
+            'picture.*' => 'image|mimes:jpeg,png,jpg,gif|max:20480',
+        ]);
+
+        $picturePaths = [];
+        if ($request->hasFile('picture')) {
+            foreach ($request->file('picture') as $file) {
+                $picturePaths[] = $file->store('shipment-approvals', 'public');
+            }
+        }
+
+        ShipmentApproval::create([
+            'project_site_name' => $validated['project_site_name'],
+            'sa_number' => data_get($validated, 'sa_number', 'N/A') ?: 'N/A',
+            'tools_id' => data_get($validated, 'tools_id'),
+            'description' => $validated['description'],
+            'picture' => empty($picturePaths) ? null : $picturePaths,
+            'created_by' => Auth::id(),
+        ]);
+
+        return redirect()->back()->with('status', 'Shipment approval recorded successfully.');
+    }
+
 
     public function edit(ShipmentApproval $shipmentApproval)
     {

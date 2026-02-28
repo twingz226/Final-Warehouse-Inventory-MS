@@ -14,7 +14,7 @@ export default function AuthenticatedLayout({ header, children }) {
     const [showLogoutDialog, setShowLogoutDialog] = useState(false);
 
     return (
-        <div className="min-h-screen bg-gray-100 dark:bg-gray-900 flex">
+        <div className="min-h-screen bg-gray-100 dark:bg-gray-900 flex print:bg-white print:dark:bg-white">
             {/* Sidebar - Hidden on mobile, visible on desktop */}
             <div className="hidden md:flex md:w-64 md:flex-col md:fixed md:inset-y-0 print:hidden">
                 <div className="flex flex-col flex-grow pt-5 bg-blue-600/70 dark:bg-blue-900/80 backdrop-blur-sm border-r border-white/10 dark:border-white/5 overflow-y-auto [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-white/20 hover:[&::-webkit-scrollbar-thumb]:bg-white/40 [&::-webkit-scrollbar-thumb]:rounded-full shadow-2xl">
