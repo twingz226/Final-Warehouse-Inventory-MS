@@ -704,11 +704,11 @@ export default function Index({ auth, purchases, status }) {
                                         </thead>
                                         <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
                                             {purchases.data.length > 0 ? (() => {
-                                                // ── Group by supplier_name + purchase_date ──────────
+                                                // ── Group by supplier_name + purchase_date + created_at ──────────
                                                 const groups = [];
                                                 const seen = {};
                                                 purchases.data.forEach((p) => {
-                                                    const key = `${p.supplier_name}||${p.purchase_date}`;
+                                                    const key = `${p.supplier_name}||${p.purchase_date}||${p.created_at}`;
                                                     if (seen[key] === undefined) {
                                                         seen[key] = groups.length;
                                                         groups.push({ key, rows: [p] });

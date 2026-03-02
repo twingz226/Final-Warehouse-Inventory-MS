@@ -21,7 +21,7 @@ const emptyRowSearch = () => ({
 
 export default function Form({ auth, purchase, statusOptions }) {
     // ── Shared form data (Inertia) ─────────────────────────────────────────────
-    const { data, setData, post, put, processing, errors, reset } = useForm({
+    const { data, setData, post, put, processing, errors, reset, transform } = useForm({
         supplier_name: purchase?.supplier_name || '',
         supplier_phone: purchase?.supplier_phone || '',
         purchase_date: purchase?.purchase_date || new Date().toISOString().split('T')[0],
@@ -119,14 +119,13 @@ export default function Form({ auth, purchase, statusOptions }) {
         e.preventDefault();
         if (purchase) {
             // Edit: flatten the first (only) item row back to top-level fields
-            const flat = {
+            transform((data) => ({
                 ...data,
                 item_name: data.items[0].item_name,
                 quantity: data.items[0].quantity,
                 description: data.items[0].description,
-            };
+            }));
             put(route('purchases.update', purchase.id), {
-                data: flat,
                 onSuccess: () => reset(),
             });
         } else {

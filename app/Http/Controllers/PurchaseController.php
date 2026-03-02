@@ -37,10 +37,10 @@ class PurchaseController extends Controller
         $date = $request->input('date');
         
         // 1. First, paginate the distinct project groups
-        $groupQuery = Purchase::select('purchases.supplier_name', 'purchases.purchase_date')
-            ->groupBy('purchases.supplier_name', 'purchases.purchase_date')
-            ->orderBy('purchases.purchase_date', 'desc')
-            ->orderBy('purchases.supplier_name', 'asc');
+        $groupQuery = Purchase::select('purchases.supplier_name', 'purchases.purchase_date', 'purchases.created_at')
+            ->selectRaw('MAX(purchases.id) as latest_id')
+            ->groupBy('purchases.supplier_name', 'purchases.purchase_date', 'purchases.created_at')
+            ->orderBy('latest_id', 'desc');
         
         if ($search) {
             $groupQuery->where(function($q) use ($search) {
@@ -67,12 +67,12 @@ class PurchaseController extends Controller
                     foreach ($groups as $group) {
                         $q->orWhere(function($sq) use ($group) {
                             $sq->where('purchases.supplier_name', $group->supplier_name)
-                               ->where('purchases.purchase_date', $group->purchase_date);
+                               ->where('purchases.purchase_date', $group->purchase_date)
+                               ->where('purchases.created_at', $group->created_at);
                         });
                     }
                 })
-                ->orderBy('purchases.purchase_date', 'desc')
-                ->orderBy('purchases.supplier_name', 'asc');
+                ->orderBy('purchases.id', 'desc');
             
             $purchasesForGroups = $itemQuery->get();
         }
@@ -136,6 +136,7 @@ class PurchaseController extends Controller
         ];
 
         DB::transaction(function () use ($shared, $validated) {
+            $now = now();
             foreach ($validated['items'] as $itemRow) {
                 $data = array_merge($shared, [
                     'item_name'   => $itemRow['item_name'],
@@ -143,7 +144,10 @@ class PurchaseController extends Controller
                     'description' => $itemRow['description'] ?? null,
                 ]);
 
-                $purchase = Purchase::create($data);
+                $purchase = new Purchase($data);
+                $purchase->created_at = $now;
+                $purchase->updated_at = $now;
+                $purchase->save();
 
                 $this->logHistory(
                     $purchase,
@@ -169,6 +173,7 @@ class PurchaseController extends Controller
         
         $groupItems = Purchase::where('purchases.supplier_name', $purchase->supplier_name)
             ->where('purchases.purchase_date', $purchase->purchase_date)
+            ->where('purchases.created_at', $purchase->created_at)
             ->leftJoin('items', 'purchases.item_name', '=', 'items.name')
             ->select('purchases.*', 'items.category as item_category', 'items.unit as item_unit')
             ->get();
