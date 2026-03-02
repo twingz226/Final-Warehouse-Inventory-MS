@@ -1,11 +1,14 @@
 import { Head, Link, router } from '@inertiajs/react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
-import { useState, useEffect } from 'react';
-import { PlusIcon, EyeIcon, TrashIcon, PrinterIcon } from '@heroicons/react/24/outline';
+import { useState, useEffect, useRef } from 'react';
+import { PlusIcon, EyeIcon, TrashIcon, PrinterIcon, MagnifyingGlassIcon } from '@heroicons/react/24/outline';
 
 export default function Index({ auth, purchases, status }) {
     const [tooltip, setTooltip] = useState({ show: false, text: '', x: 0, y: 0 });
     const [dateFilter, setDateFilter] = useState('');
+    const [searchTerm, setSearchTerm] = useState('');
+    const [suggestions, setSuggestions] = useState([]);
+    const [showSuggestions, setShowSuggestions] = useState(false);
     const [printProjectName, setPrintProjectName] = useState(null);
     const [printProjectItems, setPrintProjectItems] = useState([]);
     const [printImages, setPrintImages] = useState({});
@@ -27,12 +30,64 @@ export default function Index({ auth, purchases, status }) {
         };
     }, [openDropdown]);
 
+    const firstRender = useRef(true);
+
     useEffect(() => {
         const params = new URLSearchParams(window.location.search);
         if (params.get('date')) {
             setDateFilter(params.get('date'));
         }
+        if (params.get('search')) {
+            setSearchTerm(params.get('search'));
+        }
+        firstRender.current = false;
     }, []);
+
+    useEffect(() => {
+        if (firstRender.current) return;
+
+        // Fetch suggestions when search term changes
+        const fetchSuggestions = async () => {
+            if (searchTerm.length >= 1) {
+                try {
+                    const response = await fetch(`/commercial/public/index.php/purchases/suggestions?q=${encodeURIComponent(searchTerm)}`);
+                    const data = await response.json();
+                    setSuggestions(data);
+                    setShowSuggestions(true);
+                } catch (error) {
+                    console.error("Failed to fetch suggestions:", error);
+                }
+            } else {
+                setSuggestions([]);
+                setShowSuggestions(false);
+            }
+        };
+
+        const timer = setTimeout(() => {
+            fetchSuggestions();
+
+            const params = new URLSearchParams(window.location.search);
+            const currentSearch = params.get('search') || '';
+
+            if (searchTerm !== currentSearch) {
+                if (searchTerm) {
+                    params.set('search', searchTerm);
+                } else {
+                    params.delete('search');
+                }
+
+                params.delete('page');
+
+                const queryStr = params.toString();
+                router.visit(route('purchases.index') + (queryStr ? `?${queryStr}` : ''), {
+                    preserveState: true,
+                    preserveScroll: true,
+                });
+            }
+        }, 300);
+
+        return () => clearTimeout(timer);
+    }, [searchTerm]);
 
     const handleDateChange = (e) => {
         const newDate = e.target.value;
@@ -653,10 +708,68 @@ export default function Index({ auth, purchases, status }) {
                                 </div>
                             )}
 
-                            {/* Date Filter */}
-                            <div className="mb-6 flex justify-end">
-                                <div className="flex items-center gap-2">
-                                    <label htmlFor="date-filter" className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                            {/* Filters */}
+                            <div className="mb-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                                {/* Search Bar */}
+                                <div className="relative w-full sm:w-96 rounded-md shadow-sm z-20">
+                                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                        <MagnifyingGlassIcon className="h-5 w-5 text-gray-400" aria-hidden="true" />
+                                    </div>
+                                    <input
+                                        type="text"
+                                        value={searchTerm}
+                                        onChange={(e) => setSearchTerm(e.target.value)}
+                                        onFocus={() => { if (searchTerm.length > 0) setShowSuggestions(true); }}
+                                        onBlur={() => setTimeout(() => setShowSuggestions(false), 200)}
+                                        placeholder="Search outgoing items..."
+                                        className="block w-full pl-10 pr-10 py-2 border border-gray-300 dark:border-gray-700 rounded-md leading-5 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-300 placeholder-gray-500 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm shadow-sm transition-colors duration-200 ease-in-out"
+                                        autoComplete="off"
+                                    />
+                                    {searchTerm && (
+                                        <button
+                                            onClick={() => { setSearchTerm(''); setSuggestions([]); setShowSuggestions(false); }}
+                                            className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-500 transition-colors"
+                                            title="Clear search"
+                                        >
+                                            <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                            </svg>
+                                        </button>
+                                    )}
+
+                                    {/* Auto-suggestions Dropdown */}
+                                    {showSuggestions && suggestions.length > 0 && (
+                                        <div className="absolute z-30 mt-1 w-full bg-white dark:bg-gray-900 shadow-xl max-h-60 rounded-md py-1 text-base ring-1 ring-black ring-opacity-5 overflow-auto focus:outline-none sm:text-sm border border-gray-200 dark:border-gray-700 transform transition-all duration-200 ease-out origin-top">
+                                            {suggestions.map((suggestion, index) => (
+                                                <div
+                                                    key={index}
+                                                    onClick={() => {
+                                                        setSearchTerm(suggestion.text);
+                                                        setShowSuggestions(false);
+                                                    }}
+                                                    className="cursor-pointer select-none relative py-2.5 pl-3 pr-9 hover:bg-indigo-50 dark:hover:bg-gray-800 text-gray-900 dark:text-gray-100 flex items-center group transition-colors duration-150"
+                                                >
+                                                    <span className="block truncate font-medium">
+                                                        {suggestion.text}
+                                                    </span>
+                                                    <span className={`ml-2 text-xs px-2 py-0.5 rounded-full ${suggestion.type === 'project' ? 'bg-indigo-100 dark:bg-indigo-900/50 text-indigo-700 dark:text-indigo-300' : 'bg-green-100 dark:bg-green-900/50 text-green-700 dark:text-green-300'}`}>
+                                                        {suggestion.type === 'project' ? 'Project' : 'Item'}
+                                                    </span>
+                                                    {/* Arrow indicator that fades in on hover */}
+                                                    <span className="absolute inset-y-0 right-0 flex items-center pr-4 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                                                        <svg className="h-4 w-4 text-indigo-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
+                                                        </svg>
+                                                    </span>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    )}
+                                </div>
+
+                                {/* Date Filter */}
+                                <div className="flex items-center gap-2 w-full sm:w-auto">
+                                    <label htmlFor="date-filter" className="text-sm font-medium text-gray-700 dark:text-gray-300 shrink-0">
                                         Filter by Date:
                                     </label>
                                     <input
@@ -669,9 +782,9 @@ export default function Index({ auth, purchases, status }) {
                                     {dateFilter && (
                                         <button
                                             onClick={() => handleDateChange({ target: { value: '' } })}
-                                            className="text-sm text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300 ml-2 py-1 px-3 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800"
+                                            className="text-sm text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300 py-1 px-3 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 shrink-0"
                                         >
-                                            Clear Filter
+                                            Clear
                                         </button>
                                     )}
                                 </div>

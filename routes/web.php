@@ -114,6 +114,9 @@ Route::middleware('auth')->group(function () {
     // Return item route
     Route::post('borrowings/{borrowing}/return', [\App\Http\Controllers\BorrowingController::class, 'returnItem'])->name('borrowings.return');
     
+    // Purchase suggestions route
+    Route::get('purchases/suggestions', [\App\Http\Controllers\Api\PurchaseSearchController::class, 'suggestions'])->name('purchases.suggestions');
+    
     // Purchase routes  
     Route::resource('purchases', \App\Http\Controllers\PurchaseController::class)->only([
         'index', 'create', 'store', 'show', 'edit', 'update', 'destroy'
