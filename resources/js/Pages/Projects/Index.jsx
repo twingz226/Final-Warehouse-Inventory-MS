@@ -152,9 +152,15 @@ export default function Index({ auth, purchases }) {
                                     {isExpanded && (
                                         <div className="border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 p-6 print:p-0 print:border-none print:bg-white text-black">
                                             {/* Print header showing project name in the print output */}
-                                            <div className="hidden print:block mb-6 text-center">
-                                                <h2 className="text-2xl font-bold">Withdrawal Slip ({group.destinationName})</h2>
-                                                {group.projectName && <p className="text-gray-600">Project: {group.projectName}</p>}
+                                            <div className="hidden print:flex mb-2 flex-col items-center justify-center">
+                                                <div className="flex items-center justify-center gap-4">
+                                                    <img src="/images/warlen.png" alt="Warlen Logo" className="h-16 w-auto object-contain" />
+                                                    <h1 className="text-2xl font-bold tracking-wide text-black uppercase">WARLEN INDUSTRIAL SALES CORPORATION</h1>
+                                                </div>
+                                                <div className="text-center -mt-2">
+                                                    <h2 className="text-xl font-bold uppercase text-black">Withdrawal Slip ({group.destinationName})</h2>
+                                                    {group.projectName && <p className="text-black font-medium text-sm">Project: {group.projectName}</p>}
+                                                </div>
                                             </div>
                                             <div className="overflow-x-auto pb-2 [&::-webkit-scrollbar]:h-2 [&::-webkit-scrollbar-track]:bg-gray-100 dark:[&::-webkit-scrollbar-track]:bg-gray-800 [&::-webkit-scrollbar-thumb]:bg-gray-300 dark:[&::-webkit-scrollbar-thumb]:bg-gray-600 hover:[&::-webkit-scrollbar-thumb]:bg-gray-400 dark:hover:[&::-webkit-scrollbar-thumb]:bg-gray-500 [&::-webkit-scrollbar-thumb]:rounded-full print:overflow-visible">
                                                 <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700 print:border-collapse print:border print:border-black print:divide-y-0">
