@@ -20,6 +20,11 @@ export default function InventoryIndex({ auth, items, low_stock_items, summary, 
     const [searchTimeout, setSearchTimeout] = useState(null);
     const [tooltip, setTooltip] = useState({ show: false, text: '', x: 0, y: 0 });
     const [confirmingRollover, setConfirmingRollover] = useState(false);
+    const [showLowStockItems, setShowLowStockItems] = useState(false);
+
+    const toggleLowStockDropdown = () => {
+        setShowLowStockItems(!showLowStockItems);
+    };
 
     const performSearch = () => {
         if (searchTimeout) {
@@ -254,16 +259,41 @@ export default function InventoryIndex({ auth, items, low_stock_items, summary, 
 
                         {/* Low Stock Alert */}
                         {lowStockItems.length > 0 && (
-                            <div className="bg-red-50 dark:bg-red-950 border border-red-200 dark:border-red-800 rounded-md p-4 mb-6">
-                                <h3 className="text-lg font-medium text-red-800 dark:text-red-400">Low Stock Alert</h3>
-                                <p className="text-sm text-red-700 dark:text-red-300 mb-2">The following items are running low on stock:</p>
-                                <ol className="list-decimal list-inside text-sm text-red-700 dark:text-red-300">
-                                    {lowStockItems.map(item => (
-                                        <li key={item.id}>
-                                            {item.name} - {item.unit === 'Quantity' ? Math.floor(item.available_stock) : item.available_stock} {item.unit === 'Quantity' ? 'pcs.' : item.unit} available
-                                        </li>
-                                    ))}
-                                </ol>
+                            <div className="bg-red-50 dark:bg-red-950 border border-red-200 dark:border-red-800 rounded-md p-4 mb-6 transition-all duration-300">
+                                <div
+                                    className="flex justify-between items-center cursor-pointer"
+                                    onClick={toggleLowStockDropdown}
+                                >
+                                    <div className="flex items-center">
+                                        <ExclamationTriangleIcon className="h-6 w-6 text-red-600 dark:text-red-400 mr-2" />
+                                        <h3 className="text-lg font-medium text-red-800 dark:text-red-400">
+                                            Low Stock Alert ({lowStockItems.length} items)
+                                        </h3>
+                                    </div>
+                                    <button
+                                        type="button"
+                                        className="text-red-800 dark:text-red-400 hover:text-red-900 dark:hover:text-red-300 focus:outline-none transition-colors"
+                                    >
+                                        <div className={`transform transition-transform duration-200 ${showLowStockItems ? 'rotate-180' : ''}`}>
+                                            <ChevronUpDownIcon className="h-5 w-5" />
+                                        </div>
+                                    </button>
+                                </div>
+
+                                {showLowStockItems && (
+                                    <div className="mt-4 pt-4 border-t border-red-200 dark:border-red-800 animate-fadeIn">
+                                        <p className="text-sm text-red-700 dark:text-red-300 mb-2">The following items are running low on stock:</p>
+                                        <div className="max-h-60 overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-red-200 dark:scrollbar-thumb-red-800">
+                                            <ol className="list-decimal list-inside text-sm text-red-700 dark:text-red-300 space-y-1">
+                                                {lowStockItems.map(item => (
+                                                    <li key={item.id} className="p-1 hover:bg-red-100 dark:hover:bg-red-900/50 rounded transition-colors">
+                                                        <span className="font-medium">{item.name}</span> - {item.unit === 'Quantity' ? Math.floor(item.available_stock) : item.available_stock} {item.unit === 'Quantity' ? 'pcs.' : item.unit} available
+                                                    </li>
+                                                ))}
+                                            </ol>
+                                        </div>
+                                    </div>
+                                )}
                             </div>
                         )}
 
