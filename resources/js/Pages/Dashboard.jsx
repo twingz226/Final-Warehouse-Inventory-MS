@@ -38,7 +38,7 @@ export default function Dashboard({
     recentActivities,
     itemsByCategory,
     stockDistribution,
-    monthlyBorrowings,
+    weeklyBorrowings,
     items,
     summary
 }) {
@@ -83,12 +83,12 @@ export default function Dashboard({
         }],
     };
 
-    // Prepare data for line chart (monthly borrowings)
+    // Prepare data for line chart (weekly borrowings)
     const lineData = {
-        labels: monthlyBorrowings?.map(item => item.month) || [],
+        labels: weeklyBorrowings?.map(item => item.week) || [],
         datasets: [{
             label: 'Borrowings',
-            data: monthlyBorrowings?.map(item => item.count) || [],
+            data: weeklyBorrowings?.map(item => item.count) || [],
             borderColor: 'rgba(147, 51, 234, 1)', // Purple
             backgroundColor: 'rgba(147, 51, 234, 0.1)',
             tension: 0.4,
@@ -142,7 +142,7 @@ export default function Dashboard({
             },
             title: {
                 display: true,
-                text: 'Monthly Borrowing Trends',
+                text: 'Weekly Borrowing trends',
             },
         },
         scales: {
@@ -329,7 +329,7 @@ export default function Dashboard({
                             </div>
                         </div>
 
-                        {/* Line Chart - Monthly Borrowing Trends */}
+                        {/* Line Chart - Weekly Borrowing trends */}
                         <div className="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
                             <div className="p-6">
                                 <div className="h-80">
@@ -351,9 +351,9 @@ export default function Dashboard({
                                         <div key={activity.id} className="flex items-start space-x-3">
                                             <div className="flex-shrink-0">
                                                 <div className={`w-8 h-8 rounded-full flex items-center justify-center ${activity.activity_type === 'item' ? 'bg-blue-100 text-blue-600' :
-                                                        activity.activity_type === 'distribution' ? 'bg-green-100 text-green-600' :
-                                                            activity.activity_type === 'borrowing' ? 'bg-purple-100 text-purple-600' :
-                                                                'bg-gray-100 text-gray-600'
+                                                    activity.activity_type === 'distribution' ? 'bg-green-100 text-green-600' :
+                                                        activity.activity_type === 'borrowing' ? 'bg-purple-100 text-purple-600' :
+                                                            'bg-gray-100 text-gray-600'
                                                     }`}>
                                                     {activity.activity_type === 'item' ? 'I' :
                                                         activity.activity_type === 'distribution' ? 'D' :

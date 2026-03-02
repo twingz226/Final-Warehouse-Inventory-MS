@@ -35,15 +35,15 @@ Route::get('/dashboard', function () {
             'distributed' => \App\Models\Purchase::where('status', 'received')->sum('quantity'),
             'total' => \App\Models\Item::sum('quantity'),
         ],
-        'monthlyBorrowings' => \App\Models\Borrowing::selectRaw('MONTH(created_at) as month, YEAR(created_at) as year, COUNT(*) as count')
-            ->where('created_at', '>=', now()->subMonths(6))
-            ->groupBy('year', 'month')
+        'weeklyBorrowings' => \App\Models\Borrowing::selectRaw('YEAR(created_at) as year, WEEK(created_at, 1) as week, MIN(created_at) as min_date, COUNT(*) as count')
+            ->where('created_at', '>=', now()->subWeeks(12))
+            ->groupBy('year', 'week')
             ->orderBy('year')
-            ->orderBy('month')
+            ->orderBy('week')
             ->get()
             ->map(function ($item) {
                 return [
-                    'month' => date('M Y', strtotime($item->year . '-' . $item->month . '-01')),
+                    'week' => \Carbon\Carbon::parse($item->min_date)->startOfWeek()->format('M d'),
                     'count' => $item->count
                 ];
             }),

@@ -200,106 +200,112 @@ export default function Form({ auth, borrowing, statusOptions }) {
                                     )}
                                 </div>
 
-                                {data.items.map((item, index) => (
-                                    <div key={index} className="md:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-6 bg-gray-50 dark:bg-gray-700/50 p-4 rounded-lg border border-gray-200 dark:border-gray-600 relative">
-                                        {!borrowing && data.items.length > 1 && (
-                                            <button
-                                                type="button"
-                                                onClick={() => removeItem(index)}
-                                                className="absolute top-2 right-2 text-red-500 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300"
-                                            >
-                                                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                                                    <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
-                                                </svg>
-                                            </button>
-                                        )}
-                                        <div className="md:col-span-2">
-                                            <label htmlFor={`item_name_${index}`} className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                                                Item Name *
-                                            </label>
-                                            <div className="relative searchable-dropdown">
+                                {data.items.map((item, index) => {
+                                    const availableResults = searchState[index]?.results?.filter(
+                                        result => !data.items.filter((_, i) => i !== index).map(si => si.item_name).includes(result.name)
+                                    ) || [];
+
+                                    return (
+                                        <div key={index} className="md:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-6 bg-gray-50 dark:bg-gray-700/50 p-4 rounded-lg border border-gray-200 dark:border-gray-600 relative">
+                                            {!borrowing && data.items.length > 1 && (
+                                                <button
+                                                    type="button"
+                                                    onClick={() => removeItem(index)}
+                                                    className="absolute top-2 right-2 text-red-500 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300"
+                                                >
+                                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                                        <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
+                                                    </svg>
+                                                </button>
+                                            )}
+                                            <div className="md:col-span-2">
+                                                <label htmlFor={`item_name_${index}`} className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                                                    Item Name *
+                                                </label>
+                                                <div className="relative searchable-dropdown">
+                                                    <input
+                                                        id={`item_name_${index}`}
+                                                        type="text"
+                                                        value={searchState[index]?.query || ''}
+                                                        onChange={(e) => handleSearch(e.target.value, index)}
+                                                        onFocus={() => handleInputFocus(index)}
+                                                        onClick={() => handleInputFocus(index)}
+                                                        className="mt-1 block w-full bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-blue-500 dark:focus:border-blue-400"
+                                                        placeholder="Search for an item..."
+                                                        required
+                                                    />
+                                                    {searchState[index]?.show && (
+                                                        <div className="absolute z-10 mt-1 w-full bg-white dark:bg-gray-800 shadow-lg max-h-60 rounded-md py-1 text-base ring-1 ring-black dark:ring-gray-600 ring-opacity-5 overflow-auto focus:outline-none sm:text-sm">
+                                                            {searchState[index]?.isSearching ? (
+                                                                <div className="px-4 py-2 text-gray-500 dark:text-gray-400">Searching...</div>
+                                                            ) : availableResults.length > 0 ? (
+                                                                availableResults.map((result) => (
+                                                                    <div
+                                                                        key={result.id}
+                                                                        className="cursor-pointer select-none relative py-2 pl-3 pr-9 bg-gray-50 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-500 rounded-md transition-colors duration-200"
+                                                                        onClick={() => handleItemSelect(result, index)}
+                                                                    >
+                                                                        <div className="flex items-center">
+                                                                            <span className="font-normal ml-3 block truncate text-gray-900 dark:text-gray-100">
+                                                                                {result.name}
+                                                                            </span>
+                                                                            <span className="text-gray-500 dark:text-gray-400 ml-2">
+                                                                                ({result.quantity} available)
+                                                                            </span>
+                                                                        </div>
+                                                                        {result.description && (
+                                                                            <span className="text-gray-400 dark:text-gray-500 ml-3 block truncate text-sm">
+                                                                                {result.description}
+                                                                            </span>
+                                                                        )}
+                                                                    </div>
+                                                                ))
+                                                            ) : searchState[index]?.query?.length >= 2 ? (
+                                                                <div className="px-4 py-2 text-gray-500 dark:text-gray-400">No items found</div>
+                                                            ) : null}
+                                                        </div>
+                                                    )}
+                                                </div>
+                                                {errors[`items.${index}.item_name`] && <p className="mt-2 text-sm text-red-600 dark:text-red-400">{errors[`items.${index}.item_name`]}</p>}
+                                            </div>
+
+                                            <div>
+                                                <label htmlFor={`tool_id_${index}`} className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                                                    Tool ID
+                                                </label>
                                                 <input
-                                                    id={`item_name_${index}`}
+                                                    id={`tool_id_${index}`}
                                                     type="text"
-                                                    value={searchState[index]?.query || ''}
-                                                    onChange={(e) => handleSearch(e.target.value, index)}
-                                                    onFocus={() => handleInputFocus(index)}
-                                                    onClick={() => handleInputFocus(index)}
+                                                    value={item.tool_id || ''}
+                                                    onChange={(e) => {
+                                                        const newItems = [...data.items];
+                                                        newItems[index].tool_id = e.target.value;
+                                                        setData('items', newItems);
+                                                    }}
                                                     className="mt-1 block w-full bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-blue-500 dark:focus:border-blue-400"
-                                                    placeholder="Search for an item..."
+                                                />
+                                                {errors[`items.${index}.tool_id`] && <p className="mt-2 text-sm text-red-600 dark:text-red-400">{errors[`items.${index}.tool_id`]}</p>}
+                                            </div>
+
+                                            <div>
+                                                <label htmlFor={`quantity_${index}`} className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                                                    Quantity *
+                                                </label>
+                                                <input
+                                                    id={`quantity_${index}`}
+                                                    type="number"
+                                                    min="1"
+                                                    value={item.quantity}
+                                                    onChange={(e) => handleQuantityChange(e.target.value, index)}
+                                                    className="mt-1 block w-full bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-blue-500 dark:focus:border-blue-400"
                                                     required
                                                 />
-                                                {searchState[index]?.show && (
-                                                    <div className="absolute z-10 mt-1 w-full bg-white dark:bg-gray-800 shadow-lg max-h-60 rounded-md py-1 text-base ring-1 ring-black dark:ring-gray-600 ring-opacity-5 overflow-auto focus:outline-none sm:text-sm">
-                                                        {searchState[index]?.isSearching ? (
-                                                            <div className="px-4 py-2 text-gray-500 dark:text-gray-400">Searching...</div>
-                                                        ) : searchState[index]?.results?.length > 0 ? (
-                                                            searchState[index].results.map((result) => (
-                                                                <div
-                                                                    key={result.id}
-                                                                    className="cursor-pointer select-none relative py-2 pl-3 pr-9 bg-gray-50 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-500 rounded-md transition-colors duration-200"
-                                                                    onClick={() => handleItemSelect(result, index)}
-                                                                >
-                                                                    <div className="flex items-center">
-                                                                        <span className="font-normal ml-3 block truncate text-gray-900 dark:text-gray-100">
-                                                                            {result.name}
-                                                                        </span>
-                                                                        <span className="text-gray-500 dark:text-gray-400 ml-2">
-                                                                            ({result.quantity} available)
-                                                                        </span>
-                                                                    </div>
-                                                                    {result.description && (
-                                                                        <span className="text-gray-400 dark:text-gray-500 ml-3 block truncate text-sm">
-                                                                            {result.description}
-                                                                        </span>
-                                                                    )}
-                                                                </div>
-                                                            ))
-                                                        ) : searchState[index]?.query?.length >= 2 ? (
-                                                            <div className="px-4 py-2 text-gray-500 dark:text-gray-400">No items found</div>
-                                                        ) : null}
-                                                    </div>
-                                                )}
+                                                {errors[`items.${index}.quantity`] && <p className="mt-2 text-sm text-red-600 dark:text-red-400">{errors[`items.${index}.quantity`]}</p>}
                                             </div>
-                                            {errors[`items.${index}.item_name`] && <p className="mt-2 text-sm text-red-600 dark:text-red-400">{errors[`items.${index}.item_name`]}</p>}
-                                        </div>
 
-                                        <div>
-                                            <label htmlFor={`tool_id_${index}`} className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                                                Tool ID
-                                            </label>
-                                            <input
-                                                id={`tool_id_${index}`}
-                                                type="text"
-                                                value={item.tool_id || ''}
-                                                onChange={(e) => {
-                                                    const newItems = [...data.items];
-                                                    newItems[index].tool_id = e.target.value;
-                                                    setData('items', newItems);
-                                                }}
-                                                className="mt-1 block w-full bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-blue-500 dark:focus:border-blue-400"
-                                            />
-                                            {errors[`items.${index}.tool_id`] && <p className="mt-2 text-sm text-red-600 dark:text-red-400">{errors[`items.${index}.tool_id`]}</p>}
                                         </div>
-
-                                        <div>
-                                            <label htmlFor={`quantity_${index}`} className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                                                Quantity *
-                                            </label>
-                                            <input
-                                                id={`quantity_${index}`}
-                                                type="number"
-                                                min="1"
-                                                value={item.quantity}
-                                                onChange={(e) => handleQuantityChange(e.target.value, index)}
-                                                className="mt-1 block w-full bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 dark:focus:ring-blue-400 focus:border-blue-500 dark:focus:border-blue-400"
-                                                required
-                                            />
-                                            {errors[`items.${index}.quantity`] && <p className="mt-2 text-sm text-red-600 dark:text-red-400">{errors[`items.${index}.quantity`]}</p>}
-                                        </div>
-
-                                    </div>
-                                ))}
+                                    );
+                                })}
 
                                 <div>
                                     <label htmlFor="borrow_date" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
