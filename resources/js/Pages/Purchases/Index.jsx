@@ -482,13 +482,13 @@ export default function Index({ auth, purchases, status }) {
                                     <div className="p-8 print:p-0 w-full bg-white text-black font-sans leading-relaxed max-w-[210mm] mx-auto min-h-[297mm] print:min-h-0">
                                         {/* Header Section */}
                                         <div className="text-center mb-6 print:mb-1">
-                                            <div className="flex justify-center items-center mb-2 print:mb-0">
+                                            <div className="flex justify-center items-center print:mb-0">
                                                 <img src="/images/warlen.png" alt="Logo" className="h-12 w-12 object-contain mr-3" />
                                                 <h1 className="text-2xl print:text-[20px] font-bold uppercase tracking-wide text-blue-900 print:leading-none" style={{ color: '#1e3a8a' }}>
                                                     WARLEN INDUSTRIAL SALES CORPORATION
                                                 </h1>
                                             </div>
-                                            <h2 className="text-sm font-semibold uppercase tracking-widest text-red-600 mb-1 print:mb-0 print:leading-none" style={{ color: '#dc2626' }}>
+                                            <h2 className="text-[12px] font-semibold uppercase tracking-widest text-red-600 mb-1 print:mb-0 print:leading-none -mt-2" style={{ color: '#dc2626' }}>
                                                 General Engineering and Specialty Contractor
                                             </h2>
                                             <p className="text-xs print:leading-tight">
