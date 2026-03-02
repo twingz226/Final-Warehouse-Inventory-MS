@@ -252,6 +252,21 @@ export default function InventoryIndex({ auth, items, low_stock_items, summary, 
                             </div>
                         </div>
 
+                        {/* Low Stock Alert */}
+                        {lowStockItems.length > 0 && (
+                            <div className="bg-red-50 dark:bg-red-950 border border-red-200 dark:border-red-800 rounded-md p-4 mb-6">
+                                <h3 className="text-lg font-medium text-red-800 dark:text-red-400">Low Stock Alert</h3>
+                                <p className="text-sm text-red-700 dark:text-red-300 mb-2">The following items are running low on stock:</p>
+                                <ol className="list-decimal list-inside text-sm text-red-700 dark:text-red-300">
+                                    {lowStockItems.map(item => (
+                                        <li key={item.id}>
+                                            {item.name} - {item.unit === 'Quantity' ? Math.floor(item.available_stock) : item.available_stock} {item.unit === 'Quantity' ? 'pcs.' : item.unit} available
+                                        </li>
+                                    ))}
+                                </ol>
+                            </div>
+                        )}
+
                         {/* Enhanced Filters */}
                         <div className="bg-white dark:bg-gray-800 shadow rounded-lg mb-6">
                             <div className="px-4 py-4 sm:p-6">
@@ -375,21 +390,6 @@ export default function InventoryIndex({ auth, items, low_stock_items, summary, 
                                 )}
                             </div>
                         </div>
-
-                        {/* Low Stock Alert */}
-                        {lowStockItems.length > 0 && (
-                            <div className="bg-red-50 dark:bg-red-950 border border-red-200 dark:border-red-800 rounded-md p-4 mb-6">
-                                <h3 className="text-lg font-medium text-red-800 dark:text-red-400">Low Stock Alert</h3>
-                                <p className="text-sm text-red-700 dark:text-red-300 mb-2">The following items are running low on stock:</p>
-                                <ol className="list-decimal list-inside text-sm text-red-700 dark:text-red-300">
-                                    {lowStockItems.map(item => (
-                                        <li key={item.id}>
-                                            {item.name} - {item.unit === 'Quantity' ? Math.floor(item.available_stock) : item.available_stock} {item.unit === 'Quantity' ? 'pcs.' : item.unit} available
-                                        </li>
-                                    ))}
-                                </ol>
-                            </div>
-                        )}
 
                         {/* Items Table */}
                         <div className="bg-white dark:bg-gray-800 shadow overflow-hidden sm:rounded-md">

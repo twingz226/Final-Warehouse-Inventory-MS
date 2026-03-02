@@ -120,7 +120,7 @@ export default function Index({ auth, shipmentApprovals, status }) {
                                                             <div className="flex space-x-2">
                                                                 <Link
                                                                     href={route('shipment-approvals.edit', approval.id)}
-                                                                    className="text-yellow-600 dark:text-yellow-400 hover:text-yellow-900 dark:hover:text-yellow-300"
+                                                                    className="hidden text-yellow-600 dark:text-yellow-400 hover:text-yellow-900 dark:hover:text-yellow-300"
                                                                     onMouseEnter={(e) => { const rect = e.currentTarget.getBoundingClientRect(); setTooltip({ show: true, text: 'Edit', x: rect.left + rect.width / 2, y: rect.bottom + 10 }); }}
                                                                     onMouseLeave={() => setTooltip({ show: false, text: '', x: 0, y: 0 })}
                                                                 >
