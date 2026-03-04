@@ -13,7 +13,8 @@ import {
     UserIcon,
     FunnelIcon,
     CalendarIcon,
-    ExclamationTriangleIcon
+    ExclamationTriangleIcon,
+    EyeIcon
 } from '@heroicons/react/24/outline';
 
 export default function ActivityHistory({ auth, history, items, distributions, filters, activityTypes, actions }) {
@@ -21,6 +22,8 @@ export default function ActivityHistory({ auth, history, items, distributions, f
     const [activityType, setActivityType] = useState(filters.activity_type || '');
     const [date, setDate] = useState(filters.date || '');
     const [searchTimeout, setSearchTimeout] = useState(null);
+    const [showModal, setShowModal] = useState(false);
+    const [selectedActivity, setSelectedActivity] = useState(null);
     const isFirstRender = useRef(true);
 
     useEffect(() => {
@@ -308,6 +311,20 @@ export default function ActivityHistory({ auth, history, items, distributions, f
                                                             )}
                                                         </div>
 
+                                                        {/* View Button */}
+                                                        <div className="flex justify-end mb-2">
+                                                            <button
+                                                                onClick={() => {
+                                                                    setSelectedActivity(record);
+                                                                    setShowModal(true);
+                                                                }}
+                                                                className="inline-flex items-center px-3 py-1.5 text-xs font-medium text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-900/20 hover:bg-indigo-100 dark:hover:bg-indigo-800/30 rounded-lg transition-colors duration-200"
+                                                            >
+                                                                <EyeIcon className="h-4 w-4 mr-1" />
+                                                                View
+                                                            </button>
+                                                        </div>
+
                                                         {/* Entity Link */}
                                                         {record.activity_type === 'item' && record.item && (
                                                             <div className="mb-2">
@@ -439,6 +456,137 @@ export default function ActivityHistory({ auth, history, items, distributions, f
                     </div>
                 </div>
             </div>
+
+            {/* Activity Detail Modal */}
+            {showModal && selectedActivity && (
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50" onClick={() => setShowModal(false)}>
+                    <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
+                        <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+                            <div className="flex items-center justify-between">
+                                <h3 className="text-lg font-medium text-gray-900 dark:text-white">
+                                    Activity Details
+                                </h3>
+                                <button
+                                    onClick={() => setShowModal(false)}
+                                    className="text-gray-400 hover:text-gray-600 dark:text-gray-300 dark:hover:text-gray-100"
+                                >
+                                    <XMarkIcon className="h-6 w-6" />
+                                </button>
+                            </div>
+                        </div>
+
+                        <div className="px-6 py-4 space-y-6">
+                            {/* Basic Info */}
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Activity ID</label>
+                                    <p className="mt-1 text-sm text-gray-900 dark:text-white">{selectedActivity.id}</p>
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Action</label>
+                                    <p className="mt-1 text-sm text-gray-900 dark:text-white">{selectedActivity.action_label}</p>
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Activity Type</label>
+                                    <p className="mt-1 text-sm text-gray-900 dark:text-white">
+                                        {selectedActivity.activity_type === 'item' ? 'Item' :
+                                         selectedActivity.activity_type === 'distribution' ? 'Distribution' :
+                                         selectedActivity.activity_type === 'borrowing' ? 'Borrowing' : selectedActivity.activity_type}
+                                    </p>
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Created At</label>
+                                    <p className="mt-1 text-sm text-gray-900 dark:text-white">{new Date(selectedActivity.created_at).toLocaleString()}</p>
+                                </div>
+                                {selectedActivity.user && (
+                                    <div className="md:col-span-2">
+                                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">User</label>
+                                        <p className="mt-1 text-sm text-gray-900 dark:text-white">{selectedActivity.user.name}</p>
+                                    </div>
+                                )}
+                            </div>
+
+                            {/* Description */}
+                            {selectedActivity.description && (
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Description</label>
+                                    <p className="mt-1 text-sm text-gray-900 dark:text-white">{selectedActivity.description}</p>
+                                </div>
+                            )}
+
+                            {/* Related Entity */}
+                            {(selectedActivity.item || selectedActivity.purchase || selectedActivity.borrowing) && (
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Related Entity</label>
+                                    <div className="mt-1">
+                                        {selectedActivity.activity_type === 'item' && selectedActivity.item && (
+                                            <div className="text-sm text-gray-900 dark:text-white">
+                                                <strong>Item:</strong> {selectedActivity.item.name}
+                                                {selectedActivity.item.quantity !== undefined && (
+                                                    <span> (Qty: {selectedActivity.item.quantity}{selectedActivity.item.unit ? ` ${formatUnit(selectedActivity.item.unit)}` : ''})</span>
+                                                )}
+                                            </div>
+                                        )}
+                                        {selectedActivity.activity_type === 'distribution' && selectedActivity.purchase && (
+                                            <div className="text-sm text-gray-900 dark:text-white">
+                                                <strong>Distribution:</strong> {selectedActivity.purchase.item_name} to {selectedActivity.purchase.supplier_name}
+                                                {selectedActivity.purchase.quantity !== undefined && (
+                                                    <span> (Qty: {selectedActivity.purchase.quantity}{selectedActivity.purchase.unit ? ` ${formatUnit(selectedActivity.purchase.unit)}` : ''})</span>
+                                                )}
+                                            </div>
+                                        )}
+                                        {selectedActivity.activity_type === 'borrowing' && selectedActivity.borrowing && (
+                                            <div className="text-sm text-gray-900 dark:text-white">
+                                                <strong>Borrowing:</strong> {selectedActivity.borrowing.item_name} by {selectedActivity.borrowing.borrower_name}
+                                                {selectedActivity.borrowing.quantity !== undefined && (
+                                                    <span> (Qty: {selectedActivity.borrowing.quantity}{selectedActivity.borrowing.unit ? ` ${formatUnit(selectedActivity.borrowing.unit)}` : ''})</span>
+                                                )}
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
+                            )}
+
+                            {/* Changes */}
+                            {(() => {
+                                const allChanges = formatChanges(selectedActivity.old_values, selectedActivity.new_values);
+                                return allChanges && allChanges.length > 0 && (
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Changes</label>
+                                        <div className="space-y-3">
+                                            {allChanges.map((change, idx) => (
+                                                <div key={idx} className="bg-gray-50 dark:bg-gray-700 p-3 rounded border border-gray-200 dark:border-gray-600">
+                                                    <div className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1">
+                                                        {change.field}
+                                                    </div>
+                                                    <div className="flex flex-col sm:flex-row sm:items-center space-y-1 sm:space-y-0 sm:space-x-2 text-sm">
+                                                        <span className="text-red-600 line-through break-words">
+                                                            {change.old || 'empty'}
+                                                        </span>
+                                                        <ArrowPathIcon className="h-4 w-4 text-gray-400 flex-shrink-0" />
+                                                        <span className="text-green-600 break-words">
+                                                            {change.new || 'empty'}
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                );
+                            })()}
+                        </div>
+
+                        <div className="px-6 py-4 border-t border-gray-200 dark:border-gray-700 flex justify-end">
+                            <button
+                                onClick={() => setShowModal(false)}
+                                className="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-colors duration-200"
+                            >
+                                Close
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </AuthenticatedLayout>
     );
 }
