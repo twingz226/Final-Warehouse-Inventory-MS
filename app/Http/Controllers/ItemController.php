@@ -211,17 +211,23 @@ class ItemController extends Controller
     public function searchItems(Request $request)
     {
         $search = $request->input('search');
+        $category = $request->input('category');
 
         $query = Item::query();
 
         if (!empty($search)) {
             $query->where(function ($q) use ($search) {
                 $q->where('name', 'like', '%' . $search . '%')
-                    ->orWhere('description', 'like', '%' . $search . '%');
+                  ->orWhere('description', 'like', '%' . $search . '%')
+                  ->orWhere('category', 'like', '%' . $search . '%');
             });
         }
 
-        $items = $query->take(50)->get()->map(function ($item) {
+        if (!empty($category) && in_array($category, ['tool', 'material'])) {
+            $query->where('category', $category);
+        }
+
+        $items = $query->orderBy('name')->take(50)->get()->map(function ($item) {
             $totalDistributed = Purchase::where('item_name', $item->name)
                 ->where('status', 'received')
                 ->sum('quantity');
@@ -236,13 +242,26 @@ class ItemController extends Controller
                 'id' => $item->id,
                 'name' => $item->name,
                 'description' => $item->description,
+                'category' => $item->category,
                 'quantity' => $available,
                 'available_stock' => $available,
                 'unit' => $item->unit,
+                'stock_level' => $this->getStockLevel($available),
             ];
         })->filter()->values();
 
         return response()->json($items);
+    }
+
+    /**
+     * Determine stock level for visual indicators.
+     */
+    private function getStockLevel($available)
+    {
+        if ($available <= 5) return 'critical';
+        if ($available <= 10) return 'low';
+        if ($available <= 25) return 'medium';
+        return 'high';
     }
 
     /**
@@ -298,6 +317,12 @@ class ItemController extends Controller
      */
     public function storeStock(Request $request)
     {
+        // Check if this is a single item or multiple items submission
+        if ($request->has('items')) {
+            return $this->storeMultipleStock($request);
+        }
+        
+        // Single item validation and processing
         $validated = $request->validate([
             'item_id' => 'required|exists:items,id',
             'quantity' => 'required|numeric|min:0.01',
@@ -328,6 +353,77 @@ class ItemController extends Controller
         return redirect()
             ->route('items.index')
             ->with('status', "Stock added successfully. {$item->name} now has {$item->quantity} {$item->unit}.");
+    }
+
+    /**
+     * Store multiple stock additions.
+     */
+    private function storeMultipleStock(Request $request)
+    {
+        $validated = $request->validate([
+            'items' => 'required|array|min:1',
+            'items.*.item_id' => 'required|exists:items,id',
+            'items.*.quantity' => 'required|numeric|min:0.01',
+        ]);
+
+        $processedItems = [];
+        $errors = [];
+
+        DB::transaction(function () use ($validated, &$processedItems, &$errors) {
+            foreach ($validated['items'] as $index => $itemData) {
+                try {
+                    $item = Item::findOrFail($itemData['item_id']);
+                    $oldValues = $item->toArray();
+                    $oldQuantity = $item->quantity;
+
+                    // Add the incoming quantity to the existing quantity
+                    $item->quantity += $itemData['quantity'];
+                    $item->date_time = now();
+                    $item->save();
+
+                    $newValues = $item->toArray();
+
+                    $this->logHistory(
+                        $item,
+                        'stock_added',
+                        $oldValues,
+                        $newValues,
+                        (function() use ($itemData, $item, $oldQuantity) {
+                            $unit = $item->unit === 'Kg' ? 'kg' : 'pcs';
+                            return "+{$itemData['quantity']} {$unit} added to '{$item->name}' — stock updated from {$oldQuantity} to {$item->quantity} {$unit}.";
+                        })()
+                    );
+
+                    $processedItems[] = [
+                        'name' => $item->name,
+                        'old_quantity' => $oldQuantity,
+                        'added_quantity' => $itemData['quantity'],
+                        'new_quantity' => $item->quantity,
+                        'unit' => $item->unit,
+                    ];
+                } catch (\Exception $e) {
+                    $errors[] = "Failed to update item at position " . ($index + 1) . ": " . $e->getMessage();
+                }
+            }
+        });
+
+        if (!empty($errors)) {
+            return redirect()
+                ->route('items.add-stock')
+                ->withErrors(['items' => implode(', ', $errors)])
+                ->withInput();
+        }
+
+        $message = "Stock added successfully to " . count($processedItems) . " item(s):";
+        foreach ($processedItems as $processed) {
+            $unit = $processed['unit'] === 'Kg' ? 'kg' : 'pcs';
+            $message .= " {$processed['name']} ({$processed['old_quantity']} → {$processed['new_quantity']} {$unit}),";
+        }
+        $message = rtrim($message, ',');
+
+        return redirect()
+            ->route('items.index')
+            ->with('status', $message);
     }
 
     /**
