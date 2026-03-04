@@ -4,6 +4,9 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { PencilIcon, ArrowLeftIcon } from '@heroicons/react/24/outline';
 
 export default function Show({ auth, item }) {
+    const formatQuantity = (quantity) => {
+        return parseFloat(quantity).toString();
+    };
     return (
         <AuthenticatedLayout
             user={auth.user}
@@ -54,7 +57,7 @@ export default function Show({ auth, item }) {
                                             Quantity
                                         </dt>
                                         <dd className="mt-1 text-sm text-gray-900 dark:text-gray-100 sm:mt-0 sm:col-span-2">
-                                            {item.unit === 'Quantity' ? Math.floor(item.quantity) : item.quantity} {item.unit === 'Quantity' ? 'pcs.' : item.unit}
+                                            {formatQuantity(item.quantity)} {item.unit === 'Quantity' ? 'pcs' : item.unit.toLowerCase()}
                                         </dd>
                                     </div>
                                     <div className="py-4 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4">
