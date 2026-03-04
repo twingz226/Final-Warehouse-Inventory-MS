@@ -365,16 +365,16 @@ export default function Index({ auth, purchases, status }) {
 
                     <div class="signatures-row">
                         <div class="signature-block">
-                            <span>Noted By:</span>
-                            <span class="underline-field" style="width: 100%; display: block; margin-top: 15px;"></span>
+                            <span class="underline-field" style="width: 100%; display: block;"></span>
+                            <span style="margin-top: 15px;">Noted By:</span>
                         </div>
                         <div class="signature-block">
-                            <span>Issued By:</span>
-                            <span class="underline-field" style="width: 100%; display: block; margin-top: 15px; text-align: center; font-weight: normal;">${purchase.issued_by || ''}</span>
+                            <span class="underline-field" style="width: 100%; display: block; text-align: center; font-weight: normal;">${purchase.issued_by || ''}</span>
+                            <span style="margin-top: 15px;">Issued By:</span>
                         </div>
                         <div class="signature-block">
-                            <span>Issued To:</span>
-                            <span class="underline-field" style="width: 100%; display: block; margin-top: 15px; text-align: center; font-weight: normal;">${purchase.issued_to || ''}</span>
+                            <span class="underline-field" style="width: 100%; display: block; text-align: center; font-weight: normal;">${purchase.issued_to || ''}</span>
+                            <span style="margin-top: 15px;">Issued To:</span>
                         </div>
                     </div>
 
