@@ -142,6 +142,10 @@ export default function ActivityHistory({ auth, history, items, distributions, f
         return map[unit] || unit.toLowerCase();
     };
 
+    const formatQuantity = (quantity) => {
+        return parseFloat(quantity).toString();
+    };
+
     const formatChanges = (oldValues, newValues) => {
         if (!oldValues && !newValues) return null;
 
@@ -336,7 +340,7 @@ export default function ActivityHistory({ auth, history, items, distributions, f
                                                                 </Link>
                                                                 {record.item.quantity !== undefined && (
                                                                     <span className="ml-2 text-xs sm:text-sm text-gray-500 dark:text-gray-400">
-                                                                        (Qty: {record.item.quantity}{record.item.unit ? ` ${formatUnit(record.item.unit)}` : ''})
+                                                                        (Qty: {formatQuantity(record.item.quantity)}{record.item.unit ? ` ${formatUnit(record.item.unit)}` : ''})
                                                                     </span>
                                                                 )}
                                                             </div>
@@ -355,7 +359,7 @@ export default function ActivityHistory({ auth, history, items, distributions, f
                                                                 </span>
                                                                 {record.purchase.quantity !== undefined && (
                                                                     <span className="ml-2 text-xs sm:text-sm text-gray-500 dark:text-gray-400">
-                                                                        (Qty: {record.purchase.quantity}{record.purchase.unit ? ` ${formatUnit(record.purchase.unit)}` : ''})
+                                                                        (Qty: {formatQuantity(record.purchase.quantity)}{record.purchase.unit ? ` ${formatUnit(record.purchase.unit)}` : ''})
                                                                     </span>
                                                                 )}
                                                             </div>
@@ -374,7 +378,7 @@ export default function ActivityHistory({ auth, history, items, distributions, f
                                                                 </span>
                                                                 {record.borrowing.quantity !== undefined && (
                                                                     <span className="ml-2 text-xs sm:text-sm text-gray-500 dark:text-gray-400">
-                                                                        (Qty: {record.borrowing.quantity}{record.borrowing.unit ? ` ${formatUnit(record.borrowing.unit)}` : ''})
+                                                                        (Qty: {formatQuantity(record.borrowing.quantity)}{record.borrowing.unit ? ` ${formatUnit(record.borrowing.unit)}` : ''})
                                                                     </span>
                                                                 )}
                                                             </div>
@@ -393,11 +397,11 @@ export default function ActivityHistory({ auth, history, items, distributions, f
                                                                         </div>
                                                                         <div className="flex flex-col sm:flex-row sm:items-center space-y-1 sm:space-y-0 sm:space-x-2 text-xs sm:text-sm">
                                                                             <span className="text-red-600 line-through break-words">
-                                                                                {change.old || 'empty'}
+                                                                                {change.field === 'quantity' && !isNaN(change.old) ? formatQuantity(change.old) : (change.old || 'empty')}
                                                                             </span>
                                                                             <ArrowPathIcon className="h-3 w-3 sm:h-4 sm:w-4 text-gray-400 flex-shrink-0" />
                                                                             <span className="text-green-600 break-words">
-                                                                                {change.new || 'empty'}
+                                                                                {change.field === 'quantity' && !isNaN(change.new) ? formatQuantity(change.new) : (change.new || 'empty')}
                                                                             </span>
                                                                         </div>
                                                                     </div>
@@ -523,7 +527,7 @@ export default function ActivityHistory({ auth, history, items, distributions, f
                                             <div className="text-sm text-gray-900 dark:text-white">
                                                 <strong>Item:</strong> {selectedActivity.item.name}
                                                 {selectedActivity.item.quantity !== undefined && (
-                                                    <span> (Qty: {selectedActivity.item.quantity}{selectedActivity.item.unit ? ` ${formatUnit(selectedActivity.item.unit)}` : ''})</span>
+                                                    <span> (Qty: {formatQuantity(selectedActivity.item.quantity)}{selectedActivity.item.unit ? ` ${formatUnit(selectedActivity.item.unit)}` : ''})</span>
                                                 )}
                                             </div>
                                         )}
@@ -531,7 +535,7 @@ export default function ActivityHistory({ auth, history, items, distributions, f
                                             <div className="text-sm text-gray-900 dark:text-white">
                                                 <strong>Distribution:</strong> {selectedActivity.purchase.item_name} to {selectedActivity.purchase.supplier_name}
                                                 {selectedActivity.purchase.quantity !== undefined && (
-                                                    <span> (Qty: {selectedActivity.purchase.quantity}{selectedActivity.purchase.unit ? ` ${formatUnit(selectedActivity.purchase.unit)}` : ''})</span>
+                                                    <span> (Qty: {formatQuantity(selectedActivity.purchase.quantity)}{selectedActivity.purchase.unit ? ` ${formatUnit(selectedActivity.purchase.unit)}` : ''})</span>
                                                 )}
                                             </div>
                                         )}
@@ -539,7 +543,7 @@ export default function ActivityHistory({ auth, history, items, distributions, f
                                             <div className="text-sm text-gray-900 dark:text-white">
                                                 <strong>Borrowing:</strong> {selectedActivity.borrowing.item_name} by {selectedActivity.borrowing.borrower_name}
                                                 {selectedActivity.borrowing.quantity !== undefined && (
-                                                    <span> (Qty: {selectedActivity.borrowing.quantity}{selectedActivity.borrowing.unit ? ` ${formatUnit(selectedActivity.borrowing.unit)}` : ''})</span>
+                                                    <span> (Qty: {formatQuantity(selectedActivity.borrowing.quantity)}{selectedActivity.borrowing.unit ? ` ${formatUnit(selectedActivity.borrowing.unit)}` : ''})</span>
                                                 )}
                                             </div>
                                         )}
