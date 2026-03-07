@@ -112,13 +112,26 @@ export default function Index({ auth, purchases, status }) {
         router.delete(route('purchases.destroy', id));
     };
 
-    const handlePrint = (purchase) => {
-        // Create a new window for printing
+    const handlePrint = async (purchase) => {
+        // Create a new window for printing immediately so the popup blocker doesn't block it due to async wait
         const printWindow = window.open('', '_blank', 'width=800,height=600,scrollbars=yes,resizable=yes');
 
         if (!printWindow) {
             alert('Please allow popups to print the withdrawal slip');
             return;
+        }
+
+        let logoDataUrl = `${window.location.origin}/images/warlen.png`;
+        try {
+            const response = await fetch('/images/warlen.png');
+            const blob = await response.blob();
+            logoDataUrl = await new Promise((resolve) => {
+                const reader = new FileReader();
+                reader.onloadend = () => resolve(reader.result);
+                reader.readAsDataURL(blob);
+            });
+        } catch (error) {
+            console.error('Error fetching logo:', error);
         }
 
         // Generate detailed print content
@@ -291,7 +304,7 @@ export default function Index({ auth, purchases, status }) {
             <body>
                 <div class="slip-container">
                     <div class="header">
-                        <img src="/images/warlen.png" alt="Logo" class="logo-placeholder" style="object-fit: contain; background: none; border-radius: 0;" />
+                        <img src="${logoDataUrl}" alt="Logo" class="logo-placeholder" style="object-fit: contain; background: none; border-radius: 0;" />
                         <div class="company-name">Warlen Industrial Sales Corporation</div>
                         <div class="company-address">Deka Sales Bldg., Lacson Ext., Alijis Rd., Bacolod City</div>
                     </div>
