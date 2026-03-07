@@ -790,8 +790,8 @@ export default function Index({ auth, purchases, status }) {
                                 </div>
                             </div>
 
-                            <div className="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
-                                <div className="overflow-x-auto">
+                            <div className="bg-white dark:bg-gray-800 shadow-sm sm:rounded-lg">
+                                <div>
                                     <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
                                         <thead className="bg-blue-600/70 dark:bg-blue-900/80">
                                             <tr>
