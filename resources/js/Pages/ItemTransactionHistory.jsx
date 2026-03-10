@@ -8,13 +8,15 @@ import {
     Bars3CenterLeftIcon,
     ChevronDownIcon,
     ChevronUpIcon,
-    WrenchIcon
+    WrenchIcon,
+    PrinterIcon
 } from '@heroicons/react/24/outline';
 
 export default function ItemTransactionHistory({ auth, transactions, items, filters }) {
     const [selectedItem, setSelectedItem] = useState(filters.item_name || '');
     const [searchQuery, setSearchQuery] = useState('');
     const [expandedGroups, setExpandedGroups] = useState({});
+    const [printingGroup, setPrintingGroup] = useState(null);
 
     // Trigger router GET when item changes
     useEffect(() => {
@@ -46,6 +48,21 @@ export default function ItemTransactionHistory({ auth, transactions, items, filt
             ...prev,
             [key]: !prev[key]
         }));
+    };
+
+    const handlePrint = (e, groupKey) => {
+        e.stopPropagation();
+
+        setExpandedGroups({
+            [groupKey]: true
+        });
+
+        setPrintingGroup(groupKey);
+
+        setTimeout(() => {
+            window.print();
+            setTimeout(() => setPrintingGroup(null), 100);
+        }, 300);
     };
 
     // Group transactions by Date if a specific item is selected, or by Item Name if no item is selected
@@ -88,11 +105,21 @@ export default function ItemTransactionHistory({ auth, transactions, items, filt
         >
             <Head title="Item Transaction History" />
 
-            <div className="py-12">
-                <div className="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-6">
+            <div className="py-12 print:py-0">
+                <style>
+                    {`
+                    @media print {
+                        @page { 
+                            size: portrait; 
+                            margin-top: 5mm; 
+                        }
+                    }
+                    `}
+                </style>
+                <div className="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-6 print:space-y-0">
 
                     {/* Filters Section */}
-                    <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
+                    <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 print:hidden">
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                             {/* Item Filter */}
                             <div>
@@ -138,7 +165,7 @@ export default function ItemTransactionHistory({ auth, transactions, items, filt
 
                     {/* Selected Item Title */}
                     {selectedItem && (
-                        <h3 className="text-lg leading-6 font-medium text-gray-900 dark:text-white flex items-center">
+                        <h3 className="text-lg leading-6 font-medium text-gray-900 dark:text-white flex items-center print:hidden">
                             <Bars3CenterLeftIcon className="h-5 w-5 mr-2 text-indigo-500" />
                             History for: <span className="ml-1 font-bold text-indigo-600 dark:text-indigo-400">{selectedItem}</span>
                         </h3>
@@ -154,10 +181,10 @@ export default function ItemTransactionHistory({ auth, transactions, items, filt
                             const isExpanded = expandedGroups[group.groupName] || false;
 
                             return (
-                                <div key={index} className="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
+                                <div key={index} className={`bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg ${printingGroup && printingGroup !== group.groupName ? 'print:hidden' : ''}`}>
                                     {/* Header / Summary Row */}
                                     <div
-                                        className="p-6 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-150 flex items-center justify-between"
+                                        className="p-6 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-150 flex items-center justify-between print:hidden"
                                         onClick={() => toggleGroup(group.groupName)}
                                     >
                                         <div className="flex items-center space-x-4">
@@ -178,7 +205,15 @@ export default function ItemTransactionHistory({ auth, transactions, items, filt
                                             </div>
                                         </div>
                                         <div className="flex items-center text-gray-400 space-x-4">
-                                            <div>
+                                            <button
+                                                onClick={(e) => handlePrint(e, group.groupName)}
+                                                className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-900/30 hover:bg-indigo-100 dark:hover:bg-indigo-900/50 rounded-lg transition-colors print:hidden"
+                                                title={`Print ${group.groupName} details`}
+                                            >
+                                                <PrinterIcon className="h-4 w-4" />
+                                                <span className="hidden sm:inline">Print</span>
+                                            </button>
+                                            <div className="print:hidden">
                                                 {isExpanded ? (
                                                     <ChevronUpIcon className="h-6 w-6" />
                                                 ) : (
@@ -191,53 +226,70 @@ export default function ItemTransactionHistory({ auth, transactions, items, filt
                                     {/* Expanded Details - Table of Items */}
                                     {isExpanded && (
                                         <div className="border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 p-6 print:p-0 print:border-none print:bg-white text-black">
-                                            <div className="overflow-x-auto pb-2 [&::-webkit-scrollbar]:h-2 [&::-webkit-scrollbar-track]:bg-gray-100 dark:[&::-webkit-scrollbar-track]:bg-gray-800 [&::-webkit-scrollbar-thumb]:bg-gray-300 dark:[&::-webkit-scrollbar-thumb]:bg-gray-600 hover:[&::-webkit-scrollbar-thumb]:bg-gray-400 dark:hover:[&::-webkit-scrollbar-thumb]:bg-gray-500 [&::-webkit-scrollbar-thumb]:rounded-full">
-                                                <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-                                                    <thead className="bg-blue-600/70 dark:bg-blue-900/80">
+                                            {/* Print header showing project name in the print output */}
+                                            <div className="hidden print:block mb-3">
+                                                <div className="flex items-center justify-center gap-4">
+                                                    <img src="/images/warlen.png" alt="Warlen Logo" className="h-16 w-auto object-contain" />
+                                                    <h1 className="text-2xl font-bold tracking-wide text-black uppercase leading-none">WARLEN INDUSTRIAL SALES CORPORATION</h1>
+                                                </div>
+                                                <div className="text-center -mt-4 mb-4">
+                                                    <h2 className="text-xl font-bold uppercase text-black leading-none">Transaction History</h2>
+                                                </div>
+                                                <div className="text-left">
+                                                    {selectedItem ? (
+                                                        <p className="text-black font-semibold text-lg">Item: {selectedItem} | Date: {group.groupName}</p>
+                                                    ) : (
+                                                        <p className="text-black font-semibold text-lg">Item: {group.groupName}</p>
+                                                    )}
+                                                </div>
+                                            </div>
+                                            <div className="overflow-x-auto pb-2 [&::-webkit-scrollbar]:h-2 [&::-webkit-scrollbar-track]:bg-gray-100 dark:[&::-webkit-scrollbar-track]:bg-gray-800 [&::-webkit-scrollbar-thumb]:bg-gray-300 dark:[&::-webkit-scrollbar-thumb]:bg-gray-600 hover:[&::-webkit-scrollbar-thumb]:bg-gray-400 dark:hover:[&::-webkit-scrollbar-thumb]:bg-gray-500 [&::-webkit-scrollbar-thumb]:rounded-full print:overflow-visible">
+                                                <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700 print:border-collapse print:border print:border-black print:divide-y-0">
+                                                    <thead className="bg-blue-600/70 dark:bg-blue-900/80 print:bg-blue-600/70 print:dark:bg-blue-900/80 print:[print-color-adjust:exact]">
                                                         <tr>
                                                             {selectedItem ? (
-                                                                <th className="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">
+                                                                <th className="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider print:border print:border-black print:p-2 print:text-white print:font-bold">
                                                                     <div className="flex items-center">
                                                                         <ClockIcon className="h-4 w-4 mr-1" /> Time
                                                                     </div>
                                                                 </th>
                                                             ) : (
-                                                                <th className="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">
+                                                                <th className="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider print:border print:border-black print:p-2 print:text-white print:font-bold">
                                                                     <div className="flex items-center">
-                                                                        <CalendarIcon className="h-4 w-4 mr-1" /> Date
+                                                                        <CalendarIcon className="h-4 w-4 mr-1 print:hidden" /> Date
                                                                     </div>
                                                                 </th>
                                                             )}
-                                                            <th className="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">
+                                                            <th className="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider print:border print:border-black print:p-2 print:text-white print:font-bold">
                                                                 Quantity
                                                             </th>
-                                                            <th className="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">
+                                                            <th className="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider print:border print:border-black print:p-2 print:text-white print:font-bold">
                                                                 Project Site / Destination
                                                             </th>
                                                         </tr>
                                                     </thead>
-                                                    <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700 text-black">
+                                                    <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700 text-black print:divide-y-0">
                                                         {group.items.map((item, idx) => (
-                                                            <tr key={idx} className="odd:bg-white even:bg-gray-200 dark:odd:bg-gray-800 dark:even:bg-gray-700 hover:bg-blue-200 dark:hover:bg-gray-600 transition-colors duration-200 border-b border-gray-300 dark:border-gray-600">
+                                                            <tr key={idx} className="odd:bg-white even:bg-gray-200 dark:odd:bg-gray-800 dark:even:bg-gray-700 hover:bg-blue-200 dark:hover:bg-gray-600 transition-colors duration-200 border-b border-gray-300 dark:border-gray-600 print:bg-white print:odd:bg-white print:even:bg-white print:border-none print:[print-color-adjust:exact]">
                                                                 {selectedItem ? (
-                                                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100 font-medium">
+                                                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100 font-medium print:border print:border-black print:p-2 print:text-black">
                                                                         {formatTime(item.created_at)}
                                                                     </td>
                                                                 ) : (
-                                                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100 font-medium whitespace-nowrap">
+                                                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100 font-medium whitespace-nowrap print:border print:border-black print:p-2 print:text-black">
                                                                         <div className="flex flex-col">
                                                                             <span>{formatDate(item.created_at)}</span>
-                                                                            <span className="text-xs text-gray-500 dark:text-gray-400">{formatTime(item.created_at)}</span>
+                                                                            <span className="text-xs text-gray-500 dark:text-gray-400 print:text-gray-800">{formatTime(item.created_at)}</span>
                                                                         </div>
                                                                     </td>
                                                                 )}
-                                                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100 font-bold">
+                                                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100 font-bold print:border print:border-black print:p-2 print:text-black">
                                                                     {item.quantity}
                                                                 </td>
-                                                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
+                                                                <td className="px-6 py-4 text-sm text-gray-900 dark:text-gray-100 print:border print:border-black print:p-2 print:text-black">
                                                                     <span className="font-medium">{item.supplier_name || '-'}</span>
                                                                     {item.project_name && (
-                                                                        <span className="ml-2 text-xs text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded">
+                                                                        <span className="ml-2 text-xs text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-gray-700 print:bg-transparent print:p-0 px-2 py-1 rounded print:text-black print:font-normal">
                                                                             Proj: {item.project_name}
                                                                         </span>
                                                                     )}
@@ -256,7 +308,7 @@ export default function ItemTransactionHistory({ auth, transactions, items, filt
 
                     {/* Pagination */}
                     {transactions.last_page > 1 && (
-                        <div className="bg-white dark:bg-gray-800 shadow sm:rounded-lg overflow-hidden mt-6 mb-6">
+                        <div className="bg-white dark:bg-gray-800 shadow sm:rounded-lg overflow-hidden mt-6 mb-6 print:hidden">
                             <div className="px-6 py-4 border-t border-gray-200 dark:border-gray-700">
                                 <div className="flex flex-col sm:flex-row justify-between items-center gap-3">
                                     <div className="text-sm text-gray-700 dark:text-gray-300">
