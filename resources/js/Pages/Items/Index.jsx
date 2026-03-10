@@ -225,11 +225,11 @@ export default function Index({ auth, items, status }) {
             <AuthenticatedLayout
                 user={auth.user}
                 header={
-                    <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-                        <h2 className="font-semibold text-xl text-gray-800 dark:text-white leading-tight">
+                    <div className="flex sm:flex-row justify-between items-center gap-4 w-full">
+                        <h2 className="font-semibold text-xl text-gray-800 dark:text-white leading-tight truncate">
                             Incoming Items
                         </h2>
-                        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 w-full sm:w-auto">
+                        <div className="flex flex-row items-center gap-2 sm:gap-4 flex-shrink-0">
                             {/* Desktop View Toggle */}
                             <div className="hidden sm:flex items-center bg-gray-100 dark:bg-gray-700 rounded-lg p-1">
                                 <button
