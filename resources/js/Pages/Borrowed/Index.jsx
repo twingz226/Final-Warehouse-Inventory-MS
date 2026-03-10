@@ -8,6 +8,7 @@ import SecondaryButton from '@/Components/SecondaryButton';
 
 export default function Index({ auth, borrowings, status, statusOptions }) {
     const [search, setSearch] = useState('');
+    const [selectedDate, setSelectedDate] = useState('');
     const [selectedStatus, setSelectedStatus] = useState('');
     const [searchTimeout, setSearchTimeout] = useState(null);
     const [tooltip, setTooltip] = useState({ show: false, text: '', x: 0, y: 0 });
@@ -47,6 +48,23 @@ export default function Index({ auth, borrowings, status, statusOptions }) {
             params.set('status', status);
         } else {
             params.delete('status');
+        }
+        params.set('page', '1');
+
+        router.get(`${window.location.pathname}?${params.toString()}`, {}, {
+            preserveScroll: true,
+            preserveState: true,
+        });
+    };
+
+    const handleDateFilter = (date) => {
+        setSelectedDate(date);
+
+        const params = new URLSearchParams(window.location.search);
+        if (date) {
+            params.set('date', date);
+        } else {
+            params.delete('date');
         }
         params.set('page', '1');
 
@@ -143,7 +161,7 @@ export default function Index({ auth, borrowings, status, statusOptions }) {
                                 </div>
 
                                 {/* Search and Filters */}
-                                <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
                                     <div className="relative">
                                         <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                                             <MagnifyingGlassIcon className="h-5 w-5 text-gray-400 dark:text-gray-500" />
@@ -156,6 +174,12 @@ export default function Index({ auth, borrowings, status, statusOptions }) {
                                             onChange={(e) => handleSearch(e.target.value)}
                                         />
                                     </div>
+                                    <input
+                                        type="date"
+                                        className="block w-full py-2 px-3 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 dark:text-gray-100"
+                                        value={selectedDate}
+                                        onChange={(e) => handleDateFilter(e.target.value)}
+                                    />
                                     <select
                                         value={selectedStatus}
                                         onChange={(e) => handleStatusFilter(e.target.value)}
