@@ -193,8 +193,10 @@ export default function AuthenticatedLayout({ header, children }) {
 
             {/* Main content */}
             <div className="md:pl-64 print:pl-0 flex flex-col flex-1 min-w-0 h-screen print:h-auto overflow-y-auto print:overflow-visible [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-track]:bg-gray-100 dark:[&::-webkit-scrollbar-track]:bg-gray-800 [&::-webkit-scrollbar-thumb]:bg-gray-300 dark:[&::-webkit-scrollbar-thumb]:bg-gray-600 hover:[&::-webkit-scrollbar-thumb]:bg-gray-400 dark:hover:[&::-webkit-scrollbar-thumb]:bg-gray-500 [&::-webkit-scrollbar-thumb]:rounded-full">
-                {/* Mobile menu button */}
-                <div className="md:hidden bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-4 py-3 print:hidden">
+                {/* Sticky Top Bar */}
+                <div className="sticky top-0 z-30 flex flex-col w-full print:hidden">
+                    {/* Mobile menu button */}
+                    <div className="md:hidden bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-4 py-3">
                     <button
                         onClick={() =>
                             setShowingNavigationDropdown(
@@ -235,7 +237,23 @@ export default function AuthenticatedLayout({ header, children }) {
                     </button>
                 </div>
 
-                {/* Mobile navigation overlay */}
+                {header && (
+                    <header className="bg-orange-500 dark:bg-orange-600 shadow">
+                        <div className="mx-auto max-w-7xl px-4 py-3 sm:px-6 lg:px-8">
+                            <div className="flex items-center justify-between">
+                                <div className="flex-1">
+                                    {header}
+                                </div>
+                                <div className="ml-4">
+                                    <ThemeToggle />
+                                </div>
+                            </div>
+                        </div>
+                    </header>
+                )}
+            </div>
+
+            {/* Mobile navigation overlay */}
                 {showingNavigationDropdown && (
                     <div className="md:hidden fixed inset-0 z-40 flex">
                         <div className="fixed inset-0 bg-black opacity-25 dark:opacity-50" onClick={() => setShowingNavigationDropdown(false)}></div>
@@ -353,20 +371,7 @@ export default function AuthenticatedLayout({ header, children }) {
                     </div>
                 )}
 
-                {header && (
-                    <header className="bg-orange-500 dark:bg-orange-600 shadow sticky top-0 z-30 print:hidden">
-                        <div className="mx-auto max-w-7xl px-4 py-3 sm:px-6 lg:px-8">
-                            <div className="flex items-center justify-between">
-                                <div className="flex-1">
-                                    {header}
-                                </div>
-                                <div className="ml-4">
-                                    <ThemeToggle />
-                                </div>
-                            </div>
-                        </div>
-                    </header>
-                )}
+
 
                 <main className="flex-1">{children}</main>
             </div>
