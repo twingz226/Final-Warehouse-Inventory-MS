@@ -47,7 +47,7 @@ export default function Form({ auth, borrowing, statusOptions }) {
             // Need to create a fresh copy inside the timeout to avoid stale state issues, or we can use functional updates if needed
             try {
                 const response = await axios.get(route('items.search'), {
-                    params: { search: value }
+                    params: { search: value, category: 'tool' }
                 });
                 setSearchState(prevState => {
                     const newState = [...prevState];

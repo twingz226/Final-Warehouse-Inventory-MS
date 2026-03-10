@@ -112,6 +112,37 @@ class ItemController extends Controller
      */
     public function store(Request $request)
     {
+        if ($request->has('items')) {
+            $validated = $request->validate([
+                'items' => 'required|array|min:1',
+                'items.*.name' => 'required|string|max:255|unique:items,name|distinct',
+                'items.*.description' => 'nullable|string',
+                'items.*.category' => 'required|in:tool,material',
+                'items.*.quantity' => 'required|numeric|min:0',
+                'items.*.unit' => 'required|in:Quantity,Kg,pcs',
+            ]);
+
+            $createdCount = 0;
+            DB::transaction(function () use ($validated, &$createdCount) {
+                foreach ($validated['items'] as $itemData) {
+                    $itemData['date_time'] = now();
+                    $item = Item::create($itemData);
+
+                    $unit = in_array($item->unit, ['Quantity', 'pcs']) ? 'pcs' : 'kg';
+                    $this->logHistory($item, 'created', null, $itemData, "New item '{$item->name}' added — {$item->quantity} {$unit} in stock.");
+                    $createdCount++;
+                }
+            });
+
+            $msg = $createdCount > 1 
+                ? "{$createdCount} items created successfully."
+                : "Item created successfully.";
+
+            return redirect()
+                ->route('items.index')
+                ->with('status', $msg);
+        }
+
         $validated = $request->validate([
             'name' => 'required|string|max:255|unique:items,name',
             'description' => 'nullable|string',

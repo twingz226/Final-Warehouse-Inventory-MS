@@ -26,28 +26,36 @@ export default function InventoryIndex({ auth, items, low_stock_items, summary, 
         setShowLowStockItems(!showLowStockItems);
     };
 
-    const performSearch = () => {
+    const performSearch = (searchTerm) => {
         if (searchTimeout) {
             clearTimeout(searchTimeout);
         }
 
         const timeout = setTimeout(() => {
-            applyFilters();
+            applyFilters({ search: searchTerm });
         }, 500);
 
         setSearchTimeout(timeout);
     };
 
-    const applyFilters = () => {
+    const applyFilters = (overrides = {}) => {
         const params = new URLSearchParams();
 
-        if (search) params.set('search', search);
-        if (category !== 'all') params.set('category', category);
-        if (stockLevel !== 'all') params.set('stock_level', stockLevel);
-        if (dateFrom) params.set('date_from', dateFrom);
-        if (dateTo) params.set('date_to', dateTo);
-        if (sortBy !== 'name') params.set('sort_by', sortBy);
-        if (sortOrder !== 'asc') params.set('sort_order', sortOrder);
+        const s = overrides.search !== undefined ? overrides.search : search;
+        const c = overrides.category !== undefined ? overrides.category : category;
+        const sl = overrides.stockLevel !== undefined ? overrides.stockLevel : stockLevel;
+        const df = overrides.dateFrom !== undefined ? overrides.dateFrom : dateFrom;
+        const dt = overrides.dateTo !== undefined ? overrides.dateTo : dateTo;
+        const sb = overrides.sortBy !== undefined ? overrides.sortBy : sortBy;
+        const so = overrides.sortOrder !== undefined ? overrides.sortOrder : sortOrder;
+
+        if (s) params.set('search', s);
+        if (c !== 'all') params.set('category', c);
+        if (sl !== 'all') params.set('stock_level', sl);
+        if (df) params.set('date_from', df);
+        if (dt) params.set('date_to', dt);
+        if (sb !== 'name') params.set('sort_by', sb);
+        if (so !== 'asc') params.set('sort_order', so);
         params.set('page', '1');
 
         const url = params.toString() ? `/inventory?${params.toString()}` : '/inventory';
@@ -72,13 +80,15 @@ export default function InventoryIndex({ auth, items, low_stock_items, summary, 
     };
 
     const toggleSort = (field) => {
+        let newSortOrder = 'asc';
         if (sortBy === field) {
-            setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
+            newSortOrder = sortOrder === 'asc' ? 'desc' : 'asc';
+            setSortOrder(newSortOrder);
         } else {
             setSortBy(field);
             setSortOrder('asc');
         }
-        applyFilters();
+        applyFilters({ sortBy: field, sortOrder: newSortOrder });
     };
 
 
@@ -325,7 +335,7 @@ export default function InventoryIndex({ auth, items, low_stock_items, summary, 
                                                 value={search}
                                                 onChange={(e) => {
                                                     setSearch(e.target.value);
-                                                    performSearch();
+                                                    performSearch(e.target.value);
                                                 }}
                                             />
                                         </div>
@@ -354,7 +364,7 @@ export default function InventoryIndex({ auth, items, low_stock_items, summary, 
                                                 value={category}
                                                 onChange={(e) => {
                                                     setCategory(e.target.value);
-                                                    applyFilters();
+                                                    applyFilters({ category: e.target.value });
                                                 }}
                                                 className="block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-sm focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500"
                                             >
@@ -373,7 +383,7 @@ export default function InventoryIndex({ auth, items, low_stock_items, summary, 
                                                 value={stockLevel}
                                                 onChange={(e) => {
                                                     setStockLevel(e.target.value);
-                                                    applyFilters();
+                                                    applyFilters({ stockLevel: e.target.value });
                                                 }}
                                                 className="block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-sm focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500"
                                             >
@@ -395,7 +405,7 @@ export default function InventoryIndex({ auth, items, low_stock_items, summary, 
                                                 value={dateFrom}
                                                 onChange={(e) => {
                                                     setDateFrom(e.target.value);
-                                                    applyFilters();
+                                                    applyFilters({ dateFrom: e.target.value });
                                                 }}
                                                 className="block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-sm focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500"
                                             />
@@ -411,7 +421,7 @@ export default function InventoryIndex({ auth, items, low_stock_items, summary, 
                                                 value={dateTo}
                                                 onChange={(e) => {
                                                     setDateTo(e.target.value);
-                                                    applyFilters();
+                                                    applyFilters({ dateTo: e.target.value });
                                                 }}
                                                 className="block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-sm focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500"
                                             />

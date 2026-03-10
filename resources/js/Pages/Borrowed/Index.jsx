@@ -137,7 +137,7 @@ export default function Index({ auth, borrowings, status, statusOptions }) {
                                     <div>
                                         <h1 className="text-2xl font-medium text-gray-900 dark:text-gray-100">Borrowing Records</h1>
                                         <p className="mt-1 text-sm text-gray-600 dark:text-gray-300">
-                                            Track tools and materials that have been borrowed
+                                            Track tools that have been borrowed
                                         </p>
                                     </div>
                                 </div>
