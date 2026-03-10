@@ -152,15 +152,20 @@ export default function Index({ auth, purchases, status }) {
                     }
                     .slip-container {
                         width: 100%;
-                        max-width: 500px; /* Small slip size approximation */
-                        margin: 0 auto;
-                        padding: 20px 15px;
+                        height: 50vh;
+                        max-width: none;
+                        margin: 0;
+                        padding: 20px;
                         font-size: 14px;
                     }
                     .header {
-                        position: relative;
-                        padding-left: 50px; /* Space for logo placeholder if needed */
-                        margin-bottom: 5px;
+                        text-align: center;
+                        margin-bottom: 15px;
+                    }
+                    .header-top {
+                        display: flex;
+                        justify-content: center;
+                        align-items: center;
                     }
                     .company-name {
                         font-family: "Arial Black", sans-serif;
@@ -175,31 +180,36 @@ export default function Index({ auth, purchases, status }) {
                         margin-top: 2px;
                     }
                     .logo-placeholder {
-                        position: absolute;
-                        left: 0;
-                        top: 0;
                         width: 40px;
                         height: 40px;
+                        margin-right: 8px;
                         border-radius: 50%;
                         background-color: #333; /* Dark circle like in the image */
                         -webkit-print-color-adjust: exact;
                         print-color-adjust: exact;
                     }
                     .slip-title-row {
+                        position: relative;
                         display: flex;
                         justify-content: space-between;
                         align-items: flex-end;
                         margin-bottom: 2px;
+                        min-height: 24px;
                     }
                     .year-prefix {
                         font-weight: bold;
                         font-size: 18px;
                     }
                     .slip-main-title {
+                        position: absolute;
+                        left: 50%;
+                        transform: translateX(-50%);
+                        bottom: 0;
                         font-family: "Arial Black", sans-serif;
                         font-weight: 900;
                         font-size: 18px;
                         letter-spacing: -0.5px;
+                        white-space: nowrap;
                     }
                     .slip-no {
                         font-weight: bold;
@@ -295,7 +305,7 @@ export default function Index({ auth, purchases, status }) {
                             padding: 0;
                         }
                         @page {
-                            margin: 10mm;
+                            margin: 0;
                             size: portrait;
                         }
                     }
@@ -304,8 +314,10 @@ export default function Index({ auth, purchases, status }) {
             <body>
                 <div class="slip-container">
                     <div class="header">
-                        <img src="${logoDataUrl}" alt="Logo" class="logo-placeholder" style="object-fit: contain; background: none; border-radius: 0;" />
-                        <div class="company-name">Warlen Industrial Sales Corporation</div>
+                        <div class="header-top">
+                            <img src="${logoDataUrl}" alt="Logo" class="logo-placeholder" style="object-fit: contain; background: none; border-radius: 0;" />
+                            <div class="company-name">Warlen Industrial Sales Corporation</div>
+                        </div>
                         <div class="company-address">Deka Sales Bldg., Lacson Ext., Alijis Rd., Bacolod City</div>
                     </div>
                     
@@ -348,7 +360,7 @@ export default function Index({ auth, purchases, status }) {
                             ${(() => {
                 const items = purchase._groupItems || [{ item_name: purchase.item_name, quantity: purchase.quantity, description: purchase.description }];
                 const rows = [];
-                for (let i = 0; i < 15; i++) { // Render 15 rows to match the physical slip look
+                for (let i = 0; i < 10; i++) { // Render 6 rows by default
                     if (i < items.length) {
                         const item = items[i];
                         rows.push(`
