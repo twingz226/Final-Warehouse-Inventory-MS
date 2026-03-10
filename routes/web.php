@@ -140,6 +140,10 @@ Route::middleware('auth')->group(function () {
         'index', 'store', 'edit', 'update', 'destroy'
     ]);
 
+    // Item Transaction History route
+    Route::get('/item-transaction-history', [\App\Http\Controllers\ItemTransactionHistoryController::class, 'index'])
+        ->name('item-transaction-history.index');
+
     // Daily Stock Rollover
     Route::post('/inventory/rollover', [\App\Http\Controllers\RolloverController::class, 'store'])->name('stock.rollover');
 });

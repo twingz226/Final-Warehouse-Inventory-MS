@@ -144,6 +144,22 @@ export default function AuthenticatedLayout({ header, children }) {
                                     <span className="block text-sm text-white/75 group-hover:text-white/90 transition-colors">Manage shipment approvals</span>
                                 </span>
                             </SidebarNavLink>
+
+                            {/* Item Transaction History */}
+                            <SidebarNavLink
+                                href={route('item-transaction-history.index')}
+                                active={route().current('item-transaction-history.index')}
+                            >
+                                <span className="mr-3 flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-lg bg-white/10 group-hover:bg-white/20 transition-colors duration-200">
+                                    <svg className="h-4 w-4 text-pink-300 group-hover:text-pink-200 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                    </svg>
+                                </span>
+                                <span className="flex-1">
+                                    <span className="block text-base font-medium leading-tight">Item Transaction History</span>
+                                    <span className="block text-sm text-white/75 group-hover:text-white/90 transition-colors">View item transactions</span>
+                                </span>
+                            </SidebarNavLink>
                         </div>
                     </nav>
 
@@ -393,6 +409,22 @@ export default function AuthenticatedLayout({ header, children }) {
                                 <span className="flex-1">
                                     <span className="block text-base font-medium leading-tight">Shipment Approval</span>
                                     <span className="block text-sm text-white/75 group-hover:text-white/90 transition-colors">Manage shipment approvals</span>
+                                </span>
+                            </SidebarNavLink>
+
+                            {/* Item Transaction History */}
+                            <SidebarNavLink
+                                href={route('item-transaction-history.index')}
+                                active={route().current('item-transaction-history.index')}
+                            >
+                                <span className="mr-3 flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-lg bg-white/10 group-hover:bg-white/20 transition-colors duration-200">
+                                    <svg className="h-4 w-4 text-pink-300 group-hover:text-pink-200 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                    </svg>
+                                </span>
+                                <span className="flex-1">
+                                    <span className="block text-base font-medium leading-tight">Item Transaction History</span>
+                                    <span className="block text-sm text-white/75 group-hover:text-white/90 transition-colors">View item transactions</span>
                                 </span>
                             </SidebarNavLink>
                         </div>
