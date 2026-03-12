@@ -25,12 +25,18 @@ class ItemTransactionHistoryController extends Controller
 
         $transactions = $query->latest('created_at')->paginate(20)->withQueryString();
 
-        $items = Item::orderBy('name')->get(['id', 'name']);
+        $items = Item::orderBy('name')->get();
+
+        $item = null;
+        if ($itemName) {
+            $item = Item::where('name', $itemName)->first();
+        }
 
         return Inertia::render('ItemTransactionHistory', [
             'transactions' => $transactions,
             'items' => $items,
             'filters' => $request->only(['item_name']),
+            'item' => $item,
         ]);
     }
 }
