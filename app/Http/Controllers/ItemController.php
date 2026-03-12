@@ -36,9 +36,18 @@ class ItemController extends Controller
     public function index(Request $request)
     {
         $search = $request->input('search');
+        // Default to current date - this ensures filtering works on initial load
         $date = $request->input('date', now()->toDateString());
         $sort = $request->input('sort', 'name');
         $direction = $request->input('direction', 'asc');
+
+        // Debug logging
+        \Illuminate\Support\Facades\Log::info('ItemController::index called', [
+            'search' => $search,
+            'date' => $date,
+            'sort' => $sort,
+            'direction' => $direction
+        ]);
 
         // Validate sort column and direction for security
         $allowedSorts = ['name', 'quantity', 'date_time', 'created_at'];
@@ -52,16 +61,12 @@ class ItemController extends Controller
                 $q->where('name', 'like', '%' . $search . '%')
                     ->orWhere('description', 'like', '%' . $search . '%');
             });
+            \Illuminate\Support\Facades\Log::info('Search query applied', ['search' => $search]);
         }
 
+        // Apply date filter when date parameter is provided
         if ($date) {
-            $query->where(function ($q) use ($date) {
-                $q->whereDate('date_time', $date)
-                  ->orWhereHas('history', function ($q2) use ($date) {
-                      $q2->whereIn('action', ['created', 'stock_added'])
-                         ->whereDate('created_at', $date);
-                  });
-            });
+            $query->whereDate('date_time', $date);
             $query->with(['history' => function ($historyQuery) use ($date) {
                 $historyQuery->whereIn('action', ['created', 'stock_added'])
                              ->whereDate('created_at', $date)
@@ -73,6 +78,12 @@ class ItemController extends Controller
         $query->orderBy($sort, $direction);
 
         $items = $query->paginate(10)->withQueryString();
+
+        \Illuminate\Support\Facades\Log::info('Query results', [
+            'total_items' => $items->total(),
+            'current_page' => $items->currentPage(),
+            'per_page' => $items->perPage()
+        ]);
 
         if ($date) {
             $items->getCollection()->transform(function ($item) use ($date) {

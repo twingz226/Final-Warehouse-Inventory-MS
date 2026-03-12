@@ -1,15 +1,18 @@
 // resources/js/Pages/Items/Index.jsx
 import { Head, Link, router } from '@inertiajs/react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { PlusIcon, EyeIcon, TrashIcon, PencilSquareIcon, MagnifyingGlassIcon, TableCellsIcon, Squares2X2Icon, DocumentArrowUpIcon } from '@heroicons/react/24/outline';
 import ImportModal from '@/Components/ImportModal';
+import SearchInput from '@/Components/SearchInput';
 
 export default function Index({ auth, items, status }) {
     const [confirmingItemDeletion, setConfirmingItemDeletion] = useState(false);
     const [itemToDelete, setItemToDelete] = useState(null);
     const [isBulkDelete, setIsBulkDelete] = useState(false);
     const [search, setSearch] = useState('');
+    const searchInputRef = useRef(null);
+    const searchRef = useRef(null);
     const [searchTimeout, setSearchTimeout] = useState(null);
     const [tooltip, setTooltip] = useState({ show: false, text: '', x: 0, y: 0 });
     const [viewMode, setViewMode] = useState('table'); // 'table' or 'card'
@@ -36,36 +39,26 @@ export default function Index({ auth, items, status }) {
         setSearch(initialSearch);
         setSortColumn(initialSort);
         setSortDirection(initialDirection);
-        if (initialDate) {
-            setDate(initialDate);
-        } else {
-            setDate(new Date().toISOString().split('T')[0]);
-        }
+        setDate(initialDate);
     }, []);
 
-    const handleSearch = (value) => {
-        setSearch(value);
-
-        if (searchTimeout) {
-            clearTimeout(searchTimeout);
+    const handleSearchSubmit = () => {
+        const params = new URLSearchParams(window.location.search);
+        if (search) {
+            params.set('search', search);
+        } else {
+            params.delete('search');
         }
+        params.delete('date');
+        params.set('page', '1');
+        router.get(`${window.location.pathname}?${params.toString()}`, {}, { preserveScroll: true });
+    };
 
-        const timeout = setTimeout(() => {
-            const params = new URLSearchParams(window.location.search);
-            if (value) {
-                params.set('search', value);
-            } else {
-                params.delete('search');
-            }
-            params.set('page', '1');
-
-            router.get(`${window.location.pathname}?${params.toString()}`, {}, {
-                preserveScroll: true,
-                preserveState: true,
-            });
-        }, 300);
-
-        setSearchTimeout(timeout);
+    const handleSearchChange = (e) => {
+        const value = e.target.value;
+        setSearch(value);
+        clearTimeout(searchTimeout);
+        setSearchTimeout(setTimeout(handleSearchSubmit, 500));
     };
 
     const handleDateChange = (value) => {
@@ -318,28 +311,7 @@ export default function Index({ auth, items, status }) {
                         <div className="mb-6">
                             <div className="flex flex-col sm:flex-row gap-4">
                                 <div className="flex-1">
-                                    <div className="relative">
-                                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                            <MagnifyingGlassIcon className="h-5 w-5 text-gray-400 dark:text-gray-500" />
-                                        </div>
-                                        <input
-                                            type="text"
-                                            value={search}
-                                            onChange={(e) => handleSearch(e.target.value)}
-                                            placeholder="Search tools and materials..."
-                                            className="block w-full pl-10 pr-10 py-3 border border-gray-300 dark:border-gray-600 rounded-lg leading-5 bg-white dark:bg-gray-700 placeholder-gray-500 dark:placeholder-gray-400 text-gray-900 dark:text-white focus:outline-none focus:placeholder-gray-400 dark:focus:placeholder-gray-500 focus:ring-1 focus:ring-indigo-500 dark:focus:ring-indigo-400 focus:border-indigo-500 dark:focus:border-indigo-400 sm:text-sm transition duration-150 ease-in-out"
-                                        />
-                                        {search && (
-                                            <button
-                                                onClick={() => handleSearch('')}
-                                                className="absolute inset-y-0 right-0 pr-3 flex items-center"
-                                            >
-                                                <svg className="h-5 w-5 text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
-                                                </svg>
-                                            </button>
-                                        )}
-                                    </div>
+                                    <SearchInput />
                                 </div>
                                 <div className="sm:w-48">
                                     <div className="relative">
