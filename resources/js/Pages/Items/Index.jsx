@@ -34,7 +34,7 @@ export default function Index({ auth, items, status }) {
         const initialSearch = urlParams.get('search') || '';
         const initialSort = urlParams.get('sort') || 'name';
         const initialDirection = urlParams.get('direction') || 'asc';
-        const initialDate = urlParams.get('date') || '';
+        const initialDate = urlParams.get('date') || new Date().toISOString().split('T')[0];
 
         setSearch(initialSearch);
         setSortColumn(initialSort);
@@ -49,7 +49,6 @@ export default function Index({ auth, items, status }) {
         } else {
             params.delete('search');
         }
-        params.delete('date');
         params.set('page', '1');
         router.get(`${window.location.pathname}?${params.toString()}`, {}, { preserveScroll: true });
     };

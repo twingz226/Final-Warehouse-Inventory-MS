@@ -62,16 +62,15 @@ class ItemController extends Controller
                     ->orWhere('description', 'like', '%' . $search . '%');
             });
             \Illuminate\Support\Facades\Log::info('Search query applied', ['search' => $search]);
-        }
-
-        // Apply date filter when date parameter is provided
-        if ($date) {
-            $query->whereDate('date_time', $date);
-            $query->with(['history' => function ($historyQuery) use ($date) {
-                $historyQuery->whereIn('action', ['created', 'stock_added'])
-                             ->whereDate('created_at', $date)
-                             ->latest();
-            }]);
+        } else {
+            // Only apply date filter when not searching
+            if ($date) {
+                $query->with(['history' => function ($historyQuery) use ($date) {
+                    $historyQuery->whereIn('action', ['created', 'stock_added'])
+                                 ->whereDate('created_at', $date)
+                                 ->latest();
+                }]);
+            }
         }
 
         // Apply sorting
