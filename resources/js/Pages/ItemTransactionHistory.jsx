@@ -264,10 +264,10 @@ export default function ItemTransactionHistory({ auth, transactions, items, filt
                                                                 Project Site / Destination
                                                             </th>
                                                             <th className="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider print:border print:border-black print:p-2 print:text-white print:font-bold">
-                                                                Quantity
+                                                                Total Stocks
                                                             </th>
                                                             <th className="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider print:border print:border-black print:p-2 print:text-white print:font-bold">
-                                                                Total Stocks
+                                                                Quantity
                                                             </th>
                                                             <th className="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider print:border print:border-black print:p-2 print:text-white print:font-bold">
                                                                 Available Stocks
@@ -275,45 +275,60 @@ export default function ItemTransactionHistory({ auth, transactions, items, filt
                                                         </tr>
                                                     </thead>
                                                     <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700 text-black print:divide-y-0">
-                                                        {group.items.map((transaction, idx) => (
-                                                            <tr key={idx} className="odd:bg-white even:bg-gray-200 dark:odd:bg-gray-800 dark:even:bg-gray-700 hover:bg-blue-200 dark:hover:bg-gray-600 transition-colors duration-200 border-b border-gray-300 dark:border-gray-600 print:bg-white print:odd:bg-white print:even:bg-white print:border-none print:[print-color-adjust:exact]">
-                                                                {selectedItem ? (
-                                                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100 font-medium print:border print:border-black print:p-2 print:text-black">
-                                                                        {formatTime(transaction.created_at)}
-                                                                    </td>
-                                                                ) : (
-                                                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100 font-medium whitespace-nowrap print:border print:border-black print:p-2 print:text-black">
-                                                                        <div className="flex flex-col">
-                                                                            <span>{formatDate(transaction.created_at)}</span>
-                                                                            <span className="text-xs text-gray-500 dark:text-gray-400 print:text-gray-800">{formatTime(transaction.created_at)}</span>
-                                                                        </div>
-                                                                    </td>
-                                                                )}
-                                                                <td className="px-6 py-4 text-sm text-gray-900 dark:text-gray-100 print:border print:border-black print:p-2 print:text-black">
-                                                                    <span className="font-medium">{transaction.supplier_name || '-'}</span>
-                                                                    {transaction.project_name && (
-                                                                        <span className="ml-2 text-xs text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-gray-700 print:bg-transparent print:p-0 px-2 py-1 rounded print:text-black print:font-normal">
-                                                                            Proj: {transaction.project_name}
-                                                                        </span>
-                                                                    )}
-                                                                </td>
-                                                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100 font-bold print:border print:border-black print:p-2 print:text-black">
-                                                                    {transaction.quantity}
-                                                                </td>
-                                                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100 font-bold print:border print:border-black print:p-2 print:text-black">
-                                                                    {(() => {
-                                                                        const itemData = items.find(item => item.name === transaction.item_name);
-                                                                        return itemData?.total_distributed || 0;
-                                                                    })()}
-                                                                </td>
-                                                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100 font-bold print:border print:border-black print:p-2 print:text-black">
-                                                                    {(() => {
-                                                                        const itemData = items.find(item => item.name === transaction.item_name);
-                                                                        return itemData?.available_stock || 0;
-                                                                    })()}
-                                                                </td>
-                                                            </tr>
-                                                        ))}
+                                                        {(() => {
+                                                            let previousAvailableStock = null;
+                                                            return group.items.map((transaction, idx) => {
+                                                                const itemData = items.find(item => item.name === transaction.item_name);
+                                                                const initialStock = itemData?.total_stock || 0;
+                                                                let totalStocksValue = initialStock;
+                                                                let availableStock = initialStock;
+                                                                
+                                                                if (idx > 0) {
+                                                                    // For subsequent rows, Total Stocks = previous Available Stocks
+                                                                    totalStocksValue = previousAvailableStock;
+                                                                    availableStock = totalStocksValue - transaction.quantity;
+                                                                } else {
+                                                                    // First row: Available Stocks = Total Stocks - Quantity
+                                                                    availableStock = initialStock - transaction.quantity;
+                                                                }
+                                                                
+                                                                previousAvailableStock = availableStock;
+                                                                
+                                                                return (
+                                                                    <tr key={idx} className="odd:bg-white even:bg-gray-200 dark:odd:bg-gray-800 dark:even:bg-gray-700 hover:bg-blue-200 dark:hover:bg-gray-600 transition-colors duration-200 border-b border-gray-300 dark:border-gray-600 print:bg-white print:odd:bg-white print:even:bg-white print:border-none print:[print-color-adjust:exact]">
+                                                                        {selectedItem ? (
+                                                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100 font-medium print:border print:border-black print:p-2 print:text-black">
+                                                                                {formatTime(transaction.created_at)}
+                                                                            </td>
+                                                                        ) : (
+                                                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100 font-medium whitespace-nowrap print:border print:border-black print:p-2 print:text-black">
+                                                                                <div className="flex flex-col">
+                                                                                    <span>{formatDate(transaction.created_at)}</span>
+                                                                                    <span className="text-xs text-gray-500 dark:text-gray-400 print:text-gray-800">{formatTime(transaction.created_at)}</span>
+                                                                                </div>
+                                                                            </td>
+                                                                        )}
+                                                                        <td className="px-6 py-4 text-sm text-gray-900 dark:text-gray-100 print:border print:border-black print:p-2 print:text-black">
+                                                                            <span className="font-medium">{transaction.supplier_name || '-'}</span>
+                                                                            {transaction.project_name && (
+                                                                                <span className="ml-2 text-xs text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-gray-700 print:bg-transparent print:p-0 px-2 py-1 rounded print:text-black print:font-normal">
+                                                                                    Proj: {transaction.project_name}
+                                                                                </span>
+                                                                            )}
+                                                                        </td>
+                                                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100 font-bold print:border print:border-black print:p-2 print:text-black">
+                                                                            {itemData?.unit === 'Quantity' ? Math.floor(Number(totalStocksValue)) : totalStocksValue}
+                                                                        </td>
+                                                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100 font-bold print:border print:border-black print:p-2 print:text-black">
+                                                                            {transaction.quantity}
+                                                                        </td>
+                                                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100 font-bold print:border print:border-black print:p-2 print:text-black">
+                                                                            {availableStock}
+                                                                        </td>
+                                                                    </tr>
+                                                                );
+                                                            });
+                                                        })()}
                                                     </tbody>
                                                 </table>
                                             </div>

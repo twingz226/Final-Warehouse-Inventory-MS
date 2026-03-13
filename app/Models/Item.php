@@ -56,7 +56,7 @@ class Item extends Model
     public function getTotalDistributedAttribute(): int
     {
         return \App\Models\Purchase::where('item_name', $this->name)
-            ->where('status', 'received')
+            ->whereIn('status', ['received', 'completed'])
             ->sum('quantity');
     }
 

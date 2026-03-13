@@ -23,9 +23,27 @@ class ItemTransactionHistoryController extends Controller
             $query->where('item_name', $itemName);
         }
 
-        $transactions = $query->latest('created_at')->paginate(20)->withQueryString();
+        $transactions = $query->oldest('created_at')->paginate(20)->withQueryString();
 
-        $items = Item::orderBy('name')->get();
+        $items = Item::orderBy('name')->get()->map(function ($item) {
+            $totalDistributed = Purchase::where('item_name', $item->name)
+                ->whereIn('status', ['received', 'completed'])
+                ->sum('quantity');
+            
+            return [
+                'id' => $item->id,
+                'name' => $item->name,
+                'description' => $item->description,
+                'category' => $item->category,
+                'total_stock' => $item->quantity,
+                'unit' => $item->unit,
+                'total_distributed' => $totalDistributed,
+                'available_stock' => $item->quantity - $totalDistributed,
+                'date_time' => $item->date_time,
+                'created_at' => $item->created_at,
+                'updated_at' => $item->updated_at,
+            ];
+        });
 
         $item = null;
         if ($itemName) {
