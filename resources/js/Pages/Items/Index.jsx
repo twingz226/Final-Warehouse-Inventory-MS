@@ -314,27 +314,32 @@ export default function Index({ auth, items, status }) {
                                 </div>
                                 <div className="sm:w-48">
                                     <div className="relative">
-                                        {/* Single native date input — color:transparent hides OS-formatted text, picker icon/calendar remain fully functional */}
+                                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                            <svg className="h-5 w-5 text-gray-400 dark:text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                                            </svg>
+                                        </div>
                                         <input
                                             type="date"
                                             value={date}
                                             onChange={(e) => handleDateChange(e.target.value)}
                                             style={{ color: 'transparent', caretColor: 'transparent' }}
-                                            className="block w-full px-3 py-3 border border-gray-300 dark:border-gray-600 rounded-lg leading-5 bg-white dark:bg-gray-700 focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:focus:ring-indigo-400 focus:border-indigo-500 dark:focus:border-indigo-400 sm:text-sm transition duration-150 ease-in-out cursor-pointer"
+                                            className="block w-full pl-10 pr-10 py-3 border border-gray-300 dark:border-gray-600 rounded-xl leading-5 bg-gradient-to-r from-white to-gray-50 dark:from-gray-700 dark:to-gray-800 hover:from-gray-50 hover:to-white dark:hover:from-gray-600 dark:hover:to-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 dark:focus:ring-indigo-400/50 dark:focus:border-indigo-400 shadow-sm hover:shadow-md transition-all duration-200 ease-in-out cursor-pointer"
                                         />
                                         {/* Overlay div — shows date as MM/DD/YYYY (or placeholder), pointer-events-none so clicks pass through to the date input */}
-                                        <div className="absolute inset-y-0 left-0 right-8 px-3 flex items-center pointer-events-none">
+                                        <div className="absolute inset-y-0 left-0 right-8 px-3 pl-10 flex items-center pointer-events-none">
                                             {date
-                                                ? <span className="text-gray-900 dark:text-white sm:text-sm">{formatDateDisplay(date)}</span>
+                                                ? <span className="text-gray-900 dark:text-white sm:text-sm font-medium">{formatDateDisplay(date)}</span>
                                                 : <span className="text-gray-400 dark:text-gray-500 sm:text-sm">MM/DD/YYYY</span>
                                             }
                                         </div>
                                         {date && (
                                             <button
                                                 onClick={() => handleDateChange('')}
-                                                className="absolute inset-y-0 right-0 pr-3 flex items-center z-10"
+                                                className="absolute inset-y-0 right-0 pr-3 flex items-center z-10 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors duration-150"
+                                                title="Clear date"
                                             >
-                                                <svg className="h-5 w-5 text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <svg className="h-4 w-4 text-red-400 dark:text-red-500 hover:text-red-600 dark:hover:text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
                                                 </svg>
                                             </button>

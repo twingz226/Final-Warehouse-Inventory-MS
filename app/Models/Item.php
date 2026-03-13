@@ -47,7 +47,7 @@ class Item extends Model
      */
     public function history(): HasMany
     {
-        return $this->hasMany(ItemHistory::class)->latest();
+        return $this->hasMany(ItemHistory::class);
     }
 
     /**

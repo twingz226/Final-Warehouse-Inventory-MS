@@ -36,7 +36,7 @@ class ItemController extends Controller
     public function index(Request $request)
     {
         $search = $request->input('search');
-        // Default to current date - this ensures filtering works on initial load
+        // Get date from request, default to today if not provided
         $date = $request->input('date', now()->toDateString());
         $sort = $request->input('sort', 'name');
         $direction = $request->input('direction', 'asc');
@@ -57,20 +57,31 @@ class ItemController extends Controller
         $query = Item::query();
 
         if ($search) {
+            // When searching, don't filter by date - search across all items
+            $query->with(['history' => function ($historyQuery) {
+                $historyQuery->whereIn('action', ['created', 'stock_added'])
+                             ->latest();
+            }]);
+        } else {
+            // No search - filter by date as before
+            $query->whereHas('history', function ($historyQuery) use ($date) {
+                $historyQuery->whereIn('action', ['created', 'stock_added'])
+                             ->whereDate('created_at', $date);
+            });
+
+            $query->with(['history' => function ($historyQuery) use ($date) {
+                $historyQuery->whereIn('action', ['created', 'stock_added'])
+                             ->whereDate('created_at', $date)
+                             ->latest();
+            }]);
+        }
+
+        if ($search) {
             $query->where(function ($q) use ($search) {
                 $q->where('name', 'like', '%' . $search . '%')
                     ->orWhere('description', 'like', '%' . $search . '%');
             });
             \Illuminate\Support\Facades\Log::info('Search query applied', ['search' => $search]);
-        } else {
-            // Only apply date filter when not searching
-            if ($date) {
-                $query->with(['history' => function ($historyQuery) use ($date) {
-                    $historyQuery->whereIn('action', ['created', 'stock_added'])
-                                 ->whereDate('created_at', $date)
-                                 ->latest();
-                }]);
-            }
         }
 
         // Apply sorting
@@ -84,19 +95,37 @@ class ItemController extends Controller
             'per_page' => $items->perPage()
         ]);
 
-        if ($date) {
+        if ($search) {
+            // When searching, use the most recent history record for each item
+            $items->getCollection()->transform(function ($item) {
+                $mostRecentHistory = $item->history->first(); // Already sorted by latest()
+
+                if ($mostRecentHistory) {
+                    $item->date_time = $mostRecentHistory->created_at;
+                    // For 'stock_added', calculate the difference. For 'created', use 'new_values.quantity'
+                    if ($mostRecentHistory->action === 'stock_added' && isset($mostRecentHistory->new_values['quantity'], $mostRecentHistory->old_values['quantity'])) {
+                        $item->quantity = $mostRecentHistory->new_values['quantity'] - $mostRecentHistory->old_values['quantity'];
+                    } elseif ($mostRecentHistory->action === 'created' && isset($mostRecentHistory->new_values['quantity'])) {
+                        $item->quantity = $mostRecentHistory->new_values['quantity'];
+                    }
+                }
+                return $item;
+            });
+        } elseif ($date) {
+            // When not searching, filter by specific date as before
             $items->getCollection()->transform(function ($item) use ($date) {
-                if (!$item->date_time || $item->date_time->format('Y-m-d') !== $date) {
-                    // Use eager-loaded history
-                    $matchingHistory = $item->history->first();
-                    if ($matchingHistory) {
-                        $item->date_time = $matchingHistory->created_at;
-                        // For 'stock_added', calculate the difference. For 'created', use 'new_values.quantity'
-                        if ($matchingHistory->action === 'stock_added' && isset($matchingHistory->new_values['quantity'], $matchingHistory->old_values['quantity'])) {
-                            $item->quantity = $matchingHistory->new_values['quantity'] - $matchingHistory->old_values['quantity'];
-                        } elseif ($matchingHistory->action === 'created' && isset($matchingHistory->new_values['quantity'])) {
-                            $item->quantity = $matchingHistory->new_values['quantity'];
-                        }
+                // Find today's specific history record
+                $todaysHistory = $item->history->first(function ($history) use ($date) {
+                    return $history->created_at->format('Y-m-d') === $date;
+                });
+
+                if ($todaysHistory) {
+                    $item->date_time = $todaysHistory->created_at;
+                    // For 'stock_added', calculate the difference. For 'created', use 'new_values.quantity'
+                    if ($todaysHistory->action === 'stock_added' && isset($todaysHistory->new_values['quantity'], $todaysHistory->old_values['quantity'])) {
+                        $item->quantity = $todaysHistory->new_values['quantity'] - $todaysHistory->old_values['quantity'];
+                    } elseif ($todaysHistory->action === 'created' && isset($todaysHistory->new_values['quantity'])) {
+                        $item->quantity = $todaysHistory->new_values['quantity'];
                     }
                 }
                 return $item;
