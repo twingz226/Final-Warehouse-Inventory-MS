@@ -330,7 +330,7 @@ export default function Index({ auth, purchases, status }) {
                     <div class="info-row-flex">
                         <div style="flex-grow: 1;">
                             <span class="label">Name of Project:</span>
-                            <span class="underline-field" style="width: calc(100% - 130px);">${purchase.project_name || ''}</span>
+                            <span class="underline-field" style="width: calc(100% - 130px);">${purchase.supplier_name || ''}</span>
                         </div>
                         <div style="width: 150px; text-align: right;">
                             <span class="label">Date:</span>

@@ -304,10 +304,6 @@ class ItemController extends Controller
 
             $available = $item->quantity - $totalDistributed;
 
-            if ($available <= 0) {
-                return null; // Skip items with no available stock
-            }
-
             return [
                 'id' => $item->id,
                 'name' => $item->name,
@@ -318,7 +314,7 @@ class ItemController extends Controller
                 'unit' => $item->unit,
                 'stock_level' => $this->getStockLevel($available),
             ];
-        })->filter()->values();
+        })->values();
 
         return response()->json($items);
     }
