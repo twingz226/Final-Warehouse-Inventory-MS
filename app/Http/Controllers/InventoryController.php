@@ -75,7 +75,7 @@ class InventoryController extends Controller
         
         $items = $query->paginate(10)->through(function ($item) {
             $totalDistributed = Purchase::where('item_name', $item->name)
-                ->where('status', 'received')
+                ->whereIn('status', ['received', 'completed'])
                 ->sum('quantity');
             
             return [
@@ -99,7 +99,7 @@ class InventoryController extends Controller
             ->map(function ($item) {
                 // Calculate total distributed using raw SQL
                 $totalDistributed = Purchase::where('item_name', $item->name)
-                    ->where('status', 'received')
+                    ->whereIn('status', ['received', 'completed'])
                     ->sum('quantity');
 
                 $availableStock = $item->quantity - $totalDistributed;
@@ -120,7 +120,7 @@ class InventoryController extends Controller
         $totalTools = Item::where('category', 'tool')->count();
         $totalMaterials = Item::where('category', 'material')->count();
         $totalQuantitySum = Item::sum('quantity');
-        $totalDistributed = Purchase::where('status', 'received')->sum('quantity');
+        $totalDistributed = Purchase::whereIn('status', ['received', 'completed'])->sum('quantity');
         
         $summary = [
             'total_items' => $totalItems,
