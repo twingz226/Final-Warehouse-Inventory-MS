@@ -262,12 +262,22 @@ export default function Index({ auth, purchases, status }) {
                         height: 22px; /* Fixed height for blank rows */
                     }
                     .qty-col {
-                        width: 25%;
+                        width: 15%;
+                        text-align: center;
+                        font-weight: bold;
+                    }
+                    .unit-col {
+                        width: 15%;
                         text-align: center;
                         font-weight: bold;
                     }
                     .desc-col {
                         text-align: left;
+                        font-weight: bold;
+                    }
+                    .remarks-col {
+                        width: 15%;
+                        text-align: center;
                         font-weight: bold;
                     }
 
@@ -353,25 +363,32 @@ export default function Index({ auth, purchases, status }) {
                         <thead>
                             <tr>
                                 <th class="qty-col">Qty</th>
+                                <th class="unit-col">Unit</th>
                                 <th class="desc-col">Item Description</th>
+                                <th class="remarks-col">Remarks</th>
                             </tr>
                         </thead>
                         <tbody>
                             ${(() => {
-                const items = purchase._groupItems || [{ item_name: purchase.item_name, quantity: purchase.quantity, description: purchase.description }];
+                const items = purchase._groupItems || [{ item_name: purchase.item_name, quantity: purchase.quantity, description: purchase.description, item_unit: purchase.item_unit }];
                 const rows = [];
-                for (let i = 0; i < 10; i++) { // Render 6 rows by default
+                for (let i = 0; i < 10; i++) { // Render 10 rows by default
                     if (i < items.length) {
                         const item = items[i];
+                        const unit = item.item_unit === 'Quantity' ? 'PC' : (item.item_unit || 'PC');
                         rows.push(`
                                             <tr>
                                                 <td class="qty-col" style="font-weight: normal;">${item.quantity}</td>
+                                                <td class="unit-col" style="font-weight: normal;">${unit}</td>
                                                 <td class="desc-col" style="font-weight: normal;">${item.item_name}${item.description ? ' - ' + item.description : ''}</td>
+                                                <td class="remarks-col" style="font-weight: normal;"></td>
                                             </tr>
                                         `);
                     } else {
                         rows.push(`
                                             <tr>
+                                                <td></td>
+                                                <td></td>
                                                 <td></td>
                                                 <td></td>
                                             </tr>
