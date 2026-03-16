@@ -242,6 +242,7 @@ export default function Form({ auth, item = null }) {
                                                                 value={it.quantity}
                                                                 onChange={(e) => updateItem(index, 'quantity', e.target.value)}
                                                                 required
+                                                                disabled
                                                             />
                                                             <select
                                                                 id={`unit_${index}`}

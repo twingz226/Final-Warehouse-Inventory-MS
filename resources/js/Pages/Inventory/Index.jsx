@@ -587,10 +587,10 @@ export default function InventoryIndex({ auth, items, low_stock_items, summary, 
                                                         </span>
                                                     </td>
                                                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
-                                                        {item.unit === 'Quantity' ? Math.floor(item.total_stock) : item.total_stock} {item.unit === 'Quantity' ? 'pcs.' : item.unit}
+                                                        {(item.unit === 'Quantity' || item.unit === 'pcs') ? Math.floor(item.total_stock) : item.total_stock} {(item.unit === 'Quantity' || item.unit === 'pcs') ? 'pcs' : item.unit}
                                                     </td>
                                                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
-                                                        {item.unit === 'Quantity' ? Math.floor(item.total_distributed) : item.total_distributed} {item.unit === 'Quantity' ? 'pcs.' : item.unit}
+                                                        {(item.unit === 'Quantity' || item.unit === 'pcs') ? Math.floor(item.total_distributed) : item.total_distributed} {(item.unit === 'Quantity' || item.unit === 'pcs') ? 'pcs' : item.unit}
                                                     </td>
                                                     <td className="px-6 py-4 whitespace-nowrap">
                                                         <div className="flex items-center">
