@@ -78,6 +78,7 @@ Route::get('/items/check-name', [\App\Http\Controllers\ItemController::class, 'c
 
 // Inventory management routes
 Route::get('/inventory', [\App\Http\Controllers\InventoryController::class, 'index'])->name('inventory.index');
+Route::get('/inventory/print', [\App\Http\Controllers\InventoryController::class, 'print'])->name('inventory.print');
 
 Route::middleware('auth')->group(function () {
     // Profile routes

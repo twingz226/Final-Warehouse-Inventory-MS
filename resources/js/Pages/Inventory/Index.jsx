@@ -1,12 +1,13 @@
 import { Head, Link, router, useForm } from '@inertiajs/react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
-import { useState } from 'react';
-import { MagnifyingGlassIcon, CubeIcon, WrenchIcon, TruckIcon, ChartBarIcon, FunnelIcon, ChevronUpDownIcon, ArrowPathIcon, ExclamationTriangleIcon } from '@heroicons/react/24/outline';
+import { useState, useEffect } from 'react';
+import { MagnifyingGlassIcon, CubeIcon, WrenchIcon, TruckIcon, ChartBarIcon, FunnelIcon, ChevronUpDownIcon, ArrowPathIcon, ExclamationTriangleIcon, PrinterIcon } from '@heroicons/react/24/outline';
 
 import Modal from '@/Components/Modal';
 import PrimaryButton from '@/Components/PrimaryButton';
 import SecondaryButton from '@/Components/SecondaryButton';
 import DangerButton from '@/Components/DangerButton';
+import InventoryCharts from '@/Components/InventoryCharts';
 
 export default function InventoryIndex({ auth, items, low_stock_items, summary, filters }) {
     const [search, setSearch] = useState(filters.search || '');
@@ -21,6 +22,19 @@ export default function InventoryIndex({ auth, items, low_stock_items, summary, 
     const [tooltip, setTooltip] = useState({ show: false, text: '', x: 0, y: 0 });
     const [confirmingRollover, setConfirmingRollover] = useState(false);
     const [showLowStockItems, setShowLowStockItems] = useState(false);
+    const [showPrintModal, setShowPrintModal] = useState(false);
+    const [printOption, setPrintOption] = useState('current');
+    const [printStartPage, setPrintStartPage] = useState(1);
+    const [printEndPage, setPrintEndPage] = useState(1);
+    const [printing, setPrinting] = useState(false);
+    const [totalPages, setTotalPages] = useState(1);
+
+    useEffect(() => {
+        const interval = setInterval(() => {
+            router.reload({ only: ['items', 'summary', 'low_stock_items'], preserveScroll: true, preserveState: true });
+        }, 15000);
+        return () => clearInterval(interval);
+    }, []);
 
     const toggleLowStockDropdown = () => {
         setShowLowStockItems(!showLowStockItems);
@@ -104,6 +118,104 @@ export default function InventoryIndex({ auth, items, low_stock_items, summary, 
 
     const isLowStock = (availableStock) => {
         return availableStock <= 10;
+    };
+
+    const handlePrintClick = () => {
+        setTotalPages(items.last_page);
+        setPrintStartPage(items.current_page);
+        setPrintEndPage(items.current_page);
+        setPrintOption('current');
+        setShowPrintModal(true);
+    };
+
+    const confirmPrint = async () => {
+        setPrinting(true);
+
+        const params = new URLSearchParams();
+        params.append('print_option', printOption);
+        params.append('per_page', items.per_page);
+        params.append('page', items.current_page);
+        params.append('search', search);
+        params.append('category', category);
+        params.append('stock_level', stockLevel);
+        params.append('sort_by', sortBy);
+        params.append('sort_order', sortOrder);
+
+        if (printOption === 'range') {
+            params.append('start_page', printStartPage);
+            params.append('end_page', printEndPage);
+        }
+
+        try {
+            const response = await fetch(`/inventory/print?${params.toString()}`);
+            const data = await response.json();
+
+            const printWindow = window.open('', '_blank', 'height=600,width=800');
+
+            const tableRows = data.items.map((item) => `
+                <tr style="${isLowStock(item.available_stock) ? 'background-color: #fee2e2;' : ''}">
+                    <td style="padding: 8px; border: 1px solid #ddd;">${item.number}. ${item.name}</td>
+                    <td style="padding: 8px; border: 1px solid #ddd;">${item.category}</td>
+                    <td style="padding: 8px; border: 1px solid #ddd;">${item.unit === 'Quantity' ? Math.floor(item.total_stock) : item.total_stock} ${item.unit === 'Quantity' ? 'pcs' : item.unit}</td>
+                    <td style="padding: 8px; border: 1px solid #ddd;">${item.unit === 'Quantity' ? Math.floor(item.total_distributed) : item.total_distributed} ${item.unit === 'Quantity' ? 'pcs' : item.unit}</td>
+                    <td style="padding: 8px; border: 1px solid #ddd; ${isLowStock(item.available_stock) ? 'color: red; font-weight: bold;' : ''}">
+                        ${item.unit === 'Quantity' ? Math.floor(item.available_stock) : item.available_stock} ${item.unit === 'Quantity' ? 'pcs' : item.unit}
+                        ${isLowStock(item.available_stock) ? ' (Low Stock)' : ''}
+                    </td>
+                </tr>
+            `).join('');
+
+            const pageLabel = printOption === 'current' ? `Page ${data.start_page} of ${data.total_pages}` :
+                             printOption === 'all' ? `All ${data.total_pages} pages` :
+                             `Pages ${data.start_page} - ${data.end_page}`;
+
+            const html = `
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <title>Inventory Report - ${new Date().toLocaleDateString()}</title>
+                    <style>
+                        body { font-family: Arial, sans-serif; padding: 20px; }
+                        h1 { color: #333; }
+                        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+                        th { background-color: #2563eb; color: white; padding: 10px; text-align: left; }
+                        .print-date { color: #666; font-size: 12px; margin-bottom: 10px; }
+                        @media print {
+                            body { -webkit-print-color-adjust: exact; }
+                        }
+                    </style>
+                </head>
+                <body>
+                    <h1>Inventory Items Report</h1>
+                    <p class="print-date">Generated on: ${new Date().toLocaleString()}</p>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Item Name</th>
+                                <th>Category</th>
+                                <th>Total Stock</th>
+                                <th>Distributed</th>
+                                <th>Available</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${tableRows}
+                        </tbody>
+                    </table>
+                    <p style="margin-top: 20px; color: #666; font-size: 12px;">Total Items: ${data.total_items} | Showing: ${pageLabel}</p>
+                </body>
+                </html>
+            `;
+            printWindow.document.write(html);
+            printWindow.document.close();
+            printWindow.print();
+        } catch (error) {
+            console.error('Print error:', error);
+            alert('Failed to load print data. Please try again.');
+        } finally {
+            setPrinting(false);
+            setShowPrintModal(false);
+        }
     };
 
     const lowStockItems = low_stock_items || [];
@@ -431,6 +543,9 @@ export default function InventoryIndex({ auth, items, low_stock_items, summary, 
                             </div>
                         </div>
 
+                        {/* Inventory Charts */}
+                        <InventoryCharts items={items.data} summary={summary} />
+
                         {/* Items Table */}
                         <div className="bg-white dark:bg-gray-800 shadow overflow-hidden sm:rounded-md">
                             <div className="px-4 py-5 sm:px-6">
@@ -443,6 +558,14 @@ export default function InventoryIndex({ auth, items, low_stock_items, summary, 
                                             Real-time inventory status with stock levels and distribution tracking
                                         </p>
                                     </div>
+                                    <button
+                                        onClick={handlePrintClick}
+                                        className="inline-flex items-center px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                                        title="Print Inventory"
+                                    >
+                                        <PrinterIcon className="h-5 w-5 mr-2" />
+                                        Print
+                                    </button>
                                 </div>
                             </div>
 
@@ -678,6 +801,117 @@ export default function InventoryIndex({ auth, items, low_stock_items, summary, 
                         <DangerButton className="ms-3" onClick={performRollover} disabled={processing}>
                             {processing ? 'Finalizing...' : 'Finalize'}
                         </DangerButton>
+                    </div>
+                </div>
+            </Modal>
+
+            {/* Print Options Modal */}
+            <Modal show={showPrintModal} onClose={() => setShowPrintModal(false)}>
+                <div className="p-6">
+                    <h2 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-4">
+                        Print Inventory
+                    </h2>
+
+                    <div className="space-y-4">
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                Select pages to print:
+                            </label>
+                            <div className="space-y-2">
+                                <label className="flex items-center">
+                                    <input
+                                        type="radio"
+                                        name="printOption"
+                                        value="current"
+                                        checked={printOption === 'current'}
+                                        onChange={(e) => setPrintOption(e.target.value)}
+                                        className="h-4 w-4 text-indigo-600 border-gray-300 focus:ring-indigo-500"
+                                    />
+                                    <span className="ml-2 text-sm text-gray-700 dark:text-gray-300">
+                                        Current Page (Page {items.current_page} of {items.last_page})
+                                    </span>
+                                </label>
+                                <label className="flex items-center">
+                                    <input
+                                        type="radio"
+                                        name="printOption"
+                                        value="all"
+                                        checked={printOption === 'all'}
+                                        onChange={(e) => setPrintOption(e.target.value)}
+                                        className="h-4 w-4 text-indigo-600 border-gray-300 focus:ring-indigo-500"
+                                    />
+                                    <span className="ml-2 text-sm text-gray-700 dark:text-gray-300">
+                                        All Pages (All {items.last_page} pages)
+                                    </span>
+                                </label>
+                                <label className="flex items-center">
+                                    <input
+                                        type="radio"
+                                        name="printOption"
+                                        value="range"
+                                        checked={printOption === 'range'}
+                                        onChange={(e) => setPrintOption(e.target.value)}
+                                        className="h-4 w-4 text-indigo-600 border-gray-300 focus:ring-indigo-500"
+                                    />
+                                    <span className="ml-2 text-sm text-gray-700 dark:text-gray-300">
+                                        Page Range
+                                    </span>
+                                </label>
+                            </div>
+                        </div>
+
+                        {printOption === 'range' && (
+                            <div className="flex items-center gap-4 ml-6">
+                                <div>
+                                    <label className="block text-xs text-gray-500 dark:text-gray-400 mb-1">
+                                        From:
+                                    </label>
+                                    <input
+                                        type="number"
+                                        min="1"
+                                        max={totalPages}
+                                        value={printStartPage}
+                                        onChange={(e) => setPrintStartPage(parseInt(e.target.value) || 1)}
+                                        className="w-20 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+                                    />
+                                </div>
+                                <div>
+                                    <label className="block text-xs text-gray-500 dark:text-gray-400 mb-1">
+                                        To:
+                                    </label>
+                                    <input
+                                        type="number"
+                                        min="1"
+                                        max={totalPages}
+                                        value={printEndPage}
+                                        onChange={(e) => setPrintEndPage(parseInt(e.target.value) || 1)}
+                                        className="w-20 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+                                    />
+                                </div>
+                                <span className="text-sm text-gray-500 dark:text-gray-400">
+                                    (Max: {totalPages})
+                                </span>
+                            </div>
+                        )}
+
+                        <div className="text-sm text-gray-500 dark:text-gray-400 mt-4">
+                            {printOption === 'current' && `Will print items from page ${items.current_page} only.`}
+                            {printOption === 'all' && `Will print all ${items.total} items across ${items.last_page} pages.`}
+                            {printOption === 'range' && `Will print pages ${printStartPage} to ${printEndPage}.`}
+                        </div>
+                    </div>
+
+                    <div className="mt-6 flex justify-end gap-3">
+                        <SecondaryButton onClick={() => setShowPrintModal(false)}>
+                            Cancel
+                        </SecondaryButton>
+                        <PrimaryButton
+                            onClick={confirmPrint}
+                            disabled={printing}
+                            className={printing ? 'opacity-50' : ''}
+                        >
+                            {printing ? 'Printing...' : 'Print'}
+                        </PrimaryButton>
                     </div>
                 </div>
             </Modal>

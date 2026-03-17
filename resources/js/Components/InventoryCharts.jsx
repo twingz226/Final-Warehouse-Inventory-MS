@@ -216,24 +216,10 @@ const InventoryCharts = ({ items, summary }) => {
         labels: items.map(item => item.name.length > 15 ? item.name.substring(0, 15) + '...' : item.name),
         datasets: [
             {
-                label: 'Total Stock',
-                data: items.map(item => item.total_stock),
-                backgroundColor: 'rgba(99, 102, 241, 0.8)',
-                borderColor: 'rgba(99, 102, 241, 1)',
-                borderWidth: 1,
-            },
-            {
                 label: 'Available Stock',
                 data: items.map(item => item.available_stock),
                 backgroundColor: 'rgba(34, 197, 94, 0.8)',
                 borderColor: 'rgba(34, 197, 94, 1)',
-                borderWidth: 1,
-            },
-            {
-                label: 'Distributed',
-                data: items.map(item => item.total_distributed),
-                backgroundColor: 'rgba(251, 146, 60, 0.8)',
-                borderColor: 'rgba(251, 146, 60, 1)',
                 borderWidth: 1,
             },
         ],

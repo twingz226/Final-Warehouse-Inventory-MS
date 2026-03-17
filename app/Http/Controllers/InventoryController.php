@@ -145,4 +145,109 @@ class InventoryController extends Controller
             ],
         ]);
     }
+
+    /**
+     * Get inventory items for printing with optional page range
+     */
+    public function print(Request $request)
+    {
+        $query = Item::query();
+
+        // Apply same filters as index
+        if ($request->filled('search')) {
+            $search = $request->input('search');
+            $query->where(function($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                  ->orWhere('description', 'like', "%{$search}%");
+            });
+        }
+
+        if ($request->filled('category') && $request->input('category') !== 'all') {
+            $query->where('category', $request->input('category'));
+        }
+
+        if ($request->filled('stock_level')) {
+            $stockLevel = $request->input('stock_level');
+            switch ($stockLevel) {
+                case 'out_of_stock':
+                    $query->where('quantity', '=', 0);
+                    break;
+                case 'low_stock':
+                    $query->where('quantity', '>', 0)->where('quantity', '<=', 10);
+                    break;
+                case 'normal_stock':
+                    $query->where('quantity', '>', 5)->where('quantity', '<=', 50);
+                    break;
+                case 'high_stock':
+                    $query->where('quantity', '>', 50);
+                    break;
+            }
+        }
+
+        $sortBy = $request->input('sort_by', 'name');
+        $sortOrder = $request->input('sort_order', 'asc');
+        $query->orderBy($sortBy, $sortOrder);
+
+        // Get total count for pagination info
+        $totalItems = $query->count();
+        $perPage = $request->input('per_page', 10);
+
+        // Calculate page range
+        $printOption = $request->input('print_option', 'current');
+        $startPage = 1;
+        $endPage = 1;
+
+        if ($printOption === 'all') {
+            $endPage = ceil($totalItems / $perPage);
+        } elseif ($printOption === 'range') {
+            $startPage = max(1, (int) $request->input('start_page', 1));
+            $endPage = min(ceil($totalItems / $perPage), (int) $request->input('end_page', 1));
+            if ($endPage < $startPage) {
+                $endPage = $startPage;
+            }
+        } else {
+            // Current page
+            $startPage = (int) $request->input('page', 1);
+            $endPage = $startPage;
+        }
+
+        // Get items for the calculated page range
+        $itemsToPrint = [];
+        $itemNumber = ($startPage - 1) * $perPage + 1;
+
+        for ($page = $startPage; $page <= $endPage; $page++) {
+            $pageItems = $query->clone()
+                ->skip(($page - 1) * $perPage)
+                ->take($perPage)
+                ->get()
+                ->map(function ($item) use (&$itemNumber) {
+                    $totalDistributed = Purchase::where('item_name', $item->name)
+                        ->whereIn('status', ['received', 'completed'])
+                        ->sum('quantity');
+
+                    return [
+                        'id' => $item->id,
+                        'number' => $itemNumber++,
+                        'name' => $item->name,
+                        'description' => $item->description,
+                        'category' => $item->category,
+                        'total_stock' => $item->quantity,
+                        'unit' => $item->unit,
+                        'total_distributed' => $totalDistributed,
+                        'available_stock' => $item->quantity - $totalDistributed,
+                    ];
+                });
+
+            $itemsToPrint = array_merge($itemsToPrint, $pageItems->toArray());
+        }
+
+        return response()->json([
+            'items' => $itemsToPrint,
+            'total_items' => $totalItems,
+            'start_page' => $startPage,
+            'end_page' => $endPage,
+            'total_pages' => ceil($totalItems / $perPage),
+            'per_page' => $perPage,
+        ]);
+    }
 }
