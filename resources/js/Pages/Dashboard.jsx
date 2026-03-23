@@ -33,8 +33,10 @@ export default function Dashboard({
     totalStock,
     availableStock,
     lowStockItems,
+    lowStockDetails,
     activeBorrowings,
     overdueBorrowings,
+    borrowedItemsDetails,
     recentActivities,
     itemsByCategory,
     stockDistribution,
@@ -308,6 +310,126 @@ export default function Dashboard({
 
                     {/* Inventory Charts from Inventory Page */}
                     <InventoryCharts items={items} summary={summary} />
+
+                    {/* Low Stock Details + Borrowed Items Details */}
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+                        {/* Low Stock Items Details */}
+                        <div className="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
+                            <div className="p-6">
+                                <div className="flex items-center justify-between mb-4">
+                                    <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100">
+                                        Low Stock Items
+                                    </h3>
+                                    <Link
+                                        href={route('inventory.index', { stock_level: 'low_stock' })}
+                                        className="text-sm font-medium text-indigo-600 hover:text-indigo-700 dark:text-indigo-400 dark:hover:text-indigo-300"
+                                    >
+                                        View all
+                                    </Link>
+                                </div>
+
+                                {(lowStockDetails?.length || 0) > 0 ? (
+                                    <div className="divide-y divide-gray-200 dark:divide-gray-700">
+                                        {lowStockDetails.map((item) => (
+                                            <div key={item.id} className="py-3 flex items-center justify-between">
+                                                <div className="min-w-0">
+                                                    <div className="text-sm font-semibold text-gray-900 dark:text-gray-100 truncate">
+                                                        {item.name}
+                                                    </div>
+                                                    <div className="text-xs text-gray-500 dark:text-gray-400">
+                                                        ID: {item.id}
+                                                    </div>
+                                                </div>
+                                                <div className="text-right">
+                                                    <div className="text-sm font-semibold text-red-600 dark:text-red-400">
+                                                        {item.available_stock} {item.unit}
+                                                    </div>
+                                                    <div className="text-xs text-gray-500 dark:text-gray-400">
+                                                        Available
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                ) : (
+                                    <p className="text-sm text-gray-500 dark:text-gray-400">No low stock items</p>
+                                )}
+                            </div>
+                        </div>
+
+                        {/* Borrowed Items Details */}
+                        <div className="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
+                            <div className="p-6">
+                                <div className="flex items-center justify-between mb-4">
+                                    <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100">
+                                        Borrowed Items
+                                    </h3>
+                                    <Link
+                                        href={route('borrowings.index', { status: 'active' })}
+                                        className="text-sm font-medium text-indigo-600 hover:text-indigo-700 dark:text-indigo-400 dark:hover:text-indigo-300"
+                                    >
+                                        View all
+                                    </Link>
+                                </div>
+
+                                {(borrowedItemsDetails?.length || 0) > 0 ? (
+                                    <div className="divide-y divide-gray-200 dark:divide-gray-700">
+                                        {borrowedItemsDetails.map((b) => (
+                                            <div key={b.id} className="py-3 flex items-start justify-between gap-4">
+                                                <div className="min-w-0 flex-1">
+                                                    <div className="text-sm font-semibold text-gray-900 dark:text-gray-100 truncate">
+                                                        {b.item_name}
+                                                    </div>
+                                                    <div className="text-xs text-gray-500 dark:text-gray-400">
+                                                        Borrower: {b.borrower_name}
+                                                    </div>
+                                                    <div className="text-xs text-gray-500 dark:text-gray-400">
+                                                        Qty: {b.quantity}{b.tool_id ? ` • Tool ID: ${b.tool_id}` : ''}
+                                                    </div>
+                                                </div>
+
+                                                <div className="text-right flex-shrink-0">
+                                                    <div className={
+                                                        'inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold ' +
+                                                        (b.status === 'overdue'
+                                                            ? 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300'
+                                                            : 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300')
+                                                    }>
+                                                        {b.status}
+                                                    </div>
+                                                    <div className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                                                        Due: {b.expected_return_date ? new Date(b.expected_return_date).toLocaleDateString() : '—'}
+                                                    </div>
+                                                    {b.days_until_return !== null && b.days_until_return !== undefined && (
+                                                        <div className={
+                                                            'text-xs font-medium ' +
+                                                            (b.days_until_return < 0
+                                                                ? 'text-red-600 dark:text-red-400'
+                                                                : 'text-gray-600 dark:text-gray-300')
+                                                        }>
+                                                            {b.days_until_return < 0
+                                                                ? `${Math.abs(b.days_until_return)} day(s) overdue`
+                                                                : `${b.days_until_return} day(s) left`}
+                                                        </div>
+                                                    )}
+                                                    <div className="mt-1">
+                                                        <Link
+                                                            href={route('borrowings.show', b.id)}
+                                                            className="text-xs font-medium text-indigo-600 hover:text-indigo-700 dark:text-indigo-400 dark:hover:text-indigo-300"
+                                                        >
+                                                            Details
+                                                        </Link>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                ) : (
+                                    <p className="text-sm text-gray-500 dark:text-gray-400">No active borrowings</p>
+                                )}
+                            </div>
+                        </div>
+                    </div>
 
                     {/* Charts Section */}
                     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">

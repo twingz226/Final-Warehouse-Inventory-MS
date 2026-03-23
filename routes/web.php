@@ -15,15 +15,63 @@ Route::get('/', function () {
 });
 
 Route::get('/dashboard', function () {
+    $receivedDistributedByItemName = \App\Models\Purchase::where('status', 'received')
+        ->selectRaw('item_name, COALESCE(SUM(quantity), 0) as distributed')
+        ->groupBy('item_name')
+        ->pluck('distributed', 'item_name');
+
+    $lowStockDetails = \App\Models\Item::select('id', 'name', 'unit', 'quantity')
+        ->get()
+        ->map(function ($item) use ($receivedDistributedByItemName) {
+            $distributed = (int) ($receivedDistributedByItemName[$item->name] ?? 0);
+            $availableStock = (int) $item->quantity - $distributed;
+
+            return [
+                'id' => $item->id,
+                'name' => $item->name,
+                'unit' => $item->unit,
+                'available_stock' => $availableStock,
+            ];
+        })
+        ->filter(function ($item) {
+            return $item['available_stock'] <= 10;
+        })
+        ->sortBy('available_stock')
+        ->values()
+        ->take(10);
+
+    $borrowedItemsDetails = \App\Models\Borrowing::query()
+        ->whereIn('status', ['borrowed', 'overdue'])
+        ->orderByDesc('expected_return_date')
+        ->limit(10)
+        ->get()
+        ->map(function ($borrowing) {
+            $expectedReturn = $borrowing->expected_return_date;
+
+            return [
+                'id' => $borrowing->id,
+                'borrower_name' => $borrowing->borrower_name,
+                'item_name' => $borrowing->item_name,
+                'tool_id' => $borrowing->tool_id,
+                'quantity' => $borrowing->quantity,
+                'status' => $borrowing->status,
+                'borrow_date' => $borrowing->borrow_date,
+                'expected_return_date' => $expectedReturn,
+                'days_until_return' => $expectedReturn ? now()->diffInDays($expectedReturn, false) : null,
+            ];
+        });
+
     $data = [
         'totalItems' => \App\Models\Item::count(),
         'totalStock' => \App\Models\Item::sum('quantity'),
         'distributedStock' => \App\Models\Purchase::where('status', 'received')->sum('quantity'),
         'availableStock' => \App\Models\Item::sum('quantity') - \App\Models\Purchase::where('status', 'received')->sum('quantity'),
         'lowStockItems' => \App\Models\Item::whereRaw('quantity - (SELECT COALESCE(SUM(quantity), 0) FROM purchases WHERE item_name = items.name AND status = "received") <= 10')->count(),
+        'lowStockDetails' => $lowStockDetails,
         'pendingPurchases' => \App\Models\Purchase::where('status', 'pending')->count(),
         'activeBorrowings' => \App\Models\Borrowing::whereIn('status', ['borrowed', 'overdue'])->count(),
         'overdueBorrowings' => \App\Models\Borrowing::where('status', 'overdue')->count(),
+        'borrowedItemsDetails' => $borrowedItemsDetails,
         'recentActivities' => \App\Models\ActivityHistory::with('user')->latest()->limit(5)->get(),
         // Additional data for graphs
         'itemsByCategory' => [

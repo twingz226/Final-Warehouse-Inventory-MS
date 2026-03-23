@@ -51,7 +51,11 @@ class BorrowingController extends Controller
         }
 
         if ($status) {
-            $query->where('borrowings.status', $status);
+            if ($status === 'active') {
+                $query->whereIn('borrowings.status', ['borrowed', 'overdue']);
+            } else {
+                $query->where('borrowings.status', $status);
+            }
         }
 
         $borrowings = $query->paginate(10)->withQueryString();
