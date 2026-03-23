@@ -10,6 +10,7 @@ import {
     Legend,
     LineElement,
     PointElement,
+    Filler,
 } from 'chart.js';
 import { Bar, Pie, Line } from 'react-chartjs-2';
 import zoomPlugin from 'chartjs-plugin-zoom';
@@ -25,6 +26,7 @@ ChartJS.register(
     Legend,
     LineElement,
     PointElement,
+    Filler,
     zoomPlugin
 );
 
@@ -60,135 +62,53 @@ const InventoryCharts = ({ items, summary }) => {
     };
 
     const resetZoom = () => {
-        console.log('Reset zoom called, chartRef:', chartRef.current);
         if (chartRef.current && typeof chartRef.current.resetZoom === 'function') {
-            const scrollLeft = scrollContainerRef.current?.scrollLeft || 0;
             setZoomLevel(1.0);
-
-            // Resize chart to reset dimensions
+            chartRef.current.resetZoom();
+            
+            // Reset chart dimensions
             const resetWidth = Math.max(items.length * 50, 400);
             chartRef.current.resize(resetWidth, 300);
-
-            chartRef.current.resetZoom();
-            console.log('Reset zoom executed');
-            // Restore scroll position after zoom reset
-            setTimeout(() => {
-                if (scrollContainerRef.current) {
-                    // For reset, we want to center the view
-                    const container = scrollContainerRef.current;
-                    const totalWidth = Math.max(items.length * 50, 400);
-                    const visibleWidth = container.clientWidth;
-                    const centerScrollLeft = Math.max(0, (totalWidth - visibleWidth) / 2);
-                    scrollContainerRef.current.scrollLeft = centerScrollLeft;
-                }
-            }, 50);
-        } else {
-            console.error('Chart ref or resetZoom method not available');
         }
     };
 
     const zoomIn = () => {
-        console.log('=== ZOOM IN START ===');
-        console.log('Chart ref:', chartRef.current);
-        console.log('Scroll container:', scrollContainerRef.current);
-
         if (chartRef.current && typeof chartRef.current.zoom === 'function') {
-            const scrollLeft = scrollContainerRef.current?.scrollLeft || 0;
             const oldZoomLevel = zoomLevel;
-            const newZoomLevel = oldZoomLevel * 1.2;
+            const newZoomLevel = Math.min(oldZoomLevel * 1.2, 5);
             setZoomLevel(newZoomLevel);
 
             // Resize chart to new dimensions
             const newWidth = Math.max(items.length * 50 * newZoomLevel, 400);
             chartRef.current.resize(newWidth, 300);
 
-            console.log('Current scroll position:', scrollLeft);
-            console.log('Zoom level:', oldZoomLevel, '->', newZoomLevel);
-
             // Calculate center of visible area to zoom around current center
             const centerIndex = calculateVisibleCenter();
             const centerX = centerIndex !== null ? chartRef.current.scales.x.getPixelForValue(centerIndex) : chartRef.current.width / 2;
             const center = { x: centerX, y: chartRef.current.height / 2 };
 
-            console.log('Zooming around center:', center);
-
-            // Zoom around the current visible center to prevent view shifting
+            // Zoom around the current visible center
             chartRef.current.zoom(1.2, 'x', center);
-            console.log('Uniform zoom in executed');
-
-            // Wait for zoom to complete and state to update, then adjust scroll position
-            setTimeout(() => {
-                if (scrollContainerRef.current) {
-                    // Calculate proportional scroll adjustment based on zoom level change
-                    const oldWidth = Math.max(items.length * 50 * oldZoomLevel, 400);
-                    const newWidth = Math.max(items.length * 50 * newZoomLevel, 400);
-                    const adjustedScrollLeft = scrollLeft * (newWidth / oldWidth);
-
-                    scrollContainerRef.current.scrollLeft = adjustedScrollLeft;
-                    console.log('Scroll position adjusted from', scrollLeft, 'to', adjustedScrollLeft);
-                }
-
-                // Check final position
-                setTimeout(() => {
-                    const finalScrollLeft = scrollContainerRef.current?.scrollLeft || 0;
-                    console.log('Final scroll position:', finalScrollLeft);
-                    console.log('=== ZOOM IN END ===');
-                }, 100);
-            }, 100);
-        } else {
-            console.error('Chart ref or zoom method not available');
         }
     };
 
     const zoomOut = () => {
-        console.log('=== ZOOM OUT START ===');
-        console.log('Chart ref:', chartRef.current);
-
         if (chartRef.current && typeof chartRef.current.zoom === 'function') {
-            const scrollLeft = scrollContainerRef.current?.scrollLeft || 0;
             const oldZoomLevel = zoomLevel;
-            const newZoomLevel = oldZoomLevel / 1.2;
+            const newZoomLevel = Math.max(oldZoomLevel / 1.2, 0.5);
             setZoomLevel(newZoomLevel);
 
             // Resize chart to new dimensions
             const newWidth = Math.max(items.length * 50 * newZoomLevel, 400);
             chartRef.current.resize(newWidth, 300);
 
-            console.log('Current scroll position:', scrollLeft);
-            console.log('Zoom level:', oldZoomLevel, '->', newZoomLevel);
-
             // Calculate center of visible area to zoom around current center
             const centerIndex = calculateVisibleCenter();
             const centerX = centerIndex !== null ? chartRef.current.scales.x.getPixelForValue(centerIndex) : chartRef.current.width / 2;
             const center = { x: centerX, y: chartRef.current.height / 2 };
 
-            console.log('Zooming around center:', center);
-
-            // Zoom around the current visible center to prevent view shifting
+            // Zoom around the current visible center
             chartRef.current.zoom(0.8, 'x', center);
-            console.log('Uniform zoom out executed');
-
-            // Wait for zoom to complete and state to update, then adjust scroll position
-            setTimeout(() => {
-                if (scrollContainerRef.current) {
-                    // Calculate proportional scroll adjustment based on zoom level change
-                    const oldWidth = Math.max(items.length * 50 * oldZoomLevel, 400);
-                    const newWidth = Math.max(items.length * 50 * newZoomLevel, 400);
-                    const adjustedScrollLeft = scrollLeft * (newWidth / oldWidth);
-
-                    scrollContainerRef.current.scrollLeft = adjustedScrollLeft;
-                    console.log('Scroll position adjusted from', scrollLeft, 'to', adjustedScrollLeft);
-                }
-
-                // Check final position
-                setTimeout(() => {
-                    const finalScrollLeft = scrollContainerRef.current?.scrollLeft || 0;
-                    console.log('Final scroll position:', finalScrollLeft);
-                    console.log('=== ZOOM OUT END ===');
-                }, 100);
-            }, 100);
-        } else {
-            console.error('Chart ref or zoom method not available');
         }
     };
     // Prepare data for category distribution pie chart
@@ -363,12 +283,12 @@ const InventoryCharts = ({ items, summary }) => {
     return (
         <div className="mb-6">
             {/* Stock Levels Bar Chart */}
-            <div className="bg-gradient-to-br from-blue-50 via-white to-indigo-50 dark:from-gray-700 dark:to-gray-800 p-8 rounded-lg shadow-lg border border-gray-200 dark:border-gray-600">
+            <div className="bg-white dark:bg-gray-800 p-8 rounded-lg shadow-lg border border-gray-200 dark:border-gray-600">
                 <div className="flex items-center mb-6">
                     <ChartBarIcon className="w-6 h-6 text-indigo-600 dark:text-indigo-400 mr-3" />
                     <h3 className="text-xl font-bold text-gray-900 dark:text-white">Stock Levels Overview</h3>
                 </div>
-                <div ref={scrollContainerRef} className="overflow-x-auto">
+                <div ref={scrollContainerRef} className="overflow-x-auto scrollbar-thin scrollbar-thumb-indigo-500 scrollbar-track-gray-200 dark:scrollbar-track-gray-700">
                     <div style={{ height: '300px', minWidth: `${Math.max(items.length * 50 * zoomLevel, 400)}px` }}>
                         <Bar ref={chartRef} data={stockLevelData} options={barOptions} />
                     </div>

@@ -419,6 +419,9 @@ export default function InventoryIndex({ auth, items, low_stock_items, summary, 
                             </div>
                         )}
 
+                        {/* Inventory Charts */}
+                        <InventoryCharts items={items.data} summary={summary} />
+
                         {/* Enhanced Filters */}
                         <div className="bg-white dark:bg-gray-800 shadow rounded-lg mb-6">
                             <div className="px-4 py-4 sm:p-6">
@@ -542,9 +545,6 @@ export default function InventoryIndex({ auth, items, low_stock_items, summary, 
                                 )}
                             </div>
                         </div>
-
-                        {/* Inventory Charts */}
-                        <InventoryCharts items={items.data} summary={summary} />
 
                         {/* Items Table */}
                         <div className="bg-white dark:bg-gray-800 shadow overflow-hidden sm:rounded-md">
