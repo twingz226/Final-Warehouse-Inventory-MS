@@ -199,8 +199,10 @@ Route::middleware('auth')->group(function () {
 
     // Logo Management
     Route::get('/logo', [LogoController::class, 'index'])->name('logo.index');
-    Route::get('/logo/current', [LogoController::class, 'getCurrentLogo'])->name('logo.current');
     Route::post('/logo/update', [LogoController::class, 'update'])->name('logo.update');
 });
+
+// API Routes (outside web middleware)
+Route::get('/logo/current', [LogoController::class, 'getCurrentLogo'])->name('logo.current');
 
 require __DIR__.'/auth.php';
