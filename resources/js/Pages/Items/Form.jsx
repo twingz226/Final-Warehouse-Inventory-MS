@@ -33,7 +33,7 @@ export default function Form({ auth, item = null }) {
             name: item.name || '',
             description: item.description || '',
             category: item.category || 'tool',
-            quantity: item.quantity || 0,
+            quantity: (item.unit || 'Quantity') === 'Quantity' ? (parseInt(item.quantity, 10) || 0) : (item.quantity || 0),
             unit: item.unit || 'Quantity',
         }] : [{
             name: '',
@@ -237,7 +237,7 @@ export default function Form({ auth, item = null }) {
                                                                 id={`quantity_${index}`}
                                                                 type="number"
                                                                 min="0"
-                                                                step="0.01"
+                                                                step={it.unit === 'Quantity' ? '1' : '0.01'}
                                                                 className="mt-1 block flex-1"
                                                                 value={it.quantity}
                                                                 onChange={(e) => updateItem(index, 'quantity', e.target.value)}
