@@ -856,10 +856,10 @@ export default function Index({ auth, purchases, status }) {
                                 </div>
                             </div>
 
-                            <div className="bg-white dark:bg-gray-800 shadow-sm sm:rounded-lg">
+                            <div className="bg-white dark:bg-gray-800 shadow-sm sm:rounded-lg overflow-x-auto">
                                 <div>
                                     <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-                                        <thead className="bg-blue-600/70 dark:bg-blue-900/80">
+                                        <thead className="bg-blue-600/70 dark:bg-blue-900/80 sticky top-0 z-20">
                                             <tr>
                                                 <th className="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">
                                                     Name of Project

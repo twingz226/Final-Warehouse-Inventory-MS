@@ -19,7 +19,7 @@ export default function AuthenticatedLayout({ header, children }) {
             <div className="hidden md:flex md:w-64 md:flex-col md:fixed md:inset-y-0 print:hidden">
                 <div className="flex flex-col flex-grow pt-5 bg-blue-600/70 dark:bg-blue-900/80 backdrop-blur-sm border-r border-white/10 dark:border-white/5 overflow-y-auto [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-white/20 hover:[&::-webkit-scrollbar-thumb]:bg-white/40 [&::-webkit-scrollbar-thumb]:rounded-full shadow-2xl">
                     <div className="flex items-center justify-center flex-shrink-0 px-4 border-b border-white/20 pb-4">
-                        <Link href="/">
+                        <Link href="/logo">
                             <ApplicationLogo className="block h-12 w-auto filter drop-shadow-lg" />
                         </Link>
                     </div>
@@ -286,7 +286,7 @@ export default function AuthenticatedLayout({ header, children }) {
                             </div>
                             <div className="flex flex-col flex-grow pt-5 bg-blue-600/95 dark:bg-blue-900/95 backdrop-blur-xl border-r border-white/10 dark:border-white/5 overflow-y-auto [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-white/20 hover:[&::-webkit-scrollbar-thumb]:bg-white/40 [&::-webkit-scrollbar-thumb]:rounded-full shadow-2xl">
                     <div className="flex items-center justify-center flex-shrink-0 px-4 border-b border-white/20 pb-4">
-                        <Link href="/">
+                        <Link href="/logo">
                             <ApplicationLogo className="block h-12 w-auto filter drop-shadow-lg" />
                         </Link>
                     </div>

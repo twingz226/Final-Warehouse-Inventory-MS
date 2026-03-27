@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\LogoController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -195,6 +196,11 @@ Route::middleware('auth')->group(function () {
 
     // Daily Stock Rollover
     Route::post('/inventory/rollover', [\App\Http\Controllers\RolloverController::class, 'store'])->name('stock.rollover');
+
+    // Logo Management
+    Route::get('/logo', [LogoController::class, 'index'])->name('logo.index');
+    Route::get('/logo/current', [LogoController::class, 'getCurrentLogo'])->name('logo.current');
+    Route::post('/logo/update', [LogoController::class, 'update'])->name('logo.update');
 });
 
 require __DIR__.'/auth.php';
