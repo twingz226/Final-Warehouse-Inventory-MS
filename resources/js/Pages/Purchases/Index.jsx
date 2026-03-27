@@ -1,7 +1,10 @@
 import { Head, Link, router } from '@inertiajs/react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { useState, useEffect, useRef } from 'react';
-import { PlusIcon, EyeIcon, TrashIcon, PrinterIcon, MagnifyingGlassIcon } from '@heroicons/react/24/outline';
+import { PlusIcon, EyeIcon, TrashIcon, PrinterIcon, MagnifyingGlassIcon, PencilIcon } from '@heroicons/react/24/outline';
+import Modal from '@/Components/Modal';
+import DangerButton from '@/Components/DangerButton';
+import SecondaryButton from '@/Components/SecondaryButton';
 
 export default function Index({ auth, purchases, status }) {
     const [tooltip, setTooltip] = useState({ show: false, text: '', x: 0, y: 0 });
@@ -15,6 +18,8 @@ export default function Index({ auth, purchases, status }) {
     const [printSaNumber, setPrintSaNumber] = useState('');
     const [printToolsId, setPrintToolsId] = useState({});
     const [openDropdown, setOpenDropdown] = useState(null);
+    const [confirmingDeletion, setConfirmingDeletion] = useState(false);
+    const [groupToDelete, setGroupToDelete] = useState(null);
 
     // Close dropdown when clicking outside
     useEffect(() => {
@@ -110,6 +115,25 @@ export default function Index({ auth, purchases, status }) {
 
     const deletePurchase = (id) => {
         router.delete(route('purchases.destroy', id));
+    };
+
+    const confirmGroupDelete = (group) => {
+        setGroupToDelete(group);
+        setConfirmingDeletion(true);
+    };
+
+    const executeGroupDelete = () => {
+        if (groupToDelete) {
+            groupToDelete.rows.forEach(r => router.delete(route('purchases.destroy', r.id), {
+                preserveScroll: true,
+                onSuccess: () => setConfirmingDeletion(false),
+            }));
+        }
+    };
+
+    const closeModal = () => {
+        setConfirmingDeletion(false);
+        setGroupToDelete(null);
     };
 
     const handlePrint = async (purchase) => {
@@ -890,13 +914,7 @@ export default function Index({ auth, purchases, status }) {
                                                     };
 
                                                     const handleGroupDelete = () => {
-                                                        if (window.confirm(
-                                                            isMulti
-                                                                ? `Delete all ${group.rows.length} items distributed to "${first.supplier_name}"?`
-                                                                : `Delete this distribution record?`
-                                                        )) {
-                                                            group.rows.forEach(r => router.delete(route('purchases.destroy', r.id)));
-                                                        }
+                                                        confirmGroupDelete(group);
                                                     };
 
                                                     return (
@@ -1028,6 +1046,18 @@ export default function Index({ auth, purchases, status }) {
                                                                         </Link>
                                                                     </div>
 
+                                                                    {/* Edit — one link per group */}
+                                                                    <div className="flex flex-col gap-1">
+                                                                        <Link
+                                                                            href={route('purchases.edit', first.id)}
+                                                                            className="text-yellow-600 dark:text-yellow-400 hover:text-yellow-900 dark:hover:text-yellow-300 mt-0.5"
+                                                                            onMouseEnter={(e) => { const rect = e.currentTarget.getBoundingClientRect(); setTooltip({ show: true, text: 'Edit Record', x: rect.left + rect.width / 2, y: rect.top - 30 }); }}
+                                                                            onMouseLeave={() => setTooltip({ show: false, text: '', x: 0, y: 0 })}
+                                                                        >
+                                                                            <PencilIcon className="h-5 w-5" />
+                                                                        </Link>
+                                                                    </div>
+
                                                                     {/* Delete all in group */}
                                                                     <button
                                                                         onClick={handleGroupDelete}
@@ -1068,6 +1098,26 @@ export default function Index({ auth, purchases, status }) {
                         {tooltip.text}
                     </div>
                 )}
+                {/* Delete Confirmation Modal */}
+                <Modal show={confirmingDeletion} onClose={closeModal}>
+                    <div className="p-6">
+                        <h2 className="text-lg font-medium text-gray-900 dark:text-gray-100">
+                            Delete Distribution Record
+                        </h2>
+                        <p className="mt-1 text-sm text-gray-600 dark:text-gray-300">
+                            {groupToDelete && groupToDelete.rows.length > 1
+                                ? `Are you sure you want to delete all ${groupToDelete.rows.length} items distributed to "${groupToDelete.rows[0].supplier_name}"? This action cannot be undone.`
+                                : 'Are you sure you want to delete this distribution record? This action cannot be undone.'
+                            }
+                        </p>
+                        <div className="mt-6 flex justify-end">
+                            <SecondaryButton onClick={closeModal}>Cancel</SecondaryButton>
+                            <DangerButton className="ms-3" onClick={executeGroupDelete}>
+                                Delete
+                            </DangerButton>
+                        </div>
+                    </div>
+                </Modal>
             </AuthenticatedLayout>
         </>
     );

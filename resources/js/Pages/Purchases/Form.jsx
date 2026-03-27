@@ -19,31 +19,36 @@ const emptyRowSearch = () => ({
     timeout: null,
 });
 
-export default function Form({ auth, purchase, statusOptions }) {
+export default function Form({ auth, purchase, groupItems, statusOptions }) {
     // ── Shared form data (Inertia) ─────────────────────────────────────────────
     const { data, setData, post, put, processing, errors, reset, transform } = useForm({
         supplier_name: purchase?.supplier_name || '',
         supplier_phone: purchase?.supplier_phone || '',
-        purchase_date: purchase?.purchase_date || new Date().toISOString().split('T')[0],
+        purchase_date: purchase?.purchase_date ? new Date(purchase.purchase_date).toLocaleDateString('en-CA') : new Date().toLocaleDateString('en-CA'),
         notes: purchase?.notes || '',
         project_type: purchase?.project_type || '',
         project_name: purchase?.project_name || '',
         os: purchase?.os || '',
         issued_by: purchase?.issued_by || '',
         issued_to: purchase?.issued_to || '',
-        // For CREATE: array of rows. For EDIT: single item kept flat.
-        items: purchase
-            ? [{ item_name: purchase.item_name, quantity: purchase.quantity, description: purchase.description || '', available_quantity: null }]
-            : [{ item_name: '', quantity: '', description: '', available_quantity: null }],
+        // For CREATE: array of rows. For EDIT: all grouped items.
+        items: (groupItems && groupItems.length > 0)
+            ? groupItems.map(g => ({ item_name: g.item_name, quantity: g.quantity, description: g.description || '', available_quantity: null }))
+            : purchase
+                ? [{ item_name: purchase.item_name, quantity: purchase.quantity, description: purchase.description || '', available_quantity: null }]
+                : [{ item_name: '', quantity: '', description: '', available_quantity: null }],
     });
 
     // ── Per-row search UI state ────────────────────────────────────────────────
-    const [rowSearches, setRowSearches] = useState(() =>
-    (purchase
-        ? [{ ...emptyRowSearch(), query: purchase.item_name || '' }]
-        : [emptyRowSearch()]
-    )
-    );
+    const [rowSearches, setRowSearches] = useState(() => {
+        if (groupItems && groupItems.length > 0) {
+            return groupItems.map(g => ({ ...emptyRowSearch(), query: g.item_name || '' }));
+        }
+        if (purchase) {
+            return [{ ...emptyRowSearch(), query: purchase.item_name || '' }];
+        }
+        return [emptyRowSearch()];
+    });
 
     const containerRef = useRef(null);
 

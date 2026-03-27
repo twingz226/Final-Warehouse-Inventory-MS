@@ -189,8 +189,16 @@ class PurchaseController extends Controller
      */
     public function edit(Purchase $purchase)
     {
+        $groupItems = Purchase::where('purchases.supplier_name', $purchase->supplier_name)
+            ->where('purchases.purchase_date', $purchase->purchase_date)
+            ->where('purchases.created_at', $purchase->created_at)
+            ->leftJoin('items', 'purchases.item_name', '=', 'items.name')
+            ->select('purchases.*', 'items.category as item_category', 'items.unit as item_unit')
+            ->get();
+
         return Inertia::render('Purchases/Form', [
             'purchase' => $purchase,
+            'groupItems' => $groupItems,
         ]);
     }
 
@@ -199,36 +207,71 @@ class PurchaseController extends Controller
      */
     public function update(Request $request, Purchase $purchase)
     {
-        $oldValues = $purchase->toArray();
-        
         $validated = $request->validate([
-            'supplier_name' => 'required|string|max:255',
-            'os' => 'nullable|string|max:255',
-            'issued_by' => 'nullable|string|max:255',
-            'issued_to' => 'nullable|string|max:255',
-            'item_name' => 'required|string|max:255',
-            'description' => 'nullable|string',
-            'quantity' => 'required|integer|min:1',
-            'purchase_date' => 'required|date',
-            'notes' => 'nullable|string',
-            'project_type' => 'nullable|string|max:255',
-            'project_name' => 'nullable|string|max:255',
+            'supplier_name'          => 'required|string|max:255',
+            'os'                     => 'nullable|string|max:255',
+            'issued_by'              => 'nullable|string|max:255',
+            'issued_to'              => 'nullable|string|max:255',
+            'purchase_date'          => 'required|date',
+            'notes'                  => 'nullable|string',
+            'project_type'           => 'nullable|string|max:255',
+            'project_name'           => 'nullable|string|max:255',
+            'items'                  => 'required|array|min:1',
+            'items.*.item_name'      => 'required|string|max:255',
+            'items.*.quantity'       => 'required|integer|min:1',
+            'items.*.description'    => 'nullable|string',
         ]);
 
-        $purchase->update($validated);
+        $shared = [
+            'supplier_name'  => $validated['supplier_name'],
+            'os'             => $validated['os'] ?? null,
+            'issued_by'      => $validated['issued_by'] ?? null,
+            'issued_to'      => $validated['issued_to'] ?? null,
+            'purchase_date'  => $validated['purchase_date'],
+            'notes'          => $validated['notes'] ?? null,
+            'project_type'   => $validated['project_type'] ?? null,
+            'project_name'   => $validated['project_name'] ?? null,
+            'status'         => 'received',
+            'updated_by'     => Auth::id(),
+        ];
 
-        // Generate description based on what changed
-        $changes = [];
-        if ($oldValues['supplier_name'] !== $validated['supplier_name']) {
-            $changes[] = "destination from '{$oldValues['supplier_name']}' to '{$validated['supplier_name']}'";
-        }
-        if ($oldValues['item_name'] !== $validated['item_name']) {
-            $changes[] = "item from '{$oldValues['item_name']}' to '{$validated['item_name']}'";
-        }
-        
-        $description = count($changes) > 0 ? "Updated " . implode(', ', $changes) : "Updated distribution";
-        
-        $this->logHistory($purchase, 'updated', $oldValues, $validated, $description);
+        DB::transaction(function () use ($purchase, $shared, $validated) {
+            // Fetch all existing items in this group
+            $existing = Purchase::where('supplier_name', $purchase->supplier_name)
+                ->where('purchase_date', $purchase->purchase_date)
+                ->where('created_at', $purchase->created_at)
+                ->get();
+
+            // Delete all existing items in the group
+            Purchase::where('supplier_name', $purchase->supplier_name)
+                ->where('purchase_date', $purchase->purchase_date)
+                ->where('created_at', $purchase->created_at)
+                ->delete();
+
+            // Create new items from submitted array
+            $now = now();
+            foreach ($validated['items'] as $itemRow) {
+                $data = array_merge($shared, [
+                    'item_name'   => $itemRow['item_name'],
+                    'quantity'    => $itemRow['quantity'],
+                    'description' => $itemRow['description'] ?? null,
+                    'created_by'  => $purchase->created_by,
+                ]);
+
+                $newPurchase = new Purchase($data);
+                $newPurchase->created_at = $purchase->created_at;
+                $newPurchase->updated_at = $now;
+                $newPurchase->save();
+
+                $this->logHistory(
+                    $newPurchase,
+                    'updated',
+                    null,
+                    $data,
+                    "Updated distribution order for '{$newPurchase->item_name}' to {$newPurchase->supplier_name}"
+                );
+            }
+        });
 
         return redirect()
             ->route('purchases.index')
