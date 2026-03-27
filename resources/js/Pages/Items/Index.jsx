@@ -29,6 +29,17 @@ export default function Index({ auth, items, status }) {
         return `${m}/${d}/${y}`;
     };
 
+    const formatDateTime = (value) => {
+        if (!value) return 'N/A';
+        return new Date(value).toLocaleString('en-US', {
+            year: 'numeric',
+            month: 'numeric',
+            day: 'numeric',
+            hour: 'numeric',
+            minute: '2-digit',
+        });
+    };
+
     useEffect(() => {
         const urlParams = new URLSearchParams(window.location.search);
         const initialSearch = urlParams.get('search') || '';
@@ -456,7 +467,7 @@ export default function Index({ auth, items, status }) {
                                                             </div>
                                                         </td>
                                                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
-                                                            {item.date_time ? new Date(item.date_time).toLocaleString('en-US') : 'N/A'}
+                                                            {formatDateTime(item.date_time)}
                                                         </td>
                                                         <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                                                             <div className="flex space-x-2">
@@ -591,7 +602,7 @@ export default function Index({ auth, items, status }) {
                                                         <div className="flex justify-between items-center">
                                                             <span className="text-sm font-medium text-gray-500 dark:text-gray-400">Date & Time:</span>
                                                             <span className="text-sm text-gray-600 dark:text-gray-400">
-                                                                {item.date_time ? new Date(item.date_time).toLocaleString('en-US') : 'N/A'}
+                                                                {formatDateTime(item.date_time)}
                                                             </span>
                                                         </div>
                                                     </div>

@@ -5,8 +5,21 @@ import { PencilIcon, ArrowLeftIcon } from '@heroicons/react/24/outline';
 
 export default function Show({ auth, item }) {
     const formatQuantity = (quantity) => {
-        return parseFloat(quantity).toString();
+        if (!quantity) return '0';
+        return parseFloat(quantity).toLocaleString();
     };
+
+    const formatDateTime = (value) => {
+        if (!value) return 'N/A';
+        return new Date(value).toLocaleString('en-US', {
+            year: 'numeric',
+            month: 'numeric',
+            day: 'numeric',
+            hour: 'numeric',
+            minute: '2-digit',
+        });
+    };
+
     return (
         <AuthenticatedLayout
             user={auth.user}
@@ -65,7 +78,7 @@ export default function Show({ auth, item }) {
                                             Date & Time
                                         </dt>
                                         <dd className="mt-1 text-sm text-gray-900 dark:text-gray-100 sm:mt-0 sm:col-span-2">
-                                            {item.date_time ? new Date(item.date_time).toLocaleString() : 'N/A'}
+                                            {formatDateTime(item.date_time)}
                                         </dd>
                                     </div>
                                     <div className="py-4 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4">
