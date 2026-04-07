@@ -1,4 +1,6 @@
 import '../css/app.css';
+import '../css/animations.css';
+import '../css/print.css';
 import '../css/datepicker.css';
 import './bootstrap';
 

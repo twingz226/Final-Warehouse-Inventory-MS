@@ -106,16 +106,6 @@ export default function ItemTransactionHistory({ auth, transactions, items, filt
             <Head title="Item Transaction History" />
 
             <div className="py-12 print:py-0">
-                <style>
-                    {`
-                    @media print {
-                        @page { 
-                            size: portrait; 
-                            margin-top: 5mm; 
-                        }
-                    }
-                    `}
-                </style>
                 <div className="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-6 print:space-y-0">
 
                     {/* Filters Section */}

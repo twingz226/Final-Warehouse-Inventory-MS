@@ -60,30 +60,6 @@ export default function ThemeToggle() {
 
     return (
         <>
-            <style>{`
-            @keyframes electric-flicker-sun {
-                0%   { box-shadow: 0 0 4px 1px #fbbf24, 0 0 10px 2px #f59e0b; opacity: 1; }
-                10%  { box-shadow: 0 0 2px 1px #fbbf24, 0 0 5px 1px #f59e0b;  opacity: 0.82; }
-                25%  { box-shadow: 0 0 8px 3px #fde68a, 0 0 18px 5px #f59e0b; opacity: 1; }
-                40%  { box-shadow: 0 0 2px 1px #fbbf24, 0 0 4px 1px #f59e0b;  opacity: 0.78; }
-                55%  { box-shadow: 0 0 10px 4px #fde68a, 0 0 22px 6px #f59e0b;opacity: 1; }
-                70%  { box-shadow: 0 0 2px 1px #fbbf24, 0 0 5px 1px #f59e0b;  opacity: 0.85; }
-                85%  { box-shadow: 0 0 7px 3px #fde68a, 0 0 16px 4px #f59e0b; opacity: 1; }
-                100% { box-shadow: 0 0 4px 1px #fbbf24, 0 0 10px 2px #f59e0b; opacity: 1; }
-            }
-            @keyframes electric-flicker-moon {
-                0%   { box-shadow: 0 0 4px 1px #818cf8, 0 0 10px 2px #6366f1; opacity: 1; }
-                10%  { box-shadow: 0 0 2px 1px #818cf8, 0 0 5px 1px #6366f1;  opacity: 0.82; }
-                25%  { box-shadow: 0 0 8px 3px #a5b4fc, 0 0 18px 5px #6366f1; opacity: 1; }
-                40%  { box-shadow: 0 0 2px 1px #818cf8, 0 0 4px 1px #6366f1;  opacity: 0.78; }
-                55%  { box-shadow: 0 0 10px 4px #c7d2fe, 0 0 22px 6px #6366f1;opacity: 1; }
-                70%  { box-shadow: 0 0 2px 1px #818cf8, 0 0 5px 1px #6366f1;  opacity: 0.85; }
-                85%  { box-shadow: 0 0 7px 3px #a5b4fc, 0 0 16px 4px #6366f1; opacity: 1; }
-                100% { box-shadow: 0 0 4px 1px #818cf8, 0 0 10px 2px #6366f1; opacity: 1; }
-            }
-            .electric-theme-sun:hover  { animation: electric-flicker-sun  0.2s step-end infinite; }
-            .electric-theme-moon:hover { animation: electric-flicker-moon 0.2s step-end infinite; }
-        `}</style>
             <div className="relative inline-block">
                 <button
                     onClick={toggleTheme}

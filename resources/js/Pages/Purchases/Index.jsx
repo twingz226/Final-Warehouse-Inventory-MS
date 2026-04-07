@@ -485,25 +485,6 @@ export default function Index({ auth, purchases, status }) {
 
     return (
         <>
-            <style>{`
-            @keyframes electric-flicker {
-                0%   { box-shadow: 0 0 4px 1px #818cf8, 0 0 10px 2px #6366f1; opacity: 1; }
-                10%  { box-shadow: 0 0 2px 1px #818cf8, 0 0 6px 1px #6366f1;  opacity: 0.85; }
-                20%  { box-shadow: 0 0 8px 3px #a5b4fc, 0 0 18px 5px #6366f1; opacity: 1; }
-                30%  { box-shadow: 0 0 3px 1px #818cf8, 0 0 8px 2px #6366f1;  opacity: 0.9; }
-                40%  { box-shadow: 0 0 10px 4px #c7d2fe, 0 0 22px 6px #6366f1;opacity: 1; }
-                50%  { box-shadow: 0 0 2px 1px #818cf8, 0 0 5px 1px #6366f1;  opacity: 0.8; }
-                60%  { box-shadow: 0 0 9px 3px #a5b4fc, 0 0 20px 5px #6366f1; opacity: 1; }
-                70%  { box-shadow: 0 0 3px 1px #818cf8, 0 0 7px 2px #6366f1;  opacity: 0.88; }
-                80%  { box-shadow: 0 0 11px 4px #c7d2fe, 0 0 24px 7px #6366f1;opacity: 1; }
-                90%  { box-shadow: 0 0 2px 1px #818cf8, 0 0 6px 1px #6366f1;  opacity: 0.82; }
-                100% { box-shadow: 0 0 4px 1px #818cf8, 0 0 10px 2px #6366f1; opacity: 1; }
-            }
-            .electric-btn-indigo:hover {
-                animation: electric-flicker 0.18s step-end infinite;
-                outline: none;
-            }
-        `}</style>
             <AuthenticatedLayout
                 user={auth.user}
                 header={
@@ -525,23 +506,6 @@ export default function Index({ auth, purchases, status }) {
                 <Head title="Outgoing Items" />
 
                 <div className="py-12">
-                    <style>
-                        {`
-                        @media print {
-                            @page { 
-                                margin: 0 20mm 20mm 20mm;
-                            }
-                            html, body, #app {
-                                background-color: white !important;
-                                background: white !important;
-                            }
-                            body {
-                                -webkit-print-color-adjust: exact !important;
-                                print-color-adjust: exact !important;
-                            }
-                        }
-                        `}
-                    </style>
                     <div className="max-w-7xl mx-auto sm:px-6 lg:px-8 print:bg-white print:p-0">
                         {/* Printable Layout Preview Modal */}
                         {printProjectName && (
@@ -605,11 +569,11 @@ export default function Index({ auth, purchases, status }) {
                                         <div className="text-center mb-6 print:mb-1">
                                             <div className="flex justify-center items-center print:mb-0">
                                                 <img src="/images/warlen.png" alt="Logo" className="h-12 w-12 object-contain mr-3" />
-                                                <h1 className="text-2xl print:text-[20px] font-bold uppercase tracking-wide text-blue-900 print:leading-none" style={{ color: '#1e3a8a' }}>
+                                                <h1 className="text-2xl print:text-[20px] font-bold uppercase tracking-wide text-blue-900 print:leading-none">
                                                     WARLEN INDUSTRIAL SALES CORPORATION
                                                 </h1>
                                             </div>
-                                            <h2 className="text-[12px] font-semibold uppercase tracking-widest text-red-600 mb-1 print:mb-0 print:leading-none -mt-2" style={{ color: '#dc2626' }}>
+                                            <h2 className="text-[12px] font-semibold uppercase tracking-widest text-red-600 mb-1 print:mb-0 print:leading-none -mt-2">
                                                 General Engineering and Specialty Contractor
                                             </h2>
                                             <p className="text-xs print:leading-tight">

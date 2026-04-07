@@ -176,55 +176,6 @@ export default function Index({ auth, items, status }) {
 
     return (
         <>
-            <style>{`
-            @keyframes electric-flicker {
-                0%   { box-shadow: 0 0 4px 1px #818cf8, 0 0 10px 2px #6366f1; opacity: 1; }
-                10%  { box-shadow: 0 0 2px 1px #818cf8, 0 0 6px 1px #6366f1;  opacity: 0.85; }
-                20%  { box-shadow: 0 0 8px 3px #a5b4fc, 0 0 18px 5px #6366f1; opacity: 1; }
-                30%  { box-shadow: 0 0 3px 1px #818cf8, 0 0 8px 2px #6366f1;  opacity: 0.9; }
-                40%  { box-shadow: 0 0 10px 4px #c7d2fe, 0 0 22px 6px #6366f1;opacity: 1; }
-                50%  { box-shadow: 0 0 2px 1px #818cf8, 0 0 5px 1px #6366f1;  opacity: 0.8; }
-                60%  { box-shadow: 0 0 9px 3px #a5b4fc, 0 0 20px 5px #6366f1; opacity: 1; }
-                70%  { box-shadow: 0 0 3px 1px #818cf8, 0 0 7px 2px #6366f1;  opacity: 0.88; }
-                80%  { box-shadow: 0 0 11px 4px #c7d2fe, 0 0 24px 7px #6366f1;opacity: 1; }
-                90%  { box-shadow: 0 0 2px 1px #818cf8, 0 0 6px 1px #6366f1;  opacity: 0.82; }
-                100% { box-shadow: 0 0 4px 1px #818cf8, 0 0 10px 2px #6366f1; opacity: 1; }
-            }
-            @keyframes electric-flicker-emerald {
-                0%   { box-shadow: 0 0 4px 1px #6ee7b7, 0 0 10px 2px #10b981; opacity: 1; }
-                10%  { box-shadow: 0 0 2px 1px #6ee7b7, 0 0 6px 1px #10b981;  opacity: 0.85; }
-                20%  { box-shadow: 0 0 8px 3px #a7f3d0, 0 0 18px 5px #10b981; opacity: 1; }
-                30%  { box-shadow: 0 0 3px 1px #6ee7b7, 0 0 8px 2px #10b981;  opacity: 0.9; }
-                40%  { box-shadow: 0 0 10px 4px #d1fae5, 0 0 22px 6px #10b981;opacity: 1; }
-                50%  { box-shadow: 0 0 2px 1px #6ee7b7, 0 0 5px 1px #10b981;  opacity: 0.8; }
-                60%  { box-shadow: 0 0 9px 3px #a7f3d0, 0 0 20px 5px #10b981; opacity: 1; }
-                70%  { box-shadow: 0 0 3px 1px #6ee7b7, 0 0 7px 2px #10b981;  opacity: 0.88; }
-                80%  { box-shadow: 0 0 11px 4px #d1fae5, 0 0 24px 7px #10b981;opacity: 1; }
-                90%  { box-shadow: 0 0 2px 1px #6ee7b7, 0 0 6px 1px #10b981;  opacity: 0.82; }
-                100% { box-shadow: 0 0 4px 1px #6ee7b7, 0 0 10px 2px #10b981; opacity: 1; }
-            }
-            @keyframes electric-flicker-toggle {
-                0%   { box-shadow: 0 0 3px 1px #818cf8, 0 0 8px 2px #6366f1;  opacity: 1; }
-                15%  { box-shadow: 0 0 1px 0px #818cf8, 0 0 4px 1px #6366f1;  opacity: 0.8; }
-                30%  { box-shadow: 0 0 6px 2px #a5b4fc, 0 0 14px 4px #6366f1; opacity: 1; }
-                50%  { box-shadow: 0 0 1px 0px #818cf8, 0 0 3px 1px #6366f1;  opacity: 0.75; }
-                70%  { box-shadow: 0 0 7px 3px #a5b4fc, 0 0 16px 4px #6366f1; opacity: 1; }
-                85%  { box-shadow: 0 0 2px 1px #818cf8, 0 0 5px 1px #6366f1;  opacity: 0.85; }
-                100% { box-shadow: 0 0 3px 1px #818cf8, 0 0 8px 2px #6366f1;  opacity: 1; }
-            }
-            .electric-btn-indigo:hover {
-                animation: electric-flicker 0.18s step-end infinite;
-                outline: none;
-            }
-            .electric-btn-emerald:hover {
-                animation: electric-flicker-emerald 0.18s step-end infinite;
-                outline: none;
-            }
-            .electric-btn-toggle:hover {
-                animation: electric-flicker-toggle 0.22s step-end infinite;
-                outline: none;
-            }
-        `}</style>
             <AuthenticatedLayout
                 user={auth.user}
                 header={
@@ -334,8 +285,7 @@ export default function Index({ auth, items, status }) {
                                             type="date"
                                             value={date}
                                             onChange={(e) => handleDateChange(e.target.value)}
-                                            style={{ color: 'transparent', caretColor: 'transparent' }}
-                                            className="block w-full pl-10 pr-10 py-3 border border-gray-300 dark:border-gray-600 rounded-xl leading-5 bg-gradient-to-r from-white to-gray-50 dark:from-gray-700 dark:to-gray-800 hover:from-gray-50 hover:to-white dark:hover:from-gray-600 dark:hover:to-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 dark:focus:ring-indigo-400/50 dark:focus:border-indigo-400 shadow-sm hover:shadow-md transition-all duration-200 ease-in-out cursor-pointer"
+                                            className="text-transparent caret-transparent block w-full pl-10 pr-10 py-3 border border-gray-300 dark:border-gray-600 rounded-xl leading-5 bg-gradient-to-r from-white to-gray-50 dark:from-gray-700 dark:to-gray-800 hover:from-gray-50 hover:to-white dark:hover:from-gray-600 dark:hover:to-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 dark:focus:ring-indigo-400/50 dark:focus:border-indigo-400 shadow-sm hover:shadow-md transition-all duration-200 ease-in-out cursor-pointer"
                                         />
                                         {/* Overlay div — shows date as MM/DD/YYYY (or placeholder), pointer-events-none so clicks pass through to the date input */}
                                         <div className="absolute inset-y-0 left-0 right-8 px-3 pl-10 flex items-center pointer-events-none">

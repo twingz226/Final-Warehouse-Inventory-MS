@@ -69,13 +69,6 @@ export default function Index({ auth, purchases }) {
             <Head title="Projects" />
 
             <div className="py-12">
-                <style>
-                    {`
-                    @media print {
-                        @page { size: landscape; }
-                    }
-                    `}
-                </style>
                 <div className="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-6">
                     {/* Modern Search Bar */}
                     <div className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 print:hidden">

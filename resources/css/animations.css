@@ -1,0 +1,116 @@
+/* ============================================================
+   Electric Hover Button Animations
+   Centralized from: Items/Index, ItemTransactionHistory,
+   Purchases/Index, Purchases/Show, Borrowed/Index,
+   Borrowed/Show, Inventory/Index, ShipmentApproval/Index,
+   ThemeToggle, Projects/Index
+   ============================================================ */
+
+@keyframes electric-flicker-indigo {
+    0%   { box-shadow: 0 0 4px 1px #818cf8, 0 0 10px 2px #6366f1; opacity: 1; }
+    10%  { box-shadow: 0 0 2px 1px #818cf8, 0 0 6px 1px #6366f1;  opacity: 0.85; }
+    20%  { box-shadow: 0 0 8px 3px #a5b4fc, 0 0 18px 5px #6366f1; opacity: 1; }
+    30%  { box-shadow: 0 0 3px 1px #818cf8, 0 0 8px 2px #6366f1;  opacity: 0.9; }
+    40%  { box-shadow: 0 0 10px 4px #c7d2fe, 0 0 22px 6px #6366f1; opacity: 1; }
+    50%  { box-shadow: 0 0 2px 1px #818cf8, 0 0 5px 1px #6366f1;  opacity: 0.8; }
+    60%  { box-shadow: 0 0 9px 3px #a5b4fc, 0 0 20px 5px #6366f1; opacity: 1; }
+    70%  { box-shadow: 0 0 3px 1px #818cf8, 0 0 7px 2px #6366f1;  opacity: 0.88; }
+    80%  { box-shadow: 0 0 11px 4px #c7d2fe, 0 0 24px 7px #6366f1; opacity: 1; }
+    90%  { box-shadow: 0 0 2px 1px #818cf8, 0 0 6px 1px #6366f1;  opacity: 0.82; }
+    100% { box-shadow: 0 0 4px 1px #818cf8, 0 0 10px 2px #6366f1; opacity: 1; }
+}
+
+@keyframes electric-flicker-emerald {
+    0%   { box-shadow: 0 0 4px 1px #6ee7b7, 0 0 10px 2px #10b981; opacity: 1; }
+    10%  { box-shadow: 0 0 2px 1px #6ee7b7, 0 0 6px 1px #10b981;  opacity: 0.85; }
+    20%  { box-shadow: 0 0 8px 3px #a7f3d0, 0 0 18px 5px #10b981; opacity: 1; }
+    30%  { box-shadow: 0 0 3px 1px #6ee7b7, 0 0 8px 2px #10b981;  opacity: 0.9; }
+    40%  { box-shadow: 0 0 10px 4px #d1fae5, 0 0 22px 6px #10b981; opacity: 1; }
+    50%  { box-shadow: 0 0 2px 1px #6ee7b7, 0 0 5px 1px #10b981;  opacity: 0.8; }
+    60%  { box-shadow: 0 0 9px 3px #a7f3d0, 0 0 20px 5px #10b981; opacity: 1; }
+    70%  { box-shadow: 0 0 3px 1px #6ee7b7, 0 0 7px 2px #10b981;  opacity: 0.88; }
+    80%  { box-shadow: 0 0 11px 4px #d1fae5, 0 0 24px 7px #10b981; opacity: 1; }
+    90%  { box-shadow: 0 0 2px 1px #6ee7b7, 0 0 6px 1px #10b981;  opacity: 0.82; }
+    100% { box-shadow: 0 0 4px 1px #6ee7b7, 0 0 10px 2px #10b981; opacity: 1; }
+}
+
+@keyframes electric-flicker-toggle {
+    0%   { box-shadow: 0 0 3px 1px #818cf8, 0 0 8px 2px #6366f1;  opacity: 1; }
+    15%  { box-shadow: 0 0 1px 0px #818cf8, 0 0 4px 1px #6366f1;  opacity: 0.8; }
+    30%  { box-shadow: 0 0 6px 2px #a5b4fc, 0 0 14px 4px #6366f1; opacity: 1; }
+    50%  { box-shadow: 0 0 1px 0px #818cf8, 0 0 3px 1px #6366f1;  opacity: 0.75; }
+    70%  { box-shadow: 0 0 7px 3px #a5b4fc, 0 0 16px 4px #6366f1; opacity: 1; }
+    85%  { box-shadow: 0 0 2px 1px #818cf8, 0 0 5px 1px #6366f1;  opacity: 0.85; }
+    100% { box-shadow: 0 0 3px 1px #818cf8, 0 0 8px 2px #6366f1;  opacity: 1; }
+}
+
+@keyframes electric-flicker-gray {
+    0%   { box-shadow: 0 0 4px 1px #9ca3af, 0 0 10px 2px #4b5563; opacity: 1; }
+    10%  { box-shadow: 0 0 2px 1px #9ca3af, 0 0 6px 1px #4b5563;  opacity: 0.85; }
+    20%  { box-shadow: 0 0 8px 3px #d1d5db, 0 0 18px 5px #4b5563; opacity: 1; }
+    30%  { box-shadow: 0 0 3px 1px #9ca3af, 0 0 8px 2px #4b5563;  opacity: 0.9; }
+    40%  { box-shadow: 0 0 10px 4px #f3f4f6, 0 0 22px 6px #4b5563; opacity: 1; }
+    50%  { box-shadow: 0 0 2px 1px #9ca3af, 0 0 5px 1px #4b5563;  opacity: 0.8; }
+    60%  { box-shadow: 0 0 9px 3px #d1d5db, 0 0 20px 5px #4b5563; opacity: 1; }
+    70%  { box-shadow: 0 0 3px 1px #9ca3af, 0 0 7px 2px #4b5563;  opacity: 0.88; }
+    80%  { box-shadow: 0 0 11px 4px #f3f4f6, 0 0 24px 7px #4b5563; opacity: 1; }
+    90%  { box-shadow: 0 0 2px 1px #9ca3af, 0 0 6px 1px #4b5563;  opacity: 0.82; }
+    100% { box-shadow: 0 0 4px 1px #9ca3af, 0 0 10px 2px #4b5563; opacity: 1; }
+}
+
+@keyframes electric-flicker-rollover {
+    0%   { box-shadow: 0 0 4px 1px #6366f1, 0 0 10px 2px #4f46e5; opacity: 1; }
+    10%  { box-shadow: 0 0 2px 1px #6366f1, 0 0 5px 1px #4f46e5;  opacity: 0.82; }
+    25%  { box-shadow: 0 0 8px 3px #a5b4fc, 0 0 18px 5px #4f46e5; opacity: 1; }
+    40%  { box-shadow: 0 0 2px 1px #6366f1, 0 0 4px 1px #4f46e5;  opacity: 0.78; }
+    55%  { box-shadow: 0 0 10px 4px #c7d2fe, 0 0 22px 6px #4f46e5; opacity: 1; }
+    70%  { box-shadow: 0 0 2px 1px #6366f1, 0 0 5px 1px #4f46e5;  opacity: 0.85; }
+    85%  { box-shadow: 0 0 7px 3px #a5b4fc, 0 0 16px 4px #4f46e5; opacity: 1; }
+    100% { box-shadow: 0 0 4px 1px #6366f1, 0 0 10px 2px #4f46e5; opacity: 1; }
+}
+
+@keyframes electric-flicker-sun {
+    0%   { box-shadow: 0 0 4px 1px #fbbf24, 0 0 10px 2px #f59e0b; opacity: 1; }
+    10%  { box-shadow: 0 0 2px 1px #fbbf24, 0 0 5px 1px #f59e0b;  opacity: 0.82; }
+    25%  { box-shadow: 0 0 8px 3px #fde68a, 0 0 18px 5px #f59e0b; opacity: 1; }
+    40%  { box-shadow: 0 0 2px 1px #fbbf24, 0 0 4px 1px #f59e0b;  opacity: 0.78; }
+    55%  { box-shadow: 0 0 10px 4px #fde68a, 0 0 22px 6px #f59e0b; opacity: 1; }
+    70%  { box-shadow: 0 0 2px 1px #fbbf24, 0 0 5px 1px #f59e0b;  opacity: 0.85; }
+    85%  { box-shadow: 0 0 7px 3px #fde68a, 0 0 16px 4px #f59e0b; opacity: 1; }
+    100% { box-shadow: 0 0 4px 1px #fbbf24, 0 0 10px 2px #f59e0b; opacity: 1; }
+}
+
+@keyframes electric-flicker-moon {
+    0%   { box-shadow: 0 0 4px 1px #818cf8, 0 0 10px 2px #6366f1; opacity: 1; }
+    10%  { box-shadow: 0 0 2px 1px #818cf8, 0 0 5px 1px #6366f1;  opacity: 0.82; }
+    25%  { box-shadow: 0 0 8px 3px #a5b4fc, 0 0 18px 5px #6366f1; opacity: 1; }
+    40%  { box-shadow: 0 0 2px 1px #818cf8, 0 0 4px 1px #6366f1;  opacity: 0.78; }
+    55%  { box-shadow: 0 0 10px 4px #c7d2fe, 0 0 22px 6px #6366f1; opacity: 1; }
+    70%  { box-shadow: 0 0 2px 1px #818cf8, 0 0 5px 1px #6366f1;  opacity: 0.85; }
+    85%  { box-shadow: 0 0 7px 3px #a5b4fc, 0 0 16px 4px #6366f1; opacity: 1; }
+    100% { box-shadow: 0 0 4px 1px #818cf8, 0 0 10px 2px #6366f1; opacity: 1; }
+}
+
+@keyframes electric-flicker-blue {
+    0%   { box-shadow: 0 0 4px 1px #60a5fa, 0 0 10px 2px #2563eb; opacity: 1; }
+    10%  { box-shadow: 0 0 2px 1px #60a5fa, 0 0 6px 1px #2563eb;  opacity: 0.85; }
+    20%  { box-shadow: 0 0 8px 3px #93c5fd, 0 0 18px 5px #2563eb; opacity: 1; }
+    30%  { box-shadow: 0 0 3px 1px #60a5fa, 0 0 8px 2px #2563eb;  opacity: 0.9; }
+    40%  { box-shadow: 0 0 10px 4px #bfdbfe, 0 0 22px 6px #2563eb; opacity: 1; }
+    50%  { box-shadow: 0 0 2px 1px #60a5fa, 0 0 5px 1px #2563eb;  opacity: 0.8; }
+    60%  { box-shadow: 0 0 9px 3px #93c5fd, 0 0 20px 5px #2563eb; opacity: 1; }
+    70%  { box-shadow: 0 0 3px 1px #60a5fa, 0 0 7px 2px #2563eb;  opacity: 0.88; }
+    80%  { box-shadow: 0 0 11px 4px #bfdbfe, 0 0 24px 7px #2563eb; opacity: 1; }
+    90%  { box-shadow: 0 0 2px 1px #60a5fa, 0 0 6px 1px #2563eb;  opacity: 0.82; }
+    100% { box-shadow: 0 0 4px 1px #60a5fa, 0 0 10px 2px #2563eb; opacity: 1; }
+}
+
+/* Electric button hover utility classes */
+.electric-btn-indigo:hover  { animation: electric-flicker-indigo  0.18s step-end infinite; outline: none; }
+.electric-btn-emerald:hover { animation: electric-flicker-emerald 0.18s step-end infinite; outline: none; }
+.electric-btn-toggle:hover  { animation: electric-flicker-toggle  0.22s step-end infinite; outline: none; }
+.electric-btn-gray:hover    { animation: electric-flicker-gray    0.18s step-end infinite; outline: none; }
+.electric-btn-blue:hover    { animation: electric-flicker-blue    0.18s step-end infinite; outline: none; }
+.electric-rollover:hover    { animation: electric-flicker-rollover 0.20s step-end infinite; }
+.electric-theme-sun:hover   { animation: electric-flicker-sun     0.20s step-end infinite; }
+.electric-theme-moon:hover  { animation: electric-flicker-moon    0.20s step-end infinite; }

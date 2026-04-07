@@ -18,25 +18,6 @@ export default function Index({ auth, shipmentApprovals, status }) {
 
     return (
         <>
-            <style>{`
-            @keyframes electric-flicker-blue {
-                0%   { box-shadow: 0 0 4px 1px #60a5fa, 0 0 10px 2px #2563eb; opacity: 1; }
-                10%  { box-shadow: 0 0 2px 1px #60a5fa, 0 0 6px 1px #2563eb;  opacity: 0.85; }
-                20%  { box-shadow: 0 0 8px 3px #93c5fd, 0 0 18px 5px #2563eb; opacity: 1; }
-                30%  { box-shadow: 0 0 3px 1px #60a5fa, 0 0 8px 2px #2563eb;  opacity: 0.9; }
-                40%  { box-shadow: 0 0 10px 4px #bfdbfe, 0 0 22px 6px #2563eb;opacity: 1; }
-                50%  { box-shadow: 0 0 2px 1px #60a5fa, 0 0 5px 1px #2563eb;  opacity: 0.8; }
-                60%  { box-shadow: 0 0 9px 3px #93c5fd, 0 0 20px 5px #2563eb; opacity: 1; }
-                70%  { box-shadow: 0 0 3px 1px #60a5fa, 0 0 7px 2px #2563eb;  opacity: 0.88; }
-                80%  { box-shadow: 0 0 11px 4px #bfdbfe, 0 0 24px 7px #2563eb;opacity: 1; }
-                90%  { box-shadow: 0 0 2px 1px #60a5fa, 0 0 6px 1px #2563eb;  opacity: 0.82; }
-                100% { box-shadow: 0 0 4px 1px #60a5fa, 0 0 10px 2px #2563eb; opacity: 1; }
-            }
-            .electric-btn-blue:hover {
-                animation: electric-flicker-blue 0.18s step-end infinite;
-                outline: none;
-            }
-            `}</style>
             <AuthenticatedLayout
                 header={
                     <div className="flex justify-between items-center print:hidden">
