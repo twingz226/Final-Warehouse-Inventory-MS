@@ -20,17 +20,17 @@ Route::get('/dashboard', [DashboardController::class, 'index'])
     ->middleware(['auth', 'verified'])
     ->name('dashboard');
 
-// Item search route for autocomplete (temporarily public for testing)
-Route::get('/items/search', [\App\Http\Controllers\ItemController::class, 'searchItems'])->name('items.search');
-
-// Real-time name uniqueness check
-Route::get('/items/check-name', [\App\Http\Controllers\ItemController::class, 'checkName'])->name('items.check-name');
-
-// Inventory management routes
-Route::get('/inventory', [\App\Http\Controllers\InventoryController::class, 'index'])->name('inventory.index');
-Route::get('/inventory/print', [\App\Http\Controllers\InventoryController::class, 'print'])->name('inventory.print');
-
 Route::middleware('auth')->group(function () {
+    // Item search route for autocomplete
+    Route::get('/items/search', [\App\Http\Controllers\ItemController::class, 'searchItems'])->name('items.search');
+
+    // Real-time name uniqueness check
+    Route::get('/items/check-name', [\App\Http\Controllers\ItemController::class, 'checkName'])->name('items.check-name');
+
+    // Inventory management routes
+    Route::get('/inventory', [\App\Http\Controllers\InventoryController::class, 'index'])->name('inventory.index');
+    Route::get('/inventory/print', [\App\Http\Controllers\InventoryController::class, 'print'])->name('inventory.print');
+
     // Profile routes
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
