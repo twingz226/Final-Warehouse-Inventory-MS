@@ -66,6 +66,15 @@ class ShipmentApprovalController extends Controller
         return redirect()->back()->with('status', 'Shipment approval recorded successfully.');
     }
 
+    /**
+     * Display the specified resource.
+     */
+    public function show(ShipmentApproval $shipmentApproval)
+    {
+        return Inertia::render('ShipmentApproval/Show', [
+            'shipmentApproval' => $shipmentApproval->load('creator'),
+        ]);
+    }
 
     public function edit(ShipmentApproval $shipmentApproval)
     {

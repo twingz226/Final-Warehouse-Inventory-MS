@@ -50,10 +50,10 @@ export default function Index({ auth, shipmentApprovals, status }) {
                                                     SA#
                                                 </th>
                                                 <th className="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">
-                                                    Tools ID
+                                                    Tools ID & Items
                                                 </th>
                                                 <th className="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">
-                                                    Description
+                                                    Description Status
                                                 </th>
                                                 <th className="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider">
                                                     Picture
@@ -73,11 +73,36 @@ export default function Index({ auth, shipmentApprovals, status }) {
                                                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
                                                             {approval.sa_number}
                                                         </td>
-                                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
-                                                            {approval.tools_id || '-'}
+                                                        <td className="px-6 py-4 text-sm text-gray-900 dark:text-gray-100">
+                                                            <div className="space-y-2">
+                                                                {approval.tools_id && approval.description ? (
+                                                                    (() => {
+                                                                        const toolIds = approval.tools_id.split(',').map(id => id.trim());
+                                                                        const items = approval.description.split(',').map(item => item.trim());
+                                                                        const maxLength = Math.max(toolIds.length, items.length);
+                                                                        
+                                                                        return Array.from({ length: maxLength }, (_, index) => (
+                                                                            <div key={index} className="flex items-start space-x-2">
+                                                                                <span className="font-medium text-blue-600 dark:text-blue-400 min-w-[2rem]">
+                                                                                    {toolIds[index] || '-'}
+                                                                                </span>
+                                                                                <span className="text-gray-900 dark:text-gray-100 break-words leading-relaxed">
+                                                                                    {items[index] || '-'}
+                                                                                </span>
+                                                                            </div>
+                                                                        ));
+                                                                    })()
+                                                                ) : (
+                                                                    <div className="text-gray-500 dark:text-gray-400">
+                                                                        No Tools ID or Description
+                                                                    </div>
+                                                                )}
+                                                            </div>
                                                         </td>
                                                         <td className="px-6 py-4 text-sm text-gray-900 dark:text-gray-100">
-                                                            {approval.description || '-'}
+                                                            <div className="text-center text-gray-500 dark:text-gray-400 font-medium">
+                                                                Aligned with Tools ID
+                                                            </div>
                                                         </td>
                                                         <td className="px-6 py-4 text-sm text-gray-900 dark:text-gray-100">
                                                             {approval.picture && Array.isArray(approval.picture) && approval.picture.length > 0 ? (
@@ -99,6 +124,14 @@ export default function Index({ auth, shipmentApprovals, status }) {
                                                         </td>
                                                         <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                                                             <div className="flex space-x-2">
+                                                                <Link
+                                                                    href={route('shipment-approvals.show', approval.id)}
+                                                                    className="text-blue-600 dark:text-blue-400 hover:text-blue-900 dark:hover:text-blue-300"
+                                                                    onMouseEnter={(e) => { const rect = e.currentTarget.getBoundingClientRect(); setTooltip({ show: true, text: 'View', x: rect.left + rect.width / 2, y: rect.bottom + 10 }); }}
+                                                                    onMouseLeave={() => setTooltip({ show: false, text: '', x: 0, y: 0 })}
+                                                                >
+                                                                    <EyeIcon className="h-5 w-5" />
+                                                                </Link>
                                                                 <Link
                                                                     href={route('shipment-approvals.edit', approval.id)}
                                                                     className="hidden text-yellow-600 dark:text-yellow-400 hover:text-yellow-900 dark:hover:text-yellow-300"
