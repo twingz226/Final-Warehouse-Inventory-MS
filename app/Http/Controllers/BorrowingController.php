@@ -86,12 +86,26 @@ class BorrowingController extends Controller
         $validated = $request->validate([
             'borrower_name' => 'required|string|max:255',
             'items' => 'required|array|min:1',
-            'items.*.item_name' => 'required|string|max:255',
+            'items.*.item_name' => [
+                'required',
+                'string',
+                'max:255',
+                'exists:items,name'
+            ],
             'items.*.tool_id' => 'nullable|string|max:255',
             'items.*.quantity' => 'required|integer|min:1',
             'borrow_date' => 'required|date',
             'expected_return_date' => 'required|date|after_or_equal:borrow_date',
             'status' => 'required|in:borrowed,returned,overdue',
+        ], [
+            'items.*.item_name.exists' => 'The selected item is not available in the inventory.',
+            'items.*.item_name.required' => 'Please select an item.',
+            'items.*.quantity.required' => 'Please specify the quantity.',
+            'items.*.quantity.min' => 'Quantity must be at least 1.',
+            'borrower_name.required' => 'Please enter the borrower name.',
+            'borrow_date.required' => 'Please select the borrow date.',
+            'expected_return_date.required' => 'Please select the expected return date.',
+            'expected_return_date.after_or_equal' => 'Return date must be after or same as borrow date.',
         ]);
 
         $validated['created_by'] = Auth::id();
@@ -146,13 +160,28 @@ class BorrowingController extends Controller
         $validated = $request->validate([
             'borrower_name' => 'required|string|max:255',
             'items' => 'required|array|min:1',
-            'items.*.item_name' => 'required|string|max:255',
+            'items.*.item_name' => [
+                'required',
+                'string',
+                'max:255',
+                'exists:items,name'
+            ],
             'items.*.tool_id' => 'nullable|string|max:255',
             'items.*.quantity' => 'required|integer|min:1',
             'borrow_date' => 'required|date',
             'expected_return_date' => 'required|date|after_or_equal:borrow_date',
             'actual_return_date' => 'nullable|date|after_or_equal:borrow_date',
             'status' => 'required|in:borrowed,returned,overdue',
+        ], [
+            'items.*.item_name.exists' => 'The selected item is not available in the inventory.',
+            'items.*.item_name.required' => 'Please select an item.',
+            'items.*.quantity.required' => 'Please specify the quantity.',
+            'items.*.quantity.min' => 'Quantity must be at least 1.',
+            'borrower_name.required' => 'Please enter the borrower name.',
+            'borrow_date.required' => 'Please select the borrow date.',
+            'expected_return_date.required' => 'Please select the expected return date.',
+            'expected_return_date.after_or_equal' => 'Return date must be after or same as borrow date.',
+            'actual_return_date.after_or_equal' => 'Actual return date must be after or same as borrow date.',
         ]);
 
         $oldStatus = $borrowing->status;
