@@ -10,6 +10,7 @@ class ActivityHistory extends Model
     protected $table = 'activity_history_unified';
     
     protected $fillable = [
+        'transaction_id',
         'activity_type',
         'entity_id',
         'user_id',

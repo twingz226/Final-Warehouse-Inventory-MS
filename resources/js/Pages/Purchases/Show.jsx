@@ -198,39 +198,6 @@ export default function Show({ auth, purchase, groupItems }) {
                                 </div>
                             </div>
                         </div>
-
-                        {/* History Section */}
-                        {purchase.histories && purchase.histories.length > 0 && (
-                            <div className="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
-                                <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-600">
-                                    <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100">Activity History</h3>
-                                </div>
-                                <div className="p-6">
-                                    <div className="space-y-4">
-                                        {purchase.histories.map((history) => (
-                                            <div key={history.id} className="flex items-start space-x-3">
-                                                <div className="flex-shrink-0">
-                                                    <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getActionColor(history.action)}`}>
-                                                        {history.action.replace('_', ' ').charAt(0).toUpperCase() + history.action.replace('_', ' ').slice(1)}
-                                                    </span>
-                                                </div>
-                                                <div className="flex-1">
-                                                    <div className="text-sm text-gray-900 dark:text-gray-100">
-                                                        <span className="font-medium">{history.user?.name || 'Unknown user'}</span>
-                                                        {history.description && (
-                                                            <span className="ml-2">{history.description}</span>
-                                                        )}
-                                                    </div>
-                                                    <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                                                        {new Date(history.created_at).toLocaleString()}
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        ))}
-                                    </div>
-                                </div>
-                            </div>
-                        )}
                     </div>
                 </div>
 

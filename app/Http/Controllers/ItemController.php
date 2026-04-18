@@ -19,9 +19,10 @@ class ItemController extends Controller
     /**
      * Log item history.
      */
-    private function logHistory(Item $item, string $action, ?array $oldValues = null, ?array $newValues = null, ?string $description = null): void
+    private function logHistory(Item $item, string $action, ?array $oldValues = null, ?array $newValues = null, ?string $description = null, ?string $transactionId = null): void
     {
         ItemHistory::create([
+            'transaction_id' => $transactionId,
             'item_id' => $item->id,
             'user_id' => Auth::id(),
             'action' => $action,
@@ -434,8 +435,10 @@ class ItemController extends Controller
 
         $processedItems = [];
         $errors = [];
+        // Generate a unique transaction ID for this batch operation
+        $transactionId = 'STOCK-' . strtoupper(uniqid());
 
-        DB::transaction(function () use ($validated, &$processedItems, &$errors) {
+        DB::transaction(function () use ($validated, &$processedItems, &$errors, $transactionId) {
             foreach ($validated['items'] as $index => $itemData) {
                 try {
                     $item = Item::findOrFail($itemData['item_id']);
@@ -457,7 +460,8 @@ class ItemController extends Controller
                         (function() use ($itemData, $item, $oldQuantity) {
                             $unit = $item->unit === 'Kg' ? 'kg' : 'pcs';
                             return "+{$itemData['quantity']} {$unit} added to '{$item->name}' — stock updated from {$oldQuantity} to {$item->quantity} {$unit}.";
-                        })()
+                        })(),
+                        $transactionId
                     );
 
                     $processedItems[] = [

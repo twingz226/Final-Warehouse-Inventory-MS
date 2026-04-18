@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class PurchaseHistory extends Model
 {
     protected $fillable = [
+        'transaction_id',
         'purchase_id',
         'user_id',
         'action',

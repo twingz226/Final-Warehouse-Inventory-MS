@@ -15,15 +15,28 @@ class ItemTransactionHistoryController extends Controller
     public function index(Request $request)
     {
         $itemName = $request->input('item_name');
+        $searchQuery = $request->input('search');
         
         $query = Purchase::select('id', 'item_name', 'quantity', 'supplier_name', 'project_name', 'created_at', 'purchase_date')
-            ->whereIn('status', ['received', 'completed']);
+            ->whereIn('status', ['received', 'completed'])
+            ->distinct();
         
         if ($itemName) {
             $query->where('item_name', $itemName);
         }
 
-        $transactions = $query->oldest('created_at')->paginate(20)->withQueryString();
+        if ($searchQuery) {
+            $query->where(function($q) use ($searchQuery) {
+                $q->where('item_name', 'like', '%' . $searchQuery . '%')
+                  ->orWhere('supplier_name', 'like', '%' . $searchQuery . '%')
+                  ->orWhere('project_name', 'like', '%' . $searchQuery . '%');
+            });
+        }
+
+        $transactions = $query->groupBy('id', 'item_name', 'quantity', 'supplier_name', 'project_name', 'created_at', 'purchase_date')
+            ->oldest('created_at')
+            ->paginate(20)
+            ->withQueryString();
 
         $items = Item::orderBy('name')->get()->map(function ($item) {
             $totalDistributed = Purchase::where('item_name', $item->name)
@@ -53,7 +66,7 @@ class ItemTransactionHistoryController extends Controller
         return Inertia::render('ItemTransactionHistory', [
             'transactions' => $transactions,
             'items' => $items,
-            'filters' => $request->only(['item_name']),
+            'filters' => $request->only(['item_name', 'search']),
             'item' => $item,
         ]);
     }

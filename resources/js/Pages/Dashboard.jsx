@@ -169,7 +169,9 @@ export default function Dashboard({
 
             <div className="py-12">
                 <div className="mx-auto max-w-7xl sm:px-6 lg:px-8">
-                    {/* Statistics Cards */}
+                    {/* Dashboard content temporarily hidden - uncomment to restore */}
+                    {/* 
+                    { Statistics Cards }
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
                         <div className="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
                             <div className="p-6">
@@ -260,7 +262,7 @@ export default function Dashboard({
                         </div>
                     </div>
 
-                    {/* Additional Stats */}
+                    { Additional Stats }
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
 
                         <div className="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
@@ -308,12 +310,12 @@ export default function Dashboard({
                         </div>
                     </div>
 
-                    {/* Inventory Charts from Inventory Page */}
+                    { Inventory Charts from Inventory Page }
                     <InventoryCharts items={items} summary={summary} />
 
-                    {/* Low Stock Details + Borrowed Items Details */}
+                    { Low Stock Details + Borrowed Items Details }
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-                        {/* Low Stock Items Details */}
+                        { Low Stock Items Details }
                         <div className="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
                             <div className="p-6">
                                 <div className="flex items-center justify-between mb-4">
@@ -357,7 +359,7 @@ export default function Dashboard({
                             </div>
                         </div>
 
-                        {/* Borrowed Items Details */}
+                        { Borrowed Items Details }
                         <div className="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
                             <div className="p-6">
                                 <div className="flex items-center justify-between mb-4">
@@ -431,9 +433,9 @@ export default function Dashboard({
                         </div>
                     </div>
 
-                    {/* Charts Section */}
+                    { Charts Section }
                     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
-                        {/* Pie Chart - Items by Category */}
+                        { Pie Chart - Items by Category }
                         <div className="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
                             <div className="p-6">
                                 <div className="h-80">
@@ -442,7 +444,7 @@ export default function Dashboard({
                             </div>
                         </div>
 
-                        {/* Bar Chart - Stock Distribution */}
+                        { Bar Chart - Stock Distribution }
                         <div className="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
                             <div className="p-6">
                                 <div className="h-80">
@@ -451,7 +453,7 @@ export default function Dashboard({
                             </div>
                         </div>
 
-                        {/* Line Chart - Weekly Borrowing trends */}
+                        { Line Chart - Weekly Borrowing trends }
                         <div className="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
                             <div className="p-6">
                                 <div className="h-80">
@@ -461,7 +463,7 @@ export default function Dashboard({
                         </div>
                     </div>
 
-                    {/* Recent Activities */}
+                    { Recent Activities }
                     <div className="hidden bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
                         <div className="p-6">
                             <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-4">
@@ -498,6 +500,7 @@ export default function Dashboard({
                             )}
                         </div>
                     </div>
+                    */}
                 </div>
             </div>
         </AuthenticatedLayout>

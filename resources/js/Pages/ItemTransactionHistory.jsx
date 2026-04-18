@@ -14,7 +14,7 @@ import {
 
 export default function ItemTransactionHistory({ auth, transactions, items, filters, item }) {
     const [selectedItem, setSelectedItem] = useState(filters.item_name || '');
-    const [searchQuery, setSearchQuery] = useState('');
+    const [searchQuery, setSearchQuery] = useState(filters.search || '');
     const [expandedGroups, setExpandedGroups] = useState({});
     const [printingGroup, setPrintingGroup] = useState(null);
 
@@ -23,11 +23,22 @@ export default function ItemTransactionHistory({ auth, transactions, items, filt
         if (selectedItem !== filters.item_name) {
             router.get(
                 route('item-transaction-history.index'),
-                { item_name: selectedItem },
+                { item_name: selectedItem, search: searchQuery },
                 { preserveState: true, preserveScroll: true }
             );
         }
     }, [selectedItem]);
+
+    // Trigger router GET when search query changes
+    useEffect(() => {
+        if (searchQuery !== filters.search) {
+            router.get(
+                route('item-transaction-history.index'),
+                { item_name: selectedItem, search: searchQuery },
+                { preserveState: true, preserveScroll: true }
+            );
+        }
+    }, [searchQuery]);
 
     const formatTime = (dateString) => {
         const date = new Date(dateString);
@@ -85,14 +96,6 @@ export default function ItemTransactionHistory({ auth, transactions, items, filt
     }, {});
 
     const groups = Object.values(groupedData);
-
-    const filteredGroups = groups.filter(group =>
-        group.groupName.toLowerCase().includes(searchQuery.toLowerCase()) || 
-        group.items.some(item => 
-            (item.supplier_name && item.supplier_name.toLowerCase().includes(searchQuery.toLowerCase())) ||
-            (item.project_name && item.project_name.toLowerCase().includes(searchQuery.toLowerCase()))
-        )
-    );
 
     return (
         <AuthenticatedLayout
@@ -162,12 +165,12 @@ export default function ItemTransactionHistory({ auth, transactions, items, filt
                     )}
 
                     {/* Projects Overview Style Layout */}
-                    {filteredGroups.length === 0 ? (
+                    {groups.length === 0 ? (
                         <div className="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg p-6 text-center text-gray-500 dark:text-gray-400">
                             No transactions found matching your filters.
                         </div>
                     ) : (
-                        filteredGroups.map((group, index) => {
+                        groups.map((group, index) => {
                             const isExpanded = expandedGroups[group.groupName] || false;
 
                             return (
@@ -349,6 +352,7 @@ export default function ItemTransactionHistory({ auth, transactions, items, filt
                                                     } ${!link.url ? 'opacity-50 cursor-not-allowed pointer-events-none' : ''}`}
                                                 dangerouslySetInnerHTML={{ __html: link.label }}
                                                 preserveScroll
+                                                preserveState
                                             />
                                         ))}
                                     </div>

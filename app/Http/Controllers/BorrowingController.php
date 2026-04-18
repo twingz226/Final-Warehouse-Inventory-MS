@@ -15,9 +15,10 @@ class BorrowingController extends Controller
     /**
      * Log borrowing history.
      */
-    private function logHistory(Borrowing $borrowing, string $action, ?array $oldValues = null, ?array $newValues = null, ?string $description = null): void
+    private function logHistory(Borrowing $borrowing, string $action, ?array $oldValues = null, ?array $newValues = null, ?string $description = null, ?string $transactionId = null): void
     {
         BorrowingHistory::create([
+            'transaction_id' => $transactionId,
             'borrowing_id' => $borrowing->id,
             'user_id' => Auth::id(),
             'action' => $action,

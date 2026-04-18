@@ -16,9 +16,10 @@ class PurchaseController extends Controller
     /**
      * Log purchase history.
      */
-    private function logHistory(Purchase $purchase, string $action, ?array $oldValues = null, ?array $newValues = null, ?string $description = null): void
+    private function logHistory(Purchase $purchase, string $action, ?array $oldValues = null, ?array $newValues = null, ?string $description = null, ?string $transactionId = null): void
     {
         PurchaseHistory::create([
+            'transaction_id' => $transactionId,
             'purchase_id' => $purchase->id,
             'user_id' => Auth::id(),
             'action' => $action,
@@ -137,6 +138,8 @@ class PurchaseController extends Controller
 
         DB::transaction(function () use ($shared, $validated) {
             $now = now();
+            // Generate a unique transaction ID for this batch distribution
+            $transactionId = 'DIST-' . strtoupper(uniqid());
             foreach ($validated['items'] as $itemRow) {
                 $data = array_merge($shared, [
                     'item_name'   => $itemRow['item_name'],
@@ -154,7 +157,8 @@ class PurchaseController extends Controller
                     'created',
                     null,
                     $data,
-                    "Created distribution order for '{$purchase->item_name}' to {$purchase->supplier_name}"
+                    "Created distribution order for '{$purchase->item_name}' to {$purchase->supplier_name}",
+                    $transactionId
                 );
             }
         });
@@ -250,6 +254,8 @@ class PurchaseController extends Controller
 
             // Create new items from submitted array
             $now = now();
+            // Generate a unique transaction ID for this batch distribution update
+            $transactionId = 'DIST-' . strtoupper(uniqid());
             foreach ($validated['items'] as $itemRow) {
                 $data = array_merge($shared, [
                     'item_name'   => $itemRow['item_name'],
@@ -268,7 +274,8 @@ class PurchaseController extends Controller
                     'updated',
                     null,
                     $data,
-                    "Updated distribution order for '{$newPurchase->item_name}' to {$newPurchase->supplier_name}"
+                    "Updated distribution order for '{$newPurchase->item_name}' to {$newPurchase->supplier_name}",
+                    $transactionId
                 );
             }
         });

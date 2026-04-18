@@ -18,9 +18,9 @@ class ActivityHistoryController extends Controller
         $search = $request->input('search');
         $activityType = $request->input('activity_type');
         $date = $request->input('date');
-        
+
         $query = ActivityHistory::with(['user', 'item', 'purchase', 'borrowing']);
-        
+
         if ($search) {
             $query->where(function($q) use ($search) {
                 $q->where('description', 'like', '%' . $search . '%')
@@ -38,16 +38,22 @@ class ActivityHistoryController extends Controller
                   });
             });
         }
-        
+
         if ($activityType) {
             $query->where('activity_type', $activityType);
         }
-        
+
         if ($date) {
             $query->whereDate('created_at', $date);
         }
-        
+
+        // Get paginated records
         $history = $query->latest()->paginate(25)->withQueryString();
+
+        // Group records by transaction_id for display
+        $groupedHistory = collect($history->items())->groupBy(function($item) {
+            return $item->transaction_id ?? 'single-' . $item->id;
+        });
         
         // Get all items for filter dropdown
         $items = Item::orderBy('name')->get(['id', 'name']);
@@ -57,6 +63,7 @@ class ActivityHistoryController extends Controller
 
         return Inertia::render('ActivityHistory', [
             'history' => $history,
+            'groupedHistory' => $groupedHistory,
             'items' => $items,
             'distributions' => $distributions,
             'filters' => $request->only(['search', 'activity_type', 'date']),

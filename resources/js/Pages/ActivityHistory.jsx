@@ -17,7 +17,7 @@ import {
     EyeIcon
 } from '@heroicons/react/24/outline';
 
-export default function ActivityHistory({ auth, history, items, distributions, filters, activityTypes, actions }) {
+export default function ActivityHistory({ auth, history, groupedHistory, items, distributions, filters, activityTypes, actions }) {
     const [search, setSearch] = useState(filters.search || '');
     const [activityType, setActivityType] = useState(filters.activity_type || '');
     const [date, setDate] = useState(filters.date || '');
@@ -94,6 +94,19 @@ export default function ActivityHistory({ auth, history, items, distributions, f
                 return <TrashIcon className="h-5 w-5" />;
             default:
                 return <ClockIcon className="h-5 w-5" />;
+        }
+    };
+
+    const getActivityTypeBadgeStyle = (record) => {
+        switch (record.activity_type) {
+            case 'item':
+                return 'bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300 border-blue-200 dark:border-blue-800';
+            case 'distribution':
+                return 'bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300 border-green-200 dark:border-green-800';
+            case 'borrowing':
+                return 'bg-purple-100 dark:bg-purple-900 text-purple-700 dark:text-purple-300 border-purple-200 dark:border-purple-800';
+            default:
+                return 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 border-gray-200 dark:border-gray-600';
         }
     };
 
@@ -264,7 +277,7 @@ export default function ActivityHistory({ auth, history, items, distributions, f
 
                     {/* Activity Timeline */}
                     <div className="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
-                        {history.data.length > 0 ? (
+                        {Object.keys(groupedHistory || {}).length > 0 ? (
                             <div className="p-6">
                                 <div className="relative">
                                     {/* Timeline Line */}
@@ -273,141 +286,159 @@ export default function ActivityHistory({ auth, history, items, distributions, f
                                     {/* Mobile Timeline Line */}
                                     <div className="sm:hidden absolute left-4 top-8 bottom-0 w-0.5 bg-gray-200 dark:bg-gray-700"></div>
 
-                                    {/* Timeline Items */}
-                                    {history.data.map((record, index) => {
-                                        const changes = formatChanges(record.old_values, record.new_values);
+                                    {/* Timeline Items - Grouped by transaction */}
+                                    {Object.entries(groupedHistory || {}).map(([transactionId, records], groupIndex) => {
+                                        const isGrouped = records.length > 1;
+                                        const firstRecord = records[0];
                                         return (
-                                            <div key={`activity-${record.id}-${index}`} className="relative flex items-start mb-8 last:mb-0">
+                                            <div key={`group-${transactionId}`} className="relative flex items-start mb-8 last:mb-0">
                                                 {/* Timeline Dot */}
-                                                <div className={`flex items-center justify-center w-12 h-12 sm:w-16 sm:h-16 rounded-full border-2 ${getActionColor(record.action)} z-10 flex-shrink-0`}>
-                                                    {getActionIcon(record.action)}
+                                                <div className={`flex items-center justify-center w-12 h-12 sm:w-16 sm:h-16 rounded-full border-2 ${getActionColor(firstRecord.action)} z-10 flex-shrink-0`}>
+                                                    {getActionIcon(firstRecord.action)}
                                                 </div>
 
                                                 {/* Content */}
                                                 <div className="ml-4 sm:ml-6 flex-1 min-w-0">
-                                                    <div className={`rounded-lg p-3 sm:p-4 border transition-colors duration-200 border-gray-300 dark:border-gray-600 hover:bg-blue-200 dark:hover:bg-gray-600 ${index % 2 === 1
-                                                        ? 'bg-gray-200 dark:bg-gray-700'
+                                                    <div className={`rounded-xl p-4 sm:p-5 border transition-all duration-200 border-gray-200 dark:border-gray-700 hover:shadow-md hover:border-indigo-300 dark:hover:border-indigo-600 ${groupIndex % 2 === 1
+                                                        ? 'bg-gray-50 dark:bg-gray-800/50'
                                                         : 'bg-white dark:bg-gray-800'
                                                         }`}>
-                                                        <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between mb-2 space-y-2 sm:space-y-0">
-                                                            <div className="flex flex-col sm:flex-row sm:items-center space-y-1 sm:space-y-0 sm:space-x-3">
-                                                                <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getActionColor(record.action)}`}>
-                                                                    {record.action_label}
+                                                        {/* Header */}
+                                                        <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 mb-4">
+                                                            <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3">
+                                                                {/* Transaction Badge */}
+                                                                {isGrouped && (
+                                                                    <div className="inline-flex items-center px-3 py-1.5 rounded-full text-xs font-semibold bg-gradient-to-r from-indigo-500 to-purple-500 text-white shadow-sm">
+                                                                        <svg className="w-3.5 h-3.5 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
+                                                                        </svg>
+                                                                        {records.length} items
+                                                                    </div>
+                                                                )}
+
+                                                                {/* Activity Type Badge */}
+                                                                <span className={`inline-flex items-center px-3 py-1.5 rounded-full text-xs font-medium border ${getActivityTypeBadgeStyle(firstRecord)}`}>
+                                                                    {firstRecord.activity_type === 'item' ? 'Item' : firstRecord.activity_type === 'distribution' ? 'Distribution' : 'Borrowing'}
                                                                 </span>
-                                                                <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getActivityTypeColor(record)}`}>
-                                                                    {record.activity_type === 'item' ? 'Item' : record.activity_type === 'distribution' ? 'Distribution' : (
-                                                                        <>
-                                                                            {record.borrowing?.status === 'returned' && <CheckCircleIcon className="h-3 w-3 mr-1" />}
-                                                                            {record.borrowing?.status === 'overdue' && <ExclamationTriangleIcon className="h-3 w-3 mr-1" />}
-                                                                            {record.borrowing?.status.charAt(0).toUpperCase() + record.borrowing?.status.slice(1)}
-                                                                        </>
-                                                                    )}
-                                                                </span>
-                                                                <span className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 break-words">
-                                                                    {new Date(record.created_at).toLocaleString()}
+
+                                                                {/* Destination for distribution */}
+                                                                {firstRecord.activity_type === 'distribution' && firstRecord.purchase && (
+                                                                    <span className="text-xs text-gray-600 dark:text-gray-400 font-medium">
+                                                                        To: {firstRecord.purchase.supplier_name}
+                                                                    </span>
+                                                                )}
+
+                                                                {/* Date */}
+                                                                <span className="text-xs sm:text-sm text-gray-500 dark:text-gray-400">
+                                                                    {new Date(firstRecord.created_at).toLocaleDateString()}
                                                                 </span>
                                                             </div>
-                                                            {record.user && (
-                                                                <div className="flex items-center text-xs sm:text-sm text-gray-500 dark:text-gray-400">
-                                                                    <UserIcon className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
-                                                                    <span className="break-words">{record.user.name}</span>
+
+                                                            {/* User */}
+                                                            {firstRecord.user && (
+                                                                <div className="flex items-center text-xs sm:text-sm text-gray-600 dark:text-gray-400 bg-gray-100 dark:bg-gray-700 px-3 py-1.5 rounded-full">
+                                                                    <UserIcon className="h-3.5 w-3.5 sm:h-4 sm:w-4 mr-1.5" />
+                                                                    <span className="font-medium">{firstRecord.user.name}</span>
                                                                 </div>
                                                             )}
                                                         </div>
 
                                                         {/* View Button */}
-                                                        <div className="flex justify-end mb-2">
+                                                        <div className="flex justify-end mb-4">
                                                             <button
                                                                 onClick={() => {
-                                                                    setSelectedActivity(record);
+                                                                    setSelectedActivity(firstRecord);
                                                                     setShowModal(true);
                                                                 }}
-                                                                className="inline-flex items-center px-3 py-1.5 text-xs font-medium text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-900/20 hover:bg-indigo-100 dark:hover:bg-indigo-800/30 rounded-lg transition-colors duration-200"
+                                                                className="inline-flex items-center px-4 py-2 text-xs font-semibold text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-900/30 hover:bg-indigo-100 dark:hover:bg-indigo-900/50 rounded-lg transition-all duration-200 hover:shadow-sm"
                                                             >
-                                                                <EyeIcon className="h-4 w-4 mr-1" />
-                                                                View
+                                                                <EyeIcon className="h-4 w-4 mr-1.5" />
+                                                                View Details
                                                             </button>
                                                         </div>
 
-                                                        {/* Entity Link */}
-                                                        {record.activity_type === 'item' && record.item && (
-                                                            <div className="mb-2">
-                                                                <Link
-                                                                    href={route('items.show', record.item.id)}
-                                                                    className="text-indigo-600 dark:text-indigo-400 hover:text-indigo-900 dark:hover:text-indigo-300 font-medium text-xs sm:text-sm break-words"
-                                                                >
-                                                                    {record.item.name}
-                                                                </Link>
-                                                                {record.item.quantity !== undefined && (
-                                                                    <span className="ml-2 text-xs sm:text-sm text-gray-500 dark:text-gray-400">
-                                                                        (Qty: {formatQuantity(record.item.quantity)}{record.item.unit ? ` ${formatUnit(record.item.unit)}` : ''})
-                                                                    </span>
-                                                                )}
-                                                            </div>
-                                                        )}
+                                                        {/* Display all records in the transaction */}
+                                                        <div className="space-y-2">
+                                                            {records.map((record, recordIndex) => {
+                                                                const changes = formatChanges(record.old_values, record.new_values);
+                                                                return (
+                                                                    <div key={`record-${record.id}`} className="bg-white dark:bg-gray-700 rounded-lg p-3 border border-gray-100 dark:border-gray-600 hover:border-indigo-200 dark:hover:border-indigo-700 transition-colors">
+                                                                        {/* Entity Link */}
+                                                                        {record.activity_type === 'item' && record.item && (
+                                                                            <div className="mb-2">
+                                                                                <Link
+                                                                                    href={route('items.show', record.item.id)}
+                                                                                    className="text-indigo-600 dark:text-indigo-400 hover:text-indigo-900 dark:hover:text-indigo-300 font-semibold text-sm break-words"
+                                                                                >
+                                                                                    {record.item.name}
+                                                                                </Link>
+                                                                                {record.item.quantity !== undefined && (
+                                                                                    <span className="ml-2 text-xs text-gray-500 dark:text-gray-400">
+                                                                                        Qty: {formatQuantity(record.item.quantity)}{record.item.unit ? ` ${formatUnit(record.item.unit)}` : ''}
+                                                                                    </span>
+                                                                                )}
+                                                                            </div>
+                                                                        )}
 
-                                                        {record.activity_type === 'distribution' && record.purchase && (
-                                                            <div className="mb-2">
-                                                                <Link
-                                                                    href={route('purchases.show', record.purchase.id)}
-                                                                    className="text-indigo-600 dark:text-indigo-400 hover:text-indigo-900 dark:hover:text-indigo-300 font-medium text-xs sm:text-sm break-words"
-                                                                >
-                                                                    {record.purchase.item_name}
-                                                                </Link>
-                                                                <span className="ml-2 text-xs sm:text-sm text-gray-500 dark:text-gray-400">
-                                                                    (To: {record.purchase.supplier_name})
-                                                                </span>
-                                                                {record.purchase.quantity !== undefined && (
-                                                                    <span className="ml-2 text-xs sm:text-sm text-gray-500 dark:text-gray-400">
-                                                                        (Qty: {formatQuantity(record.purchase.quantity)}{record.purchase.unit ? ` ${formatUnit(record.purchase.unit)}` : ''})
-                                                                    </span>
-                                                                )}
-                                                            </div>
-                                                        )}
+                                                                        {record.activity_type === 'distribution' && record.purchase && (
+                                                                            <div className="mb-2">
+                                                                                <Link
+                                                                                    href={route('purchases.show', record.purchase.id)}
+                                                                                    className="text-indigo-600 dark:text-indigo-400 hover:text-indigo-900 dark:hover:text-indigo-300 font-semibold text-sm break-words"
+                                                                                >
+                                                                                    {record.purchase.item_name}
+                                                                                </Link>
+                                                                                {record.purchase.quantity !== undefined && (
+                                                                                    <span className="ml-2 text-xs text-gray-500 dark:text-gray-400">
+                                                                                        Qty: {formatQuantity(record.purchase.quantity)}{record.purchase.unit ? ` ${formatUnit(record.purchase.unit)}` : ''}
+                                                                                    </span>
+                                                                                )}
+                                                                            </div>
+                                                                        )}
 
-                                                        {record.activity_type === 'borrowing' && record.borrowing && (
-                                                            <div className="mb-2">
-                                                                <Link
-                                                                    href={route('borrowings.show', record.borrowing.id)}
-                                                                    className="text-indigo-600 dark:text-indigo-400 hover:text-indigo-900 dark:hover:text-indigo-300 font-medium text-xs sm:text-sm break-words"
-                                                                >
-                                                                    {record.borrowing.item_name}
-                                                                </Link>
-                                                                <span className="ml-2 text-xs sm:text-sm text-gray-500 dark:text-gray-400">
-                                                                    (Borrower: {record.borrowing.borrower_name})
-                                                                </span>
-                                                                {record.borrowing.quantity !== undefined && (
-                                                                    <span className="ml-2 text-xs sm:text-sm text-gray-500 dark:text-gray-400">
-                                                                        (Qty: {formatQuantity(record.borrowing.quantity)}{record.borrowing.unit ? ` ${formatUnit(record.borrowing.unit)}` : ''})
-                                                                    </span>
-                                                                )}
-                                                            </div>
-                                                        )}
+                                                                        {record.activity_type === 'borrowing' && record.borrowing && (
+                                                                            <div className="mb-2">
+                                                                                <Link
+                                                                                    href={route('borrowings.show', record.borrowing.id)}
+                                                                                    className="text-indigo-600 dark:text-indigo-400 hover:text-indigo-900 dark:hover:text-indigo-300 font-semibold text-sm break-words"
+                                                                                >
+                                                                                    {record.borrowing.item_name}
+                                                                                </Link>
+                                                                                <span className="ml-2 text-xs text-gray-500 dark:text-gray-400">
+                                                                                    By: {record.borrowing.borrower_name}
+                                                                                </span>
+                                                                                {record.borrowing.quantity !== undefined && (
+                                                                                    <span className="ml-2 text-xs text-gray-500 dark:text-gray-400">
+                                                                                        Qty: {formatQuantity(record.borrowing.quantity)}{record.borrowing.unit ? ` ${formatUnit(record.borrowing.unit)}` : ''}
+                                                                                    </span>
+                                                                                )}
+                                                                            </div>
+                                                                        )}
 
-                                                        {record.description && (
-                                                            <p className="text-gray-700 dark:text-gray-300 text-xs sm:text-sm mb-3 break-words">{record.description}</p>
-                                                        )}
-
-                                                        {changes && changes.length > 0 && (
-                                                            <div className="space-y-2">
-                                                                {changes.filter(change => !['updated_at', 'date_time'].includes(change.field)).map((change, idx) => (
-                                                                    <div key={idx} className="bg-white dark:bg-gray-800 p-2 sm:p-3 rounded border border-gray-100 dark:border-gray-700">
-                                                                        <div className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1">
-                                                                            {change.field}
-                                                                        </div>
-                                                                        <div className="flex flex-col sm:flex-row sm:items-center space-y-1 sm:space-y-0 sm:space-x-2 text-xs sm:text-sm">
-                                                                            <span className="text-red-600 line-through break-words">
-                                                                                {change.field === 'quantity' && !isNaN(change.old) ? formatQuantity(change.old) : (change.old || 'empty')}
-                                                                            </span>
-                                                                            <ArrowPathIcon className="h-3 w-3 sm:h-4 sm:w-4 text-gray-400 flex-shrink-0" />
-                                                                            <span className="text-green-600 break-words">
-                                                                                {change.field === 'quantity' && !isNaN(change.new) ? formatQuantity(change.new) : (change.new || 'empty')}
-                                                                            </span>
-                                                                        </div>
+                                                                        {changes && changes.length > 0 && (
+                                                                            <div className="mt-2 space-y-2">
+                                                                                {changes.filter(change => !['updated_at', 'date_time'].includes(change.field)).map((change, idx) => (
+                                                                                    <div key={idx} className="bg-gray-50 dark:bg-gray-800 p-2 rounded border border-gray-100 dark:border-gray-700">
+                                                                                        <div className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1">
+                                                                                            {change.field}
+                                                                                        </div>
+                                                                                        <div className="flex flex-col sm:flex-row sm:items-center space-y-1 sm:space-y-0 sm:space-x-2 text-xs">
+                                                                                            <span className="text-red-600 line-through break-words">
+                                                                                                {change.field === 'quantity' && !isNaN(change.old) ? formatQuantity(change.old) : (change.old || 'empty')}
+                                                                                            </span>
+                                                                                            <ArrowPathIcon className="h-3 w-3 sm:h-4 sm:w-4 text-gray-400 flex-shrink-0" />
+                                                                                            <span className="text-green-600 break-words">
+                                                                                                {change.field === 'quantity' && !isNaN(change.new) ? formatQuantity(change.new) : (change.new || 'empty')}
+                                                                                            </span>
+                                                                                        </div>
+                                                                                    </div>
+                                                                                ))}
+                                                                            </div>
+                                                                        )}
                                                                     </div>
-                                                                ))}
-                                                            </div>
-                                                        )}
+                                                                );
+                                                            })}
+                                                        </div>
                                                     </div>
                                                 </div>
                                             </div>
@@ -479,77 +510,175 @@ export default function ActivityHistory({ auth, history, items, distributions, f
                             </div>
                         </div>
 
-                        <div className="px-6 py-4 space-y-6">
-                            {/* Basic Info */}
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Activity ID</label>
-                                    <p className="mt-1 text-sm text-gray-900 dark:text-white">{selectedActivity.id}</p>
+                        <div className="px-6 py-4 space-y-5">
+                            {/* Header Card - Transaction Info */}
+                            <div className="bg-gradient-to-r from-indigo-50 to-purple-50 dark:from-indigo-900/20 dark:to-purple-900/20 rounded-xl p-5 border border-indigo-100 dark:border-indigo-800">
+                                <div className="flex items-start justify-between">
+                                    <div className="flex-1">
+                                        <div className="flex items-center gap-3 mb-3">
+                                            {selectedActivity.activity_type === 'item' && (
+                                                <div className="p-2 bg-blue-100 dark:bg-blue-900 rounded-lg">
+                                                    <PencilSquareIcon className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+                                                </div>
+                                            )}
+                                            {selectedActivity.activity_type === 'distribution' && (
+                                                <div className="p-2 bg-green-100 dark:bg-green-900 rounded-lg">
+                                                    <CheckCircleIcon className="h-5 w-5 text-green-600 dark:text-green-400" />
+                                                </div>
+                                            )}
+                                            {selectedActivity.activity_type === 'borrowing' && (
+                                                <div className="p-2 bg-purple-100 dark:bg-purple-900 rounded-lg">
+                                                    <ExclamationTriangleIcon className="h-5 w-5 text-purple-600 dark:text-purple-400" />
+                                                </div>
+                                            )}
+                                            <div>
+                                                <h4 className="text-lg font-semibold text-gray-900 dark:text-white">
+                                                    {selectedActivity.activity_type === 'item' ? 'Item Activity' :
+                                                     selectedActivity.activity_type === 'distribution' ? 'Distribution' :
+                                                     selectedActivity.activity_type === 'borrowing' ? 'Borrowing' : 'Activity'}
+                                                </h4>
+                                                <p className="text-sm text-gray-600 dark:text-gray-400">
+                                                    {selectedActivity.action_label || 'Recorded'}
+                                                </p>
+                                            </div>
+                                        </div>
+                                        {selectedActivity.transaction_id && (
+                                            <div className="inline-flex items-center px-3 py-1.5 rounded-full text-xs font-semibold bg-indigo-100 dark:bg-indigo-900 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-700">
+                                                <svg className="w-3.5 h-3.5 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
+                                                </svg>
+                                                {selectedActivity.transaction_id}
+                                            </div>
+                                        )}
+                                    </div>
+                                    <div className="text-right">
+                                        <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">Created</p>
+                                        <p className="text-sm font-medium text-gray-900 dark:text-white">
+                                            {new Date(selectedActivity.created_at).toLocaleString()}
+                                        </p>
+                                    </div>
                                 </div>
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Action</label>
-                                    <p className="mt-1 text-sm text-gray-900 dark:text-white">{selectedActivity.action_label}</p>
-                                </div>
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Activity Type</label>
-                                    <p className="mt-1 text-sm text-gray-900 dark:text-white">
-                                        {selectedActivity.activity_type === 'item' ? 'Item' :
-                                         selectedActivity.activity_type === 'distribution' ? 'Distribution' :
-                                         selectedActivity.activity_type === 'borrowing' ? 'Borrowing' : selectedActivity.activity_type}
-                                    </p>
-                                </div>
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Created At</label>
-                                    <p className="mt-1 text-sm text-gray-900 dark:text-white">{new Date(selectedActivity.created_at).toLocaleString()}</p>
+                            </div>
+
+                            {/* Details Grid */}
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <div className="bg-white dark:bg-gray-800 rounded-xl p-4 border border-gray-200 dark:border-gray-700">
+                                    <div className="flex items-center gap-3">
+                                        <div className="p-2 bg-gray-100 dark:bg-gray-700 rounded-lg">
+                                            <svg className="w-4 h-4 text-gray-600 dark:text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 20l4-16m2 16l4-16M6 9h14M4 15h14" />
+                                            </svg>
+                                        </div>
+                                        <div>
+                                            <p className="text-xs text-gray-500 dark:text-gray-400">Activity ID</p>
+                                            <p className="text-sm font-semibold text-gray-900 dark:text-white">#{selectedActivity.id}</p>
+                                        </div>
+                                    </div>
                                 </div>
                                 {selectedActivity.user && (
-                                    <div className="md:col-span-2">
-                                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">User</label>
-                                        <p className="mt-1 text-sm text-gray-900 dark:text-white">{selectedActivity.user.name}</p>
+                                    <div className="bg-white dark:bg-gray-800 rounded-xl p-4 border border-gray-200 dark:border-gray-700">
+                                        <div className="flex items-center gap-3">
+                                            <div className="p-2 bg-gray-100 dark:bg-gray-700 rounded-lg">
+                                                <UserIcon className="w-4 h-4 text-gray-600 dark:text-gray-400" />
+                                            </div>
+                                            <div>
+                                                <p className="text-xs text-gray-500 dark:text-gray-400">User</p>
+                                                <p className="text-sm font-semibold text-gray-900 dark:text-white">{selectedActivity.user.name}</p>
+                                            </div>
+                                        </div>
                                     </div>
                                 )}
                             </div>
 
-                            {/* Description */}
-                            {selectedActivity.description && (
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Description</label>
-                                    <p className="mt-1 text-sm text-gray-900 dark:text-white">{selectedActivity.description}</p>
-                                </div>
-                            )}
+                            {/* Related Entities */}
+                            {(() => {
+                                const transactionId = selectedActivity.transaction_id;
+                                const relatedRecords = transactionId
+                                    ? Object.values(groupedHistory || {}).flat().filter(r => r.transaction_id && r.transaction_id === transactionId)
+                                    : [selectedActivity];
 
-                            {/* Related Entity */}
-                            {(selectedActivity.item || selectedActivity.purchase || selectedActivity.borrowing) && (
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Related Entity</label>
-                                    <div className="mt-1">
-                                        {selectedActivity.activity_type === 'item' && selectedActivity.item && (
-                                            <div className="text-sm text-gray-900 dark:text-white">
-                                                <strong>Item:</strong> {selectedActivity.item.name}
-                                                {selectedActivity.item.quantity !== undefined && (
-                                                    <span> (Qty: {formatQuantity(selectedActivity.item.quantity)}{selectedActivity.item.unit ? ` ${formatUnit(selectedActivity.item.unit)}` : ''})</span>
-                                                )}
-                                            </div>
-                                        )}
-                                        {selectedActivity.activity_type === 'distribution' && selectedActivity.purchase && (
-                                            <div className="text-sm text-gray-900 dark:text-white">
-                                                <strong>Distribution:</strong> {selectedActivity.purchase.item_name} to {selectedActivity.purchase.supplier_name}
-                                                {selectedActivity.purchase.quantity !== undefined && (
-                                                    <span> (Qty: {formatQuantity(selectedActivity.purchase.quantity)}{selectedActivity.purchase.unit ? ` ${formatUnit(selectedActivity.purchase.unit)}` : ''})</span>
-                                                )}
-                                            </div>
-                                        )}
-                                        {selectedActivity.activity_type === 'borrowing' && selectedActivity.borrowing && (
-                                            <div className="text-sm text-gray-900 dark:text-white">
-                                                <strong>Borrowing:</strong> {selectedActivity.borrowing.item_name} by {selectedActivity.borrowing.borrower_name}
-                                                {selectedActivity.borrowing.quantity !== undefined && (
-                                                    <span> (Qty: {formatQuantity(selectedActivity.borrowing.quantity)}{selectedActivity.borrowing.unit ? ` ${formatUnit(selectedActivity.borrowing.unit)}` : ''})</span>
-                                                )}
-                                            </div>
-                                        )}
+                                return (
+                                    <div>
+                                        <div className="flex items-center gap-2 mb-3">
+                                            <svg className="w-4 h-4 text-indigo-600 dark:text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+                                            </svg>
+                                            <h4 className="text-sm font-semibold text-gray-900 dark:text-white">
+                                                Related Items ({relatedRecords.length})
+                                            </h4>
+                                        </div>
+                                        <div className="grid grid-cols-1 gap-3">
+                                            {relatedRecords.map((record, idx) => (
+                                                <div key={record.id} className="bg-white dark:bg-gray-800 rounded-xl p-4 border border-gray-200 dark:border-gray-700 hover:border-indigo-300 dark:hover:border-indigo-600 transition-colors">
+                                                    {record.activity_type === 'item' && record.item && (
+                                                        <div className="flex items-start justify-between">
+                                                            <div className="flex items-start gap-3">
+                                                                <div className="p-2 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
+                                                                    <svg className="w-4 h-4 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+                                                                    </svg>
+                                                                </div>
+                                                                <div>
+                                                                    <p className="text-sm font-medium text-gray-900 dark:text-white">{record.item.name}</p>
+                                                                    {record.item.quantity !== undefined && (
+                                                                        <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+                                                                            Quantity: {formatQuantity(record.item.quantity)}{record.item.unit ? ` ${formatUnit(record.item.unit)}` : ''}
+                                                                        </p>
+                                                                    )}
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    )}
+                                                    {record.activity_type === 'distribution' && record.purchase && (
+                                                        <div className="flex items-start justify-between">
+                                                            <div className="flex items-start gap-3">
+                                                                <div className="p-2 bg-green-50 dark:bg-green-900/20 rounded-lg">
+                                                                    <svg className="w-4 h-4 text-green-600 dark:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                                                    </svg>
+                                                                </div>
+                                                                <div>
+                                                                    <p className="text-sm font-medium text-gray-900 dark:text-white">{record.purchase.item_name}</p>
+                                                                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+                                                                        To: {record.purchase.supplier_name}
+                                                                    </p>
+                                                                    {record.purchase.quantity !== undefined && (
+                                                                        <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+                                                                            Quantity: {formatQuantity(record.purchase.quantity)}{record.purchase.unit ? ` ${formatUnit(record.purchase.unit)}` : ''}
+                                                                        </p>
+                                                                    )}
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    )}
+                                                    {record.activity_type === 'borrowing' && record.borrowing && (
+                                                        <div className="flex items-start justify-between">
+                                                            <div className="flex items-start gap-3">
+                                                                <div className="p-2 bg-purple-50 dark:bg-purple-900/20 rounded-lg">
+                                                                    <svg className="w-4 h-4 text-purple-600 dark:text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                                                                    </svg>
+                                                                </div>
+                                                                <div>
+                                                                    <p className="text-sm font-medium text-gray-900 dark:text-white">{record.borrowing.item_name}</p>
+                                                                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+                                                                        By: {record.borrowing.borrower_name}
+                                                                    </p>
+                                                                    {record.borrowing.quantity !== undefined && (
+                                                                        <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+                                                                            Quantity: {formatQuantity(record.borrowing.quantity)}{record.borrowing.unit ? ` ${formatUnit(record.borrowing.unit)}` : ''}
+                                                                        </p>
+                                                                    )}
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            ))}
+                                        </div>
                                     </div>
-                                </div>
-                            )}
+                                );
+                            })()}
 
                             {/* Changes */}
                             {(() => {
