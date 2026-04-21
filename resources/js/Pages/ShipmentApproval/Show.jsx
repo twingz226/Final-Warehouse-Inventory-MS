@@ -129,12 +129,6 @@ export default function Show({ auth, shipmentApproval }) {
                                 {/* Actions */}
                                 <div className="mt-8 flex justify-end space-x-3">
                                     <Link
-                                        href={route('shipment-approvals.edit', shipmentApproval.id)}
-                                        className="inline-flex items-center px-4 py-2 bg-yellow-600 text-white rounded-md hover:bg-yellow-700 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:ring-offset-2 transition-colors duration-200"
-                                    >
-                                        Edit
-                                    </Link>
-                                    <Link
                                         href={route('shipment-approvals.index')}
                                         className="inline-flex items-center px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-colors duration-200"
                                     >
