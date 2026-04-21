@@ -329,11 +329,17 @@ export default function Form({ auth, purchase, groupItems, statusOptions }) {
                                                             type="number"
                                                             value={item.quantity}
                                                             onChange={(e) => updateItem(index, { quantity: parseInt(e.target.value) || '' })}
-                                                            className={inputCls}
+                                                            className={`${inputCls} ${item.available_quantity === null ? 'bg-gray-100 dark:bg-gray-600 cursor-not-allowed opacity-60' : ''}`}
                                                             min="1"
                                                             max={item.available_quantity !== null ? item.available_quantity : undefined}
                                                             required
+                                                            disabled={item.available_quantity === null}
                                                         />
+                                                        {item.available_quantity === null && (
+                                                            <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                                                                Please select a valid item from the dropdown first
+                                                            </p>
+                                                        )}
                                                         {item.available_quantity !== null && item.quantity > item.available_quantity && (
                                                             <p className="mt-1 text-sm text-red-600 dark:text-red-400">
                                                                 Exceeds available stock ({item.available_quantity}).
