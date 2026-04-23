@@ -95,7 +95,7 @@ export default function ItemTransactionHistory({ auth, transactions, items, filt
         return acc;
     }, {});
 
-    const groups = Object.values(groupedData);
+    const groups = Object.values(groupedData).sort((a, b) => a.groupName.localeCompare(b.groupName));
 
     return (
         <AuthenticatedLayout
@@ -126,7 +126,7 @@ export default function ItemTransactionHistory({ auth, transactions, items, filt
                                     className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm transition-colors duration-200"
                                 >
                                     <option value="">-- All Items --</option>
-                                    {items.map((item) => (
+                                    {items.sort((a, b) => a.name.localeCompare(b.name)).map((item) => (
                                         <option key={item.id} value={item.name}>
                                             {item.name}
                                         </option>
