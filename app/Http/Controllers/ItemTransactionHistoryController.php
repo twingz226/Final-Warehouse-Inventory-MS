@@ -17,7 +17,7 @@ class ItemTransactionHistoryController extends Controller
         $itemName = $request->input('item_name');
         $searchQuery = $request->input('search');
         
-        $query = Purchase::select('id', 'item_name', 'quantity', 'supplier_name', 'project_name', 'created_at', 'purchase_date')
+        $query = Purchase::select('id', 'item_name', 'quantity', 'supplier_name', 'project_name', 'issued_to', 'created_at', 'purchase_date')
             ->whereIn('status', ['received', 'completed'])
             ->distinct();
         
@@ -33,7 +33,7 @@ class ItemTransactionHistoryController extends Controller
             });
         }
 
-        $transactions = $query->groupBy('id', 'item_name', 'quantity', 'supplier_name', 'project_name', 'created_at', 'purchase_date')
+        $transactions = $query->groupBy('id', 'item_name', 'quantity', 'supplier_name', 'project_name', 'issued_to', 'created_at', 'purchase_date')
             ->oldest('created_at')
             ->paginate(20)
             ->withQueryString();

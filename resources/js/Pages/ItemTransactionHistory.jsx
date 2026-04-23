@@ -257,6 +257,9 @@ export default function ItemTransactionHistory({ auth, transactions, items, filt
                                                                 Project Site / Destination
                                                             </th>
                                                             <th className="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider print:border print:border-black print:p-2 print:text-white print:font-bold">
+                                                                Issued To
+                                                            </th>
+                                                            <th className="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider print:border print:border-black print:p-2 print:text-white print:font-bold">
                                                                 Total Stocks
                                                             </th>
                                                             <th className="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider print:border print:border-black print:p-2 print:text-white print:font-bold">
@@ -308,6 +311,9 @@ export default function ItemTransactionHistory({ auth, transactions, items, filt
                                                                                     Proj: {transaction.project_name}
                                                                                 </span>
                                                                             )}
+                                                                        </td>
+                                                                        <td className="px-6 py-4 text-sm text-gray-900 dark:text-gray-100 print:border print:border-black print:p-2 print:text-black">
+                                                                            <span className="font-medium">{transaction.issued_to || '-'}</span>
                                                                         </td>
                                                                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100 font-bold print:border print:border-black print:p-2 print:text-black">
                                                                             {itemData?.unit === 'Quantity' ? Math.floor(Number(totalStocksValue)) : totalStocksValue}
