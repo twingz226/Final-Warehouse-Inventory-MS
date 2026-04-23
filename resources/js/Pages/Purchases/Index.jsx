@@ -426,7 +426,7 @@ export default function Index({ auth, purchases, status }) {
 
                     <div class="purpose-row">
                         <span>Purpose:</span>
-                        <span class="underline-field" style="flex-grow: 1; border-bottom: none; margin-left: 5px; font-weight: normal;">${purchase.os || purchase.notes || ''}</span>
+                        <span class="underline-field" style="flex-grow: 1; border-bottom: none; margin-left: 5px; font-weight: normal;"></span>
                     </div>
 
                     <div class="signatures-row">
