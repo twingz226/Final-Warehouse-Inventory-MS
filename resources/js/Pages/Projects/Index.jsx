@@ -228,6 +228,12 @@ export default function Index({ auth, purchases }) {
                                                         ))}
                                                     </tbody>
                                                 </table>
+                                                
+                                                {/* Footer Codes - Print Only */}
+                                                <div className="footer-codes hidden print:block">
+                                                    <div>QF-WHS-003</div>
+                                                    <div>Rev 00 EFF: 02/10/2025</div>
+                                                </div>
                                             </div>
                                         </div>
                                     )}

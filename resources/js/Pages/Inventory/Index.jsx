@@ -180,6 +180,12 @@ export default function InventoryIndex({ auth, items, low_stock_items, summary, 
                         table { width: 100%; border-collapse: collapse; margin-top: 20px; }
                         th { background-color: #2563eb; color: white; padding: 10px; text-align: left; }
                         .print-date { color: #666; font-size: 12px; margin-bottom: 10px; }
+                        .footer-codes {
+                            font-weight: bold;
+                            font-size: 14px;
+                            line-height: 1.2;
+                            margin-top: 10px;
+                        }
                         @media print {
                             body { -webkit-print-color-adjust: exact; }
                         }
@@ -203,6 +209,10 @@ export default function InventoryIndex({ auth, items, low_stock_items, summary, 
                         </tbody>
                     </table>
                     <p style="margin-top: 20px; color: #666; font-size: 12px;">Total Items: ${data.total_items} | Showing: ${pageLabel}</p>
+                    <div class="footer-codes">
+                        <div>QF-WHS-003</div>
+                        <div>Rev 00 EFF: 02/10/2025</div>
+                    </div>
                 </body>
                 </html>
             `;
