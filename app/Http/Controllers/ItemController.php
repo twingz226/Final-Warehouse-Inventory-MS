@@ -244,7 +244,21 @@ class ItemController extends Controller
         // Always set current datetime when updating
         $validated['date_time'] = now();
 
-        $item->update($validated);
+        DB::transaction(function () use ($item, $validated, $oldValues) {
+            $item->update($validated);
+
+            // If name changed, update all related records in other tables
+            // This is critical for data synchronization across the system
+            if ($oldValues['name'] !== $validated['name']) {
+                DB::table('purchases')
+                    ->where('item_name', $oldValues['name'])
+                    ->update(['item_name' => $validated['name']]);
+
+                DB::table('borrowings')
+                    ->where('item_name', $oldValues['name'])
+                    ->update(['item_name' => $validated['name']]);
+            }
+        });
 
         // Generate description based on what changed
         $changes = [];

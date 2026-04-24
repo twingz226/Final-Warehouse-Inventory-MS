@@ -179,7 +179,7 @@ export default function InventoryIndex({ auth, items, low_stock_items, summary, 
                         h1 { color: #333; }
                         table { width: 100%; border-collapse: collapse; margin-top: 20px; }
                         th { background-color: #2563eb; color: white; padding: 10px; text-align: left; }
-                        .print-date { color: #666; font-size: 12px; margin-bottom: 10px; }
+
                         .footer-codes {
                             font-weight: bold;
                             font-size: 14px;
@@ -193,7 +193,7 @@ export default function InventoryIndex({ auth, items, low_stock_items, summary, 
                 </head>
                 <body>
                     <h1>Inventory Items Report</h1>
-                    <p class="print-date">Generated on: ${new Date().toLocaleString()}</p>
+
                     <table>
                         <thead>
                             <tr>
