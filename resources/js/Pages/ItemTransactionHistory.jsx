@@ -316,13 +316,13 @@ export default function ItemTransactionHistory({ auth, transactions, items, filt
                                                                             <span className="font-medium">{transaction.issued_to || '-'}</span>
                                                                         </td>
                                                                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100 font-bold print:border print:border-black print:p-2 print:text-black">
-                                                                            {itemData?.unit === 'Quantity' ? Math.floor(Number(totalStocksValue)) : totalStocksValue}
+                                                                            {(itemData?.unit === 'Quantity' || itemData?.unit === 'pcs') ? Math.floor(Number(totalStocksValue)) : totalStocksValue}
                                                                         </td>
                                                                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100 font-bold print:border print:border-black print:p-2 print:text-black">
-                                                                            {transaction.quantity}
+                                                                            {(itemData?.unit === 'Quantity' || itemData?.unit === 'pcs') ? Math.floor(Number(transaction.quantity)) : transaction.quantity}
                                                                         </td>
                                                                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100 font-bold print:border print:border-black print:p-2 print:text-black">
-                                                                            {availableStock}
+                                                                            {(itemData?.unit === 'Quantity' || itemData?.unit === 'pcs') ? Math.floor(Number(availableStock)) : availableStock}
                                                                         </td>
                                                                     </tr>
                                                                 );
