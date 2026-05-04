@@ -3,11 +3,24 @@ import { Head, Link, useForm } from '@inertiajs/react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
+import DatePicker from 'react-datepicker';
+import 'react-datepicker/dist/react-datepicker.css';
 
 // ── Helper for capitalizing first letter of each word ──────────────────────
 const capitalizeWords = (str) => {
     if (!str) return str;
     return str.split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
+};
+
+// ── Helper to parse 'YYYY-MM-DD' to local Date ─────────────────────────────
+const parseLocalDate = (dateStr) => {
+    if (!dateStr) return new Date();
+    // Assuming YYYY-MM-DD format
+    const parts = dateStr.split('T')[0].split('-');
+    if (parts.length === 3) {
+        return new Date(parts[0], parts[1] - 1, parts[2], 12, 0, 0);
+    }
+    return new Date();
 };
 
 // ── Per-row search state factory ──────────────────────────────────────────────
@@ -394,14 +407,25 @@ export default function Form({ auth, purchase, groupItems, statusOptions }) {
                                         <label htmlFor="purchase_date" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
                                             Distribution Date *
                                         </label>
-                                        <input
-                                            type="date"
-                                            id="purchase_date"
-                                            value={data.purchase_date}
-                                            onChange={(e) => setData('purchase_date', e.target.value)}
-                                            className={inputCls}
-                                            required
-                                        />
+                                        <div className="w-full">
+                                            <DatePicker
+                                                id="purchase_date"
+                                                selected={parseLocalDate(data.purchase_date)}
+                                                onChange={(date) => {
+                                                    if (date) {
+                                                        const y = date.getFullYear();
+                                                        const m = String(date.getMonth() + 1).padStart(2, '0');
+                                                        const d = String(date.getDate()).padStart(2, '0');
+                                                        setData('purchase_date', `${y}-${m}-${d}`);
+                                                    } else {
+                                                        setData('purchase_date', '');
+                                                    }
+                                                }}
+                                                dateFormat="MM-dd-yyyy"
+                                                className={inputCls}
+                                                required
+                                            />
+                                        </div>
                                         {errors.purchase_date && <p className="mt-2 text-sm text-red-600 dark:text-red-400">{errors.purchase_date}</p>}
                                     </div>
                                     <div className="md:col-span-2">

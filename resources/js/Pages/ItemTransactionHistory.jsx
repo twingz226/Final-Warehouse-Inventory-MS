@@ -12,7 +12,7 @@ import {
     PrinterIcon
 } from '@heroicons/react/24/outline';
 
-export default function ItemTransactionHistory({ auth, transactions, items, filters, item }) {
+export default function ItemTransactionHistory({ auth, transactions, pagination, items, filters, item }) {
     const [selectedItem, setSelectedItem] = useState(filters.item_name || '');
     const [searchQuery, setSearchQuery] = useState(filters.search || '');
     const [expandedGroups, setExpandedGroups] = useState({});
@@ -51,7 +51,10 @@ export default function ItemTransactionHistory({ auth, transactions, items, filt
 
     const formatDate = (dateString) => {
         const date = new Date(dateString);
-        return date.toLocaleDateString('en-CA'); // YYYY-MM-DD format
+        const m = String(date.getMonth() + 1).padStart(2, '0');
+        const d = String(date.getDate()).padStart(2, '0');
+        const y = date.getFullYear();
+        return `${m}-${d}-${y}`; // MM-DD-YYYY format
     };
 
     const toggleGroup = (key) => {
@@ -345,16 +348,16 @@ export default function ItemTransactionHistory({ auth, transactions, items, filt
                     )}
 
                     {/* Pagination */}
-                    {transactions.last_page > 1 && (
+                    {pagination && pagination.last_page > 1 && (
                         <div className="bg-white dark:bg-gray-800 shadow sm:rounded-lg overflow-hidden mt-6 mb-6 print:hidden">
                             <div className="px-6 py-4 border-t border-gray-200 dark:border-gray-700">
                                 <div className="flex flex-col sm:flex-row justify-between items-center gap-3">
                                     <div className="text-sm text-gray-700 dark:text-gray-300">
-                                        Showing <span className="font-medium">{transactions.from}</span> to <span className="font-medium">{transactions.to}</span> of{' '}
-                                        <span className="font-medium">{transactions.total}</span> results
+                                        Showing <span className="font-medium">{pagination.from}</span> to <span className="font-medium">{pagination.to}</span> of{' '}
+                                        <span className="font-medium">{pagination.total}</span> results
                                     </div>
                                     <div className="flex flex-wrap justify-center gap-1">
-                                        {transactions.links.map((link, index) => (
+                                        {pagination.links.map((link, index) => (
                                             <Link
                                                 key={index}
                                                 href={link.url || '#'}
