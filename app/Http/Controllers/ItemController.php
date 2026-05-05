@@ -348,7 +348,7 @@ class ItemController extends Controller
     /**
      * Determine stock level for visual indicators.
      */
-    private function getStockLevel($available)
+    private function getStockLevel(int $available)
     {
         if ($available <= 5) return 'critical';
         if ($available <= 10) return 'low';
