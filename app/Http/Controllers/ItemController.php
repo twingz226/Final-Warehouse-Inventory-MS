@@ -60,18 +60,18 @@ class ItemController extends Controller
         if ($search) {
             // When searching, don't filter by date - search across all items
             $query->with(['history' => function ($historyQuery) {
-                $historyQuery->whereIn('action', ['created', 'stock_added'])
+                $historyQuery->whereIn('action', ['created', 'stock_added', 'updated'])
                              ->latest();
             }]);
         } else {
             // No search - filter by date as before
             $query->whereHas('history', function ($historyQuery) use ($date) {
-                $historyQuery->whereIn('action', ['created', 'stock_added'])
+                $historyQuery->whereIn('action', ['created', 'stock_added', 'updated'])
                              ->whereDate('created_at', $date);
             });
 
             $query->with(['history' => function ($historyQuery) use ($date) {
-                $historyQuery->whereIn('action', ['created', 'stock_added'])
+                $historyQuery->whereIn('action', ['created', 'stock_added', 'updated'])
                              ->whereDate('created_at', $date)
                              ->latest();
             }]);
@@ -103,30 +103,41 @@ class ItemController extends Controller
 
                 if ($mostRecentHistory) {
                     $item->date_time = $mostRecentHistory->created_at;
-                    // For 'stock_added', calculate the difference. For 'created', use 'new_values.quantity'
+                    // For 'stock_added', calculate the difference. For 'created' or 'updated', use 'new_values.quantity'
                     if ($mostRecentHistory->action === 'stock_added' && isset($mostRecentHistory->new_values['quantity'], $mostRecentHistory->old_values['quantity'])) {
                         $item->quantity = $mostRecentHistory->new_values['quantity'] - $mostRecentHistory->old_values['quantity'];
-                    } elseif ($mostRecentHistory->action === 'created' && isset($mostRecentHistory->new_values['quantity'])) {
+                    } elseif (in_array($mostRecentHistory->action, ['created', 'updated']) && isset($mostRecentHistory->new_values['quantity'])) {
                         $item->quantity = $mostRecentHistory->new_values['quantity'];
                     }
                 }
                 return $item;
             });
         } elseif ($date) {
-            // When not searching, filter by specific date as before
+            // When not searching, filter by specific date with new logic for same-day multiple actions
             $items->getCollection()->transform(function ($item) use ($date) {
-                // Find today's specific history record
-                $todaysHistory = $item->history->first(function ($history) use ($date) {
+                // Get all history records for the specific date
+                $dateHistory = $item->history->filter(function ($history) use ($date) {
                     return $history->created_at->format('Y-m-d') === $date;
                 });
 
-                if ($todaysHistory) {
-                    $item->date_time = $todaysHistory->created_at;
-                    // For 'stock_added', calculate the difference. For 'created', use 'new_values.quantity'
-                    if ($todaysHistory->action === 'stock_added' && isset($todaysHistory->new_values['quantity'], $todaysHistory->old_values['quantity'])) {
-                        $item->quantity = $todaysHistory->new_values['quantity'] - $todaysHistory->old_values['quantity'];
-                    } elseif ($todaysHistory->action === 'created' && isset($todaysHistory->new_values['quantity'])) {
-                        $item->quantity = $todaysHistory->new_values['quantity'];
+                if ($dateHistory->isNotEmpty()) {
+                    $mostRecentHistory = $dateHistory->first(); // Most recent action for this date
+                    $item->date_time = $mostRecentHistory->created_at;
+
+                    // Check if there are multiple actions on the same day
+                    if ($dateHistory->count() > 1) {
+                        // Multiple actions on same day - show total stock
+                        $latestHistory = $dateHistory->first();
+                        if (isset($latestHistory->new_values['quantity'])) {
+                            $item->quantity = $latestHistory->new_values['quantity'];
+                        }
+                    } else {
+                        // Single action on this day - use original logic
+                        if ($mostRecentHistory->action === 'stock_added' && isset($mostRecentHistory->new_values['quantity'], $mostRecentHistory->old_values['quantity'])) {
+                            $item->quantity = $mostRecentHistory->new_values['quantity'] - $mostRecentHistory->old_values['quantity'];
+                        } elseif (in_array($mostRecentHistory->action, ['created', 'updated']) && isset($mostRecentHistory->new_values['quantity'])) {
+                            $item->quantity = $mostRecentHistory->new_values['quantity'];
+                        }
                     }
                 }
                 return $item;

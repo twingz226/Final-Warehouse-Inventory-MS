@@ -238,10 +238,12 @@ export default function Form({ auth, item = null }) {
                                                                 type="number"
                                                                 min="0"
                                                                 step={it.unit === 'Quantity' ? '1' : '0.01'}
-                                                                className="mt-1 block flex-1"
+                                                                className={`mt-1 block flex-1 ${item !== null ? 'bg-gray-100 dark:bg-gray-600 text-gray-500 dark:text-gray-400 cursor-not-allowed' : ''}`}
                                                                 value={it.quantity}
                                                                 onChange={(e) => updateItem(index, 'quantity', e.target.value)}
                                                                 required
+                                                                disabled={item !== null}
+                                                                readOnly={item !== null}
                                                             />
                                                             <select
                                                                 id={`unit_${index}`}
