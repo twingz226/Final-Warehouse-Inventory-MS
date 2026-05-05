@@ -179,6 +179,29 @@ export default function ActivityHistory({ auth, history, groupedHistory, items, 
         return changes;
     };
 
+    const formatChangeValue = (value, field) => {
+        if (!value) return 'empty';
+        
+        // Format timestamp fields in user-friendly way
+        if (field === 'updated_at' || field === 'date_time' || field === 'created_at') {
+            try {
+                const date = new Date(value);
+                return date.toLocaleString('en-US', {
+                    month: 'short',
+                    day: 'numeric',
+                    year: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    hour12: true
+                });
+            } catch (e) {
+                return value;
+            }
+        }
+        
+        return value;
+    };
+
     return (
         <AuthenticatedLayout
             user={auth.user}
@@ -694,11 +717,11 @@ export default function ActivityHistory({ auth, history, groupedHistory, items, 
                                                     </div>
                                                     <div className="flex flex-col sm:flex-row sm:items-center space-y-1 sm:space-y-0 sm:space-x-2 text-sm">
                                                         <span className="text-red-600 line-through break-words">
-                                                            {change.old || 'empty'}
+                                                            {formatChangeValue(change.old, change.field)}
                                                         </span>
                                                         <ArrowPathIcon className="h-4 w-4 text-gray-400 flex-shrink-0" />
                                                         <span className="text-green-600 break-words">
-                                                            {change.new || 'empty'}
+                                                            {formatChangeValue(change.new, change.field)}
                                                         </span>
                                                     </div>
                                                 </div>
