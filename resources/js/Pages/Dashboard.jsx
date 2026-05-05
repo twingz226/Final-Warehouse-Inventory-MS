@@ -15,6 +15,39 @@ import {
 import { Pie, Bar, Line } from 'react-chartjs-2';
 import InventoryCharts from '@/Components/InventoryCharts';
 
+// Helper function to format time remaining in simple format
+function formatTimeRemaining(days) {
+    if (days < 0) {
+        const overdueDays = Math.abs(days);
+        if (overdueDays >= 1) {
+            return `${Math.floor(overdueDays)} day(s) overdue`;
+        } else {
+            const hours = Math.floor(overdueDays * 24);
+            return `${hours} hour(s) overdue`;
+        }
+    } else {
+        if (days >= 1) {
+            return `${Math.floor(days)} day(s) left`;
+        } else {
+            const hours = Math.floor(days * 24);
+            if (hours === 0) {
+                const minutes = Math.floor((days * 24 * 60) % 60);
+                return `${minutes} minute(s) left`;
+            }
+            return `${hours} hour(s) left`;
+        }
+    }
+}
+
+// Helper function to format time display
+function formatTime(time) {
+    const date = new Date(time);
+    const hours = date.getHours();
+    const minutes = date.getMinutes();
+    const seconds = date.getSeconds();
+    return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+}
+
 // Register Chart.js components
 ChartJS.register(
     ArcElement,
@@ -407,9 +440,7 @@ export default function Dashboard({
                                                                 ? 'text-red-600 dark:text-red-400'
                                                                 : 'text-gray-600 dark:text-gray-300')
                                                         }>
-                                                            {b.days_until_return < 0
-                                                                ? `${Math.abs(b.days_until_return)} day(s) overdue`
-                                                                : `${b.days_until_return} day(s) left`}
+                                                            {formatTimeRemaining(b.days_until_return)}
                                                         </div>
                                                     )}
                                                     <div className="mt-1">
