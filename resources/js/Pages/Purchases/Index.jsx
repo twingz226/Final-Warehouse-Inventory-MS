@@ -176,7 +176,7 @@ export default function Index({ auth, purchases, status }) {
                     }
                     .slip-container {
                         width: 100%;
-                        height: 45vh;
+                        height: 40vh;
                         max-width: none;
                         margin: 0;
                         padding: 20px;
@@ -465,9 +465,11 @@ export default function Index({ auth, purchases, status }) {
                         const startIdx = page * ROWS_PER_LAYOUT;
                         const pageItems = overflowItems.slice(startIdx, startIdx + ROWS_PER_LAYOUT);
                         const pageLabel = totalOverflowPages > 1 ? ` (Page ${page + 2} of ${totalOverflowPages + 1})` : '';
+                        const isBetweenPair = page % 2 === 0; // Margin between Layout 1&2, 3&4, 5&6, etc.
+                        const marginTop = isBetweenPair ? '100px' : '0';
                         
                         layouts.push(`
-                            <div class="slip-container" style="margin-top: 30px; height: 40vh;">
+                            <div class="slip-container" style="margin-top: ${marginTop}; height: 40vh;">
                                 <div class="header">
                                     <div class="header-top">
                                         <img src="${logoDataUrl}" alt="Logo" class="logo-placeholder" style="object-fit: contain; background: none; border-radius: 0;" />
