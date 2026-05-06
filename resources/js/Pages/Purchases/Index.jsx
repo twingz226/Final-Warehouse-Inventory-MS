@@ -466,7 +466,7 @@ export default function Index({ auth, purchases, status }) {
                         const pageItems = overflowItems.slice(startIdx, startIdx + ROWS_PER_LAYOUT);
                         const pageLabel = totalOverflowPages > 1 ? ` (Page ${page + 2} of ${totalOverflowPages + 1})` : '';
                         const isBetweenPair = page % 2 === 0; // Margin between Layout 1&2, 3&4, 5&6, etc.
-                        const marginTop = isBetweenPair ? '100px' : '0';
+                        const marginTop = isBetweenPair ? '115px' : '0';
                         
                         layouts.push(`
                             <div class="slip-container" style="margin-top: ${marginTop}; height: 40vh;">
