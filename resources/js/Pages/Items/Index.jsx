@@ -411,8 +411,8 @@ export default function Index({ auth, items, status }) {
                                                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
                                                             <div className="flex items-center space-x-2">
                                                                 <span>{formatQuantity(item.quantity, item.unit)}</span>
-                                                                <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${getItemStatus(item.quantity).bgColor} ${getItemStatus(item.quantity).textColor}`}>
-                                                                    {getItemStatus(item.quantity).status}
+                                                                <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${getItemStatus(item.total_stock || item.quantity).bgColor} ${getItemStatus(item.total_stock || item.quantity).textColor}`}>
+                                                                    {getItemStatus(item.total_stock || item.quantity).status}
                                                                 </span>
                                                             </div>
                                                         </td>

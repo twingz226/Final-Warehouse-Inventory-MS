@@ -100,6 +100,7 @@ class ItemController extends Controller
             // When searching, use the most recent history record for each item
             $items->getCollection()->transform(function ($item) {
                 $mostRecentHistory = $item->history->first(); // Already sorted by latest()
+                $originalQuantity = $item->quantity; // Store the total stock from inventory
 
                 if ($mostRecentHistory) {
                     $item->date_time = $mostRecentHistory->created_at;
@@ -110,6 +111,8 @@ class ItemController extends Controller
                         $item->quantity = $mostRecentHistory->new_values['quantity'];
                     }
                 }
+                // Add total_stock field for badge calculation
+                $item->total_stock = $originalQuantity;
                 return $item;
             });
         } elseif ($date) {
@@ -119,6 +122,7 @@ class ItemController extends Controller
                 $dateHistory = $item->history->filter(function ($history) use ($date) {
                     return $history->created_at->format('Y-m-d') === $date;
                 });
+                $originalQuantity = $item->quantity; // Store the total stock from inventory
 
                 if ($dateHistory->isNotEmpty()) {
                     $mostRecentHistory = $dateHistory->first(); // Most recent action for this date
@@ -140,6 +144,8 @@ class ItemController extends Controller
                         }
                     }
                 }
+                // Add total_stock field for badge calculation
+                $item->total_stock = $originalQuantity;
                 return $item;
             });
         }
