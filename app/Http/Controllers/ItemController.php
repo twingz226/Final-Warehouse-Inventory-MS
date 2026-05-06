@@ -100,7 +100,12 @@ class ItemController extends Controller
             // When searching, use the most recent history record for each item
             $items->getCollection()->transform(function ($item) {
                 $mostRecentHistory = $item->history->first(); // Already sorted by latest()
-                $originalQuantity = $item->quantity; // Store the total stock from inventory
+                
+                // Calculate available stock same as Inventory menu
+                $totalDistributed = \App\Models\Purchase::where('item_name', $item->name)
+                    ->whereIn('status', ['received', 'completed'])
+                    ->sum('quantity');
+                $availableStock = $item->quantity - $totalDistributed;
 
                 if ($mostRecentHistory) {
                     $item->date_time = $mostRecentHistory->created_at;
@@ -111,8 +116,8 @@ class ItemController extends Controller
                         $item->quantity = $mostRecentHistory->new_values['quantity'];
                     }
                 }
-                // Add total_stock field for badge calculation
-                $item->total_stock = $originalQuantity;
+                // Add total_stock field for badge calculation (using available stock)
+                $item->total_stock = $availableStock;
                 return $item;
             });
         } elseif ($date) {
@@ -122,30 +127,30 @@ class ItemController extends Controller
                 $dateHistory = $item->history->filter(function ($history) use ($date) {
                     return $history->created_at->format('Y-m-d') === $date;
                 });
-                $originalQuantity = $item->quantity; // Store the total stock from inventory
+                
+                // Calculate available stock same as Inventory menu
+                $totalDistributed = \App\Models\Purchase::where('item_name', $item->name)
+                    ->whereIn('status', ['received', 'completed'])
+                    ->sum('quantity');
+                $availableStock = $item->quantity - $totalDistributed;
 
                 if ($dateHistory->isNotEmpty()) {
                     $mostRecentHistory = $dateHistory->first(); // Most recent action for this date
                     $item->date_time = $mostRecentHistory->created_at;
 
-                    // Check if there are multiple actions on the same day
-                    if ($dateHistory->count() > 1) {
-                        // Multiple actions on same day - show total stock
-                        $latestHistory = $dateHistory->first();
-                        if (isset($latestHistory->new_values['quantity'])) {
-                            $item->quantity = $latestHistory->new_values['quantity'];
-                        }
-                    } else {
-                        // Single action on this day - use original logic
-                        if ($mostRecentHistory->action === 'stock_added' && isset($mostRecentHistory->new_values['quantity'], $mostRecentHistory->old_values['quantity'])) {
-                            $item->quantity = $mostRecentHistory->new_values['quantity'] - $mostRecentHistory->old_values['quantity'];
-                        } elseif (in_array($mostRecentHistory->action, ['created', 'updated']) && isset($mostRecentHistory->new_values['quantity'])) {
-                            $item->quantity = $mostRecentHistory->new_values['quantity'];
+                    // Calculate cumulative stock added on this date
+                    $totalAddedOnDate = 0;
+                    foreach ($dateHistory as $history) {
+                        if ($history->action === 'stock_added' && isset($history->new_values['quantity'], $history->old_values['quantity'])) {
+                            $totalAddedOnDate += ($history->new_values['quantity'] - $history->old_values['quantity']);
+                        } elseif (in_array($history->action, ['created', 'updated']) && isset($history->new_values['quantity'])) {
+                            $totalAddedOnDate = $history->new_values['quantity'];
                         }
                     }
+                    $item->quantity = $totalAddedOnDate;
                 }
-                // Add total_stock field for badge calculation
-                $item->total_stock = $originalQuantity;
+                // Add total_stock field for badge calculation (using available stock)
+                $item->total_stock = $availableStock;
                 return $item;
             });
         }
