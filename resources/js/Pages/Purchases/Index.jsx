@@ -176,7 +176,7 @@ export default function Index({ auth, purchases, status }) {
                     }
                     .slip-container {
                         width: 100%;
-                        height: 50vh;
+                        height: 45vh;
                         max-width: none;
                         margin: 0;
                         padding: 20px;
@@ -396,7 +396,7 @@ export default function Index({ auth, purchases, status }) {
                             ${(() => {
                 const items = purchase._groupItems || [{ item_name: purchase.item_name, quantity: purchase.quantity, description: purchase.description, item_unit: purchase.item_unit }];
                 const rows = [];
-                for (let i = 0; i < 10; i++) { // Render 10 rows by default
+                for (let i = 0; i < 8; i++) { // Render 8 rows by default
                     if (i < items.length) {
                         const item = items[i];
                         const unit = item.item_unit === 'Quantity' ? 'PC' : (item.item_unit || 'PC');
@@ -449,6 +449,132 @@ export default function Index({ auth, purchases, status }) {
                         <div>Rev 00 EFF: 02/10/2025</div>
                     </div>
                 </div>
+
+                ${(() => {
+                    const items = purchase._groupItems || [{ item_name: purchase.item_name, quantity: purchase.quantity, description: purchase.description, item_unit: purchase.item_unit }];
+                    const overflowItems = items.slice(8); // Get items after first 8
+                    
+                    if (overflowItems.length === 0) return '';
+                    
+                    // Generate multiple overflow layouts (8 items per layout)
+                    const layouts = [];
+                    const ROWS_PER_LAYOUT = 8;
+                    const totalOverflowPages = Math.ceil(overflowItems.length / ROWS_PER_LAYOUT);
+                    
+                    for (let page = 0; page < totalOverflowPages; page++) {
+                        const startIdx = page * ROWS_PER_LAYOUT;
+                        const pageItems = overflowItems.slice(startIdx, startIdx + ROWS_PER_LAYOUT);
+                        const pageLabel = totalOverflowPages > 1 ? ` (Page ${page + 2} of ${totalOverflowPages + 1})` : '';
+                        
+                        layouts.push(`
+                            <div class="slip-container" style="margin-top: 30px; height: 40vh;">
+                                <div class="header">
+                                    <div class="header-top">
+                                        <img src="${logoDataUrl}" alt="Logo" class="logo-placeholder" style="object-fit: contain; background: none; border-radius: 0;" />
+                                        <div class="company-name">Warlen Industrial Sales Corporation</div>
+                                    </div>
+                                    <div class="company-address">Deka Sales Bldg., Lacson Ext., Alijis Rd., Bacolod City</div>
+                                </div>
+                                
+                                <div class="slip-title-row">
+                                    <div class="year-prefix">#${new Date().getFullYear()}${pageLabel}</div>
+                                    <div class="slip-main-title">WITHDRAWAL SLIP</div>
+                                    <div class="slip-no">No. ${((purchase.os || purchase.notes || '').match(/\d+/) || [''])[0]}</div>
+                                </div>
+
+                                <div class="info-row-flex">
+                                    <div style="flex-grow: 1;">
+                                        <span class="label">Name of Project:</span>
+                                        <span class="underline-field" style="width: calc(100% - 130px);">${purchase.supplier_name || ''}</span>
+                                    </div>
+                                    <div style="width: 150px; text-align: right;">
+                                        <span class="label">Date:</span>
+                                        <span class="underline-field" style="width: 100px; text-align: center;">${new Date(purchase.purchase_date).toLocaleDateString()}</span>
+                                    </div>
+                                </div>
+
+                                <div class="info-row">
+                                    <span class="label">Type of Project:</span>
+                                    <span class="underline-field" style="width: calc(100% - 120px);">${purchase.project_type || ''}</span>
+                                </div>
+
+                                <div class="categories-row">
+                                    <div>Construction materials (${purchase.item_category === 'material' ? '✓' : ' '})</div>
+                                    <div>Spares parts (${purchase.item_category === 'tool' ? '✓' : ' '})</div>
+                                    <div>others: <span class="underline-field" style="width: 60px;">${(!purchase.item_category || (purchase.item_category !== 'material' && purchase.item_category !== 'tool')) ? '✓' : ''}</span></div>
+                                </div>
+
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th class="qty-col">Qty</th>
+                                            <th class="unit-col">Unit</th>
+                                            <th class="desc-col">Item Description</th>
+                                            <th class="remarks-col">Remarks</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        ${(() => {
+                                            const rows = [];
+                                            for (let i = 0; i < ROWS_PER_LAYOUT; i++) {
+                                                if (i < pageItems.length) {
+                                                    const item = pageItems[i];
+                                                    const unit = item.item_unit === 'Quantity' ? 'PC' : (item.item_unit || 'PC');
+                                                    rows.push(`
+                                                        <tr>
+                                                            <td class="qty-col" style="font-weight: normal;">${item.quantity}</td>
+                                                            <td class="unit-col" style="font-weight: normal;">${unit}</td>
+                                                            <td class="desc-col" style="font-weight: normal;">${item.item_name}${item.description ? ' - ' + item.description : ''}</td>
+                                                            <td class="remarks-col" style="font-weight: normal;"></td>
+                                                        </tr>
+                                                    `);
+                                                } else {
+                                                    rows.push(`
+                                                        <tr>
+                                                            <td></td>
+                                                            <td></td>
+                                                            <td></td>
+                                                            <td></td>
+                                                        </tr>
+                                                    `);
+                                                }
+                                            }
+                                            return rows.join('');
+                                        })()}
+                                    </tbody>
+                                </table>
+
+                                <div class="purpose-row">
+                                    <span>Purpose:</span>
+                                    <span class="underline-field" style="flex-grow: 1; border-bottom: none; margin-left: 5px; font-weight: normal;"></span>
+                                </div>
+
+                                <div class="signatures-row">
+                                    <div class="signature-block">
+                                        <span class="underline-field" style="width: 100%; display: block;"></span>
+                                        <span style="margin-top: 15px;">Noted By:</span>
+                                    </div>
+                                    <div class="signature-block">
+                                        <span class="underline-field" style="width: 100%; display: block; text-align: center; font-weight: normal;">${purchase.issued_by || ''}</span>
+                                        <span style="margin-top: 15px;">Issued By:</span>
+                                    </div>
+                                    <div class="signature-block">
+                                        <span class="underline-field" style="width: 100%; display: block; text-align: center; font-weight: normal;">${purchase.issued_to || ''}</span>
+                                        <span style="margin-top: 15px;">Issued To:</span>
+                                    </div>
+                                </div>
+
+                                <div class="footer-codes">
+                                    <div>QF-WHS-003</div>
+                                    <div>Rev 00 EFF: 02/10/2025</div>
+                                </div>
+                            </div>
+                        `);
+                    }
+                    
+                    return layouts.join('');
+                })()}
+
             </body>
             </html>
         `;
