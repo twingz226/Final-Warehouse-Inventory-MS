@@ -102,7 +102,7 @@ class ItemController extends Controller
                 $mostRecentHistory = $item->history->first(); // Already sorted by latest()
                 
                 // Calculate available stock same as Inventory menu
-                $totalDistributed = \App\Models\Purchase::where('item_name', $item->name)
+                $totalDistributed = Purchase::where('item_name', $item->name)
                     ->whereIn('status', ['received', 'completed'])
                     ->sum('quantity');
                 $availableStock = $item->quantity - $totalDistributed;
@@ -129,7 +129,7 @@ class ItemController extends Controller
                 });
                 
                 // Calculate available stock same as Inventory menu
-                $totalDistributed = \App\Models\Purchase::where('item_name', $item->name)
+                $totalDistributed = Purchase::where('item_name', $item->name)
                     ->whereIn('status', ['received', 'completed'])
                     ->sum('quantity');
                 $availableStock = $item->quantity - $totalDistributed;
@@ -138,16 +138,25 @@ class ItemController extends Controller
                     $mostRecentHistory = $dateHistory->first(); // Most recent action for this date
                     $item->date_time = $mostRecentHistory->created_at;
 
-                    // Calculate cumulative stock added on this date
-                    $totalAddedOnDate = 0;
-                    foreach ($dateHistory as $history) {
-                        if ($history->action === 'stock_added' && isset($history->new_values['quantity'], $history->old_values['quantity'])) {
-                            $totalAddedOnDate += ($history->new_values['quantity'] - $history->old_values['quantity']);
-                        } elseif (in_array($history->action, ['created', 'updated']) && isset($history->new_values['quantity'])) {
-                            $totalAddedOnDate = $history->new_values['quantity'];
+                    // Process records in chronological order (oldest first)
+                    // so that 'created' sets the base and 'stock_added' accumulates on top
+                    $chronological = $dateHistory->sortBy('created_at');
+                    $baseQuantity = 0;
+                    $hasBase = false;
+                    $stockAddedTotal = 0;
+
+                    foreach ($chronological as $history) {
+                        if (in_array($history->action, ['created', 'updated']) && isset($history->new_values['quantity'])) {
+                            $baseQuantity = $history->new_values['quantity'];
+                            $hasBase = true;
+                        } elseif ($history->action === 'stock_added' && isset($history->new_values['quantity'], $history->old_values['quantity'])) {
+                            $stockAddedTotal += ($history->new_values['quantity'] - $history->old_values['quantity']);
                         }
                     }
-                    $item->quantity = $totalAddedOnDate;
+
+                    // If item was created/updated on this date, show base + additions
+                    // If item existed before (only stock_added today), show just the additions
+                    $item->quantity = $hasBase ? $baseQuantity + $stockAddedTotal : $stockAddedTotal;
                 }
                 // Add total_stock field for badge calculation (using available stock)
                 $item->total_stock = $availableStock;

@@ -10,6 +10,7 @@ class ItemHistory extends Model
     protected $table = 'item_history';
     
     protected $fillable = [
+        'transaction_id',
         'item_id',
         'user_id',
         'action',
