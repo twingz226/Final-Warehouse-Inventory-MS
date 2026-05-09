@@ -1,7 +1,7 @@
 import { Head, Link, router } from '@inertiajs/react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { useState, useEffect, useRef } from 'react';
-import { PlusIcon, EyeIcon, TrashIcon, PrinterIcon, MagnifyingGlassIcon, PencilIcon } from '@heroicons/react/24/outline';
+import { PlusIcon, EyeIcon, TrashIcon, PrinterIcon, MagnifyingGlassIcon, PencilIcon, ChevronDownIcon, ChevronUpIcon } from '@heroicons/react/24/outline';
 import Modal from '@/Components/Modal';
 import DangerButton from '@/Components/DangerButton';
 import SecondaryButton from '@/Components/SecondaryButton';
@@ -20,6 +20,7 @@ export default function Index({ auth, purchases, status }) {
     const [openDropdown, setOpenDropdown] = useState(null);
     const [confirmingDeletion, setConfirmingDeletion] = useState(false);
     const [groupToDelete, setGroupToDelete] = useState(null);
+    const [expandedRows, setExpandedRows] = useState(new Set());
 
     // Close dropdown when clicking outside
     useEffect(() => {
@@ -611,6 +612,18 @@ export default function Index({ auth, purchases, status }) {
         setPrintToolsId({});
     };
 
+    const toggleRowExpansion = (groupKey) => {
+        setExpandedRows(prev => {
+            const newSet = new Set(prev);
+            if (newSet.has(groupKey)) {
+                newSet.delete(groupKey);
+            } else {
+                newSet.add(groupKey);
+            }
+            return newSet;
+        });
+    };
+
     return (
         <>
             <AuthenticatedLayout
@@ -1039,46 +1052,158 @@ export default function Index({ auth, purchases, status }) {
                                                             {/* Items list */}
                                                             <td className="px-6 py-4 align-top">
                                                                 <div className="space-y-1">
-                                                                    {group.rows.map((r, idx) => (
-                                                                        <div key={idx} className="flex items-center gap-2 min-h-[32px]">
-                                                                            <span className="text-sm font-medium text-gray-900 dark:text-gray-100">
-                                                                                {group.rows.length > 1 ? `${idx + 1}. ` : ''}{r.item_name}
-                                                                            </span>
+                                                                    {group.rows.length >= 3 && !expandedRows.has(group.key) ? (
+                                                                        <div className="flex flex-col gap-2">
+                                                                            <div className="flex items-center gap-2 min-h-[32px]">
+                                                                                <span className="text-sm font-medium text-gray-900 dark:text-gray-100">
+                                                                                    1. {group.rows[0].item_name}
+                                                                                </span>
+                                                                            </div>
+                                                                            <div className="flex items-center gap-2 min-h-[32px]">
+                                                                                <span className="text-sm font-medium text-gray-900 dark:text-gray-100">
+                                                                                    2. {group.rows[1].item_name}
+                                                                                </span>
+                                                                            </div>
+                                                                            <button
+                                                                                onClick={() => toggleRowExpansion(group.key)}
+                                                                                className="flex items-center gap-1 text-sm text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300 font-medium mt-1"
+                                                                            >
+                                                                                <ChevronDownIcon className="h-4 w-4" />
+                                                                                Show {group.rows.length - 2} more items
+                                                                            </button>
                                                                         </div>
-                                                                    ))}
+                                                                    ) : group.rows.length >= 3 && expandedRows.has(group.key) ? (
+                                                                        <div className="flex flex-col gap-2">
+                                                                            {group.rows.map((r, idx) => (
+                                                                                <div key={idx} className="flex items-center gap-2 min-h-[32px]">
+                                                                                    <span className="text-sm font-medium text-gray-900 dark:text-gray-100">
+                                                                                        {idx + 1}. {r.item_name}
+                                                                                    </span>
+                                                                                </div>
+                                                                            ))}
+                                                                            <button
+                                                                                onClick={() => toggleRowExpansion(group.key)}
+                                                                                className="flex items-center gap-1 text-sm text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300 font-medium mt-1"
+                                                                            >
+                                                                                <ChevronUpIcon className="h-4 w-4" />
+                                                                                Show less
+                                                                            </button>
+                                                                        </div>
+                                                                    ) : (
+                                                                        group.rows.map((r, idx) => (
+                                                                            <div key={idx} className="flex items-center gap-2 min-h-[32px]">
+                                                                                <span className="text-sm font-medium text-gray-900 dark:text-gray-100">
+                                                                                    {group.rows.length > 1 ? `${idx + 1}. ` : ''}{r.item_name}
+                                                                                </span>
+                                                                            </div>
+                                                                        ))
+                                                                    )}
                                                                 </div>
                                                             </td>
 
                                                             {/* Category badges */}
                                                             <td className="px-6 py-4 align-top">
                                                                 <div className="space-y-1">
-                                                                    {group.rows.map((r, idx) => (
-                                                                        <div key={idx} className="flex items-center min-h-[32px]">
-                                                                            {r.item_category ? (
-                                                                                <span className={`inline-flex px-2 py-0.5 text-xs font-semibold rounded-full capitalize ${r.item_category === 'material'
-                                                                                    ? 'bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200'
-                                                                                    : r.item_category === 'tool'
-                                                                                        ? 'bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200'
-                                                                                        : 'bg-indigo-100 dark:bg-indigo-900 text-indigo-800 dark:text-indigo-200'
+                                                                    {group.rows.length >= 3 && !expandedRows.has(group.key) ? (
+                                                                        <div className="flex flex-col gap-2">
+                                                                            <div className="flex items-center min-h-[32px]">
+                                                                                {group.rows[0].item_category ? (
+                                                                                    <span className={`inline-flex px-2 py-0.5 text-xs font-semibold rounded-full capitalize ${group.rows[0].item_category === 'material'
+                                                                                        ? 'bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200'
+                                                                                        : group.rows[0].item_category === 'tool'
+                                                                                            ? 'bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200'
+                                                                                            : 'bg-indigo-100 dark:bg-indigo-900 text-indigo-800 dark:text-indigo-200'
                                                                                     }`}>
-                                                                                    {r.item_category}
-                                                                                </span>
-                                                                            ) : (
-                                                                                <span className="text-xs text-gray-400 dark:text-gray-500">N/A</span>
-                                                                            )}
+                                                                                        {group.rows[0].item_category}
+                                                                                    </span>
+                                                                                ) : (
+                                                                                    <span className="text-xs text-gray-400 dark:text-gray-500">N/A</span>
+                                                                                )}
+                                                                            </div>
+                                                                            <div className="flex items-center min-h-[32px]">
+                                                                                {group.rows[1].item_category ? (
+                                                                                    <span className={`inline-flex px-2 py-0.5 text-xs font-semibold rounded-full capitalize ${group.rows[1].item_category === 'material'
+                                                                                        ? 'bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200'
+                                                                                        : group.rows[1].item_category === 'tool'
+                                                                                            ? 'bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200'
+                                                                                            : 'bg-indigo-100 dark:bg-indigo-900 text-indigo-800 dark:text-indigo-200'
+                                                                                    }`}>
+                                                                                        {group.rows[1].item_category}
+                                                                                    </span>
+                                                                                ) : (
+                                                                                    <span className="text-xs text-gray-400 dark:text-gray-500">N/A</span>
+                                                                                )}
+                                                                            </div>
+                                                                            <div className="min-h-[32px] flex items-center">
+                                                                                <span className="text-xs text-gray-400 dark:text-gray-500 italic">...</span>
+                                                                            </div>
                                                                         </div>
-                                                                    ))}
+                                                                    ) : group.rows.length >= 3 && expandedRows.has(group.key) ? (
+                                                                        group.rows.map((r, idx) => (
+                                                                            <div key={idx} className="flex items-center min-h-[32px]">
+                                                                                {r.item_category ? (
+                                                                                    <span className={`inline-flex px-2 py-0.5 text-xs font-semibold rounded-full capitalize ${r.item_category === 'material'
+                                                                                        ? 'bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200'
+                                                                                        : r.item_category === 'tool'
+                                                                                            ? 'bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200'
+                                                                                            : 'bg-indigo-100 dark:bg-indigo-900 text-indigo-800 dark:text-indigo-200'
+                                                                                    }`}>
+                                                                                        {r.item_category}
+                                                                                    </span>
+                                                                                ) : (
+                                                                                    <span className="text-xs text-gray-400 dark:text-gray-500">N/A</span>
+                                                                                )}
+                                                                            </div>
+                                                                        ))
+                                                                    ) : (
+                                                                        group.rows.map((r, idx) => (
+                                                                            <div key={idx} className="flex items-center min-h-[32px]">
+                                                                                {r.item_category ? (
+                                                                                    <span className={`inline-flex px-2 py-0.5 text-xs font-semibold rounded-full capitalize ${r.item_category === 'material'
+                                                                                        ? 'bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200'
+                                                                                        : r.item_category === 'tool'
+                                                                                            ? 'bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200'
+                                                                                            : 'bg-indigo-100 dark:bg-indigo-900 text-indigo-800 dark:text-indigo-200'
+                                                                                    }`}>
+                                                                                        {r.item_category}
+                                                                                    </span>
+                                                                                ) : (
+                                                                                    <span className="text-xs text-gray-400 dark:text-gray-500">N/A</span>
+                                                                                )}
+                                                                            </div>
+                                                                        ))
+                                                                    )}
                                                                 </div>
                                                             </td>
 
                                                             {/* Quantities */}
                                                             <td className="px-6 py-4 align-top">
                                                                 <div className="space-y-1">
-                                                                    {group.rows.map((r, idx) => (
-                                                                        <div key={idx} className="flex items-center text-sm text-gray-500 dark:text-gray-400 min-h-[32px]">
-                                                                            {r.quantity} {r.item_unit === 'Quantity' ? 'pcs' : (r.item_unit ? r.item_unit.toLowerCase() : '')}
+                                                                    {group.rows.length >= 3 && !expandedRows.has(group.key) ? (
+                                                                        <div className="flex flex-col gap-2">
+                                                                            <div className="flex items-center text-sm text-gray-500 dark:text-gray-400 min-h-[32px]">
+                                                                                {group.rows[0].quantity} {group.rows[0].item_unit === 'Quantity' ? 'pcs' : (group.rows[0].item_unit ? group.rows[0].item_unit.toLowerCase() : '')}
+                                                                            </div>
+                                                                            <div className="flex items-center text-sm text-gray-500 dark:text-gray-400 min-h-[32px]">
+                                                                                {group.rows[1].quantity} {group.rows[1].item_unit === 'Quantity' ? 'pcs' : (group.rows[1].item_unit ? group.rows[1].item_unit.toLowerCase() : '')}
+                                                                            </div>
+                                                                            <div className="min-h-[32px] flex items-center">
+                                                                                <span className="text-xs text-gray-400 dark:text-gray-500 italic">...</span>
+                                                                            </div>
                                                                         </div>
-                                                                    ))}
+                                                                    ) : group.rows.length >= 3 && expandedRows.has(group.key) ? (
+                                                                        group.rows.map((r, idx) => (
+                                                                            <div key={idx} className="flex items-center text-sm text-gray-500 dark:text-gray-400 min-h-[32px]">
+                                                                                {r.quantity} {r.item_unit === 'Quantity' ? 'pcs' : (r.item_unit ? r.item_unit.toLowerCase() : '')}
+                                                                            </div>
+                                                                        ))
+                                                                    ) : (
+                                                                        group.rows.map((r, idx) => (
+                                                                            <div key={idx} className="flex items-center text-sm text-gray-500 dark:text-gray-400 min-h-[32px]">
+                                                                                {r.quantity} {r.item_unit === 'Quantity' ? 'pcs' : (r.item_unit ? r.item_unit.toLowerCase() : '')}
+                                                                            </div>
+                                                                        ))
+                                                                    )}
                                                                 </div>
                                                             </td>
 
